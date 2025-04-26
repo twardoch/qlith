@@ -1,54 +1,70 @@
-# C++ objects and libs
+_old/
+
+# Build directories
+build/
+debug/
+release/
+cmake-build-*/
+
+# IDE files
+.idea/
+.vscode/
+*.user
+*.autosave
+*.swp
+*.swo
+*~
+
+# Compiled Object files
 *.slo
 *.lo
 *.o
-*.a
-*.la
-*.lai
-*.so
-*.so.*
-*.dll
-*.dylib
+*.obj
 
-# Qt-es
-object_script.*.Release
-object_script.*.Debug
-*_plugin_import.cpp
-/.qmake.cache
-/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
-*.moc
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# macOS specific
+.DS_Store
+*.dSYM/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Qt specific
 moc_*.cpp
 moc_*.h
 qrc_*.cpp
 ui_*.h
-*.qmlc
-*.jsc
-Makefile*
-*build-*
+*.moc
+.qmake.stash
+
+# Generated files
 *.qm
-*.prl
-
-# Qt unit tests
-target_wrapper.*
-
-# QtCreator
-*.autosave
-
-# QtCreator Qml
-*.qmlproject.user
-*.qmlproject.user.*
-
-# QtCreator CMake
-CMakeLists.txt.user*
-
-# QtCreator 4.8< compilation database
-compile_commands.json
-
-# QtCreator local machine specific files for imported projects
-*creator.user*
-
-*_qmlcache.qrc
+qlith_export.h 
