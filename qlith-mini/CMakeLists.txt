@@ -32,7 +32,7 @@ find_package(Qt5 COMPONENTS Widgets Network Svg REQUIRED)
 add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
 
 # Find or build gumbo-parser
-add_subdirectory(${GUMBO_DIR} ${CMAKE_BINARY_DIR}/gumbo-parser)
+#add_subdirectory(${GUMBO_DIR} ${CMAKE_BINARY_DIR}/gumbo-parser)
 
 # Find the zlib package
 find_package(ZLIB REQUIRED)

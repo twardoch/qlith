@@ -6319,7 +6319,284 @@ Actually litehtml has its own gumbo. I think we don't need the additional gumbo-
 
 _**Assistant**_
 
+Let me check if litehtml already includes its own version of gumbo-parser.
 
+---
+
+<details>
+            <summary>Listed directory external/litehtml/src/gumbo • **17** results</summary>
+        
+| Name |
+|-------|
+| 📄 `util.c` |
+| 📄 `vector.c` |
+| 📁 `visualc` |
+| 📄 `tokenizer.c` |
+| 📄 `utf8.c` |
+| 📄 `tag.c` |
+| 📄 `tag.in` |
+| 📄 `parser.c` |
+| 📄 `string_buffer.c` |
+| 📄 `string_piece.c` |
+| 📁 `include` |
+| 📄 `error.c` |
+| 📄 `char_ref.c` |
+| 📄 `char_ref.rl` |
+| 📄 `LICENSE` |
+| 📄 `attribute.c` |
+| 📄 `CMakeLists.txt` |
+
+</details>
+
+---
+
+<details>
+            <summary>Listed directory external/litehtml/src/gumbo/include/gumbo • **17** results</summary>
+        
+| Name |
+|-------|
+| 📄 `util.h` |
+| 📄 `vector.h` |
+| 📄 `tokenizer.h` |
+| 📄 `tokenizer_states.h` |
+| 📄 `utf8.h` |
+| 📄 `tag_sizes.h` |
+| 📄 `tag_strings.h` |
+| 📄 `token_type.h` |
+| 📄 `tag_enum.h` |
+| 📄 `tag_gperf.h` |
+| 📄 `error.h` |
+| 📄 `insertion_mode.h` |
+| 📄 `parser.h` |
+| 📄 `string_buffer.h` |
+| 📄 `string_piece.h` |
+| 📄 `attribute.h` |
+| 📄 `char_ref.h` |
+
+</details>
+
+---
+
+<details>
+            <summary>Listed directory external/gumbo-parser/src • **31** results</summary>
+        
+| Name |
+|-------|
+| 📄 `util.h` |
+| 📄 `vector.c` |
+| 📄 `vector.h` |
+| 📄 `tokenizer.h` |
+| 📄 `tokenizer_states.h` |
+| 📄 `utf8.c` |
+| 📄 `utf8.h` |
+| 📄 `util.c` |
+| 📄 `tag_sizes.h` |
+| 📄 `tag_strings.h` |
+| 📄 `token_type.h` |
+| 📄 `tokenizer.c` |
+| 📄 `string_piece.h` |
+| 📄 `tag.c` |
+| 📄 `tag.in` |
+| 📄 `tag_enum.h` |
+| 📄 `tag_gperf.h` |
+| 📄 `parser.c` |
+| 📄 `parser.h` |
+| 📄 `string_buffer.c` |
+| 📄 `string_buffer.h` |
+| 📄 `string_piece.c` |
+| 📄 `gumbo.h` |
+| 📄 `insertion_mode.h` |
+| 📄 `error.c` |
+| 📄 `error.h` |
+| 📄 `char_ref.rl` |
+| 📄 `char_ref.h` |
+| 📄 `char_ref.c` |
+| 📄 `attribute.h` |
+| 📄 `attribute.c` |
+
+</details>
+
+---
+
+Read file: qlith-mini/CMakeLists.txt
+
+---
+
+Read file: external/gumbo-parser/src/gumbo.h
+
+---
+
+Read file: external/litehtml/include/litehtml/document_container.h
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
+
+---
+
+<details>
+            <summary>Listed directory qlith-mini/browser • **3** results</summary>
+        
+| Name |
+|-------|
+| 📄 `main.cpp` |
+| 📄 `mainwindow.h` |
+| 📄 `CMakeLists.txt` |
+
+</details>
+
+---
+
+Read file: qlith-mini/browser/main.cpp
+
+---
+
+Read file: qlith-mini/browser/mainwindow.h
+
+---
+
+Could not find file 'qlith-mini/browser/mainwindow.cpp' in the workspace.
+
+---
+
+<details>
+            <summary>Listed directory qlith-mini/browser • **3** results</summary>
+        
+| Name |
+|-------|
+| 📄 `main.cpp` |
+| 📄 `mainwindow.h` |
+| 📄 `CMakeLists.txt` |
+
+</details>
+
+---
+
+Let me check if mainwindow.cpp exists in the directory:
+
+---
+
+<details>
+            <summary>Searched codebase "mainwindow.cpp" • **6** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Let me first look at the mainwindow.h file in the qlith-mini/browser directory:
+
+---
+
+Read file: qlith-mini/browser/mainwindow.h
+
+---
+
+Now let's look at the mainwindow.cpp file in the qlith-mini/browser directory:
+
+---
+
+Read file: qlith-mini/browser/mainwindow.cpp
+
+---
+
+Let's also look at the QLiteHtmlWidget implementation:
+
+---
+
+Could not find file 'qlith-mini/src/qlitehtmlwidget.h' in the workspace.
+
+---
+
+Let me check if the file has a different name or is in a different location:
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
+
+---
+
+Now let me look at the container implementation:
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Let me also look at the private implementation details:
+
+---
+
+Read file: qlith-mini/src/container_qpainter_p.h
+
+---
+
+Now, let's look at how the widget class is implemented:
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
+
+---
+
+Let's also look at the full implementation of the container class:
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Let's also check what's there in the private implementation of the container, since it's included in the CPP:
+
+---
+
+Read file: qlith-mini/src/container_qpainter_p.h
+
+---
+
+Now let's look at the QlithWidget implementation file to understand how it uses the container:
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
+
+---
+
+Now let's check the container_qpainter.cpp file to see the implementation of the container:
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Let me also check the private implementation for the container:
+
+---
+
+Read file: qlith-mini/src/container_qpainter_p.h
+
+---
+
+Now let's examine how qlith-mini initializes its widget and container:
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
 
 ---
 
@@ -6335,9 +6612,317 @@ _**Assistant**_
 
 ---
 
+_**User**_
 
+Using Qt5 from: /usr/local/Cellar/qt@5/5.15.16_1
+Configuring qlith-mini with CMake...
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build
+Building qlith-mini...
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen/mocs_compilation.cpp.o
+[  3%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c.o
+[ 10%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.o
+[ 10%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/error.c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-Wvoid-pointer-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/parser.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from 'void *' [-Wvoid-pointer-to-enum-cast]
+  747 |   return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length - 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+1 warning generated.
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 19%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 19%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cpp.o
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/mocs_compilation.cpp.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 25%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_container.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 39%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 49%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntaxes.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 59%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 69%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.cpp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_context.cpp.o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_context.cpp.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp.o
+[ 78%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.o
+[ 79%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp.o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_context.cpp.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 85%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 86%] Built target litehtml
+[ 86%] Built target qlith_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith
+[ 87%] Built target qlith_autogen
+[ 90%] Building CXX object src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilation.cpp.o
+[ 90%] Building CXX object src/CMakeFiles/qlith.dir/qlithwidget.cpp.o
+[ 91%] Building CXX object src/CMakeFiles/qlith.dir/container_qpainter.cpp.o
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/mocs_compilation.cpp:2:
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/moc_container_qpainter.cpp:10:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:102:52: error: no type named 'tchar_t' in namespace 'litehtml'
+  102 |     litehtml::uint_ptr create_font(const litehtml::tchar_t* faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics* fm) override;
+      |                                          ~~~~~~~~~~^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.cpp:2:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:102:52: error: no type named 'tchar_t' in namespace 'litehtml'
+  102 |     litehtml::uint_ptr create_font(const litehtml::tchar_t* faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics* fm) override;
+      |                                          ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:104:36: error: no type named 'tchar_t' in namespace 'litehtml'
+  104 |     int text_width(const litehtml::tchar_t* text, litehtml::uint_ptr hFont) override;
+      |                          ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:104:36: error: no type named 'tchar_t' in namespace 'litehtml'
+  104 |     int text_width(const litehtml::tchar_t* text, litehtml::uint_ptr hFont) override;
+      |                          ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:105:60: error: no type named 'tchar_t' in namespace 'litehtml'
+  105 |     void draw_text(litehtml::uint_ptr hdc, const litehtml::tchar_t* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
+      |                                                  ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:105:60: error: no type named 'tchar_t' in namespace 'litehtml'
+  105 |     void draw_text(litehtml::uint_ptr hdc, const litehtml::tchar_t* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
+      |                                                  ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:108:21: error: no type named 'tchar_t' in namespace 'litehtml'
+  108 |     const litehtml::tchar_t* get_default_font_name() const override;
+      |           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:108:21: error: no type named 'tchar_t' in namespace 'litehtml'
+  108 |     const litehtml::tchar_t* get_default_font_name() const override;
+      |           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:110:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:110:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:110:67: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                                                         ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:110:67: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                                                         ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:111:41: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                               ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:111:41: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                               ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:111:71: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                                                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:111:71: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                                                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:112:66: error: no type named 'background_paint' in namespace 'litehtml'
+  112 |     void draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint& bg) override;
+      |                                                        ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:116:60: error: only virtual member functions can be marked 'override'
+  116 |     void get_client_rect(litehtml::position& client) const override;
+      |                                                            ^~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:112:66: error: no type named 'background_paint' in namespace 'litehtml'
+  112 |     void draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint& bg) override;
+      |                                                        ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:116:60: error: only virtual member functions can be marked 'override'
+  116 |     void get_client_rect(litehtml::position& client) const override;
+      |                                                            ^~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:120:38: error: no type named 'tchar_t' in namespace 'litehtml'
+  120 |     void set_caption(const litehtml::tchar_t* caption) override;
+      |                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:120:38: error: no type named 'tchar_t' in namespace 'litehtml'
+  120 |     void set_caption(const litehtml::tchar_t* caption) override;
+      |                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:121:39: error: no type named 'tchar_t' in namespace 'litehtml'
+  121 |     void set_base_url(const litehtml::tchar_t* base_url) override;
+      |                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:121:39: error: no type named 'tchar_t' in namespace 'litehtml'
+  121 |     void set_base_url(const litehtml::tchar_t* base_url) override;
+      |                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:123:42: error: no type named 'tchar_t' in namespace 'litehtml'
+  123 |     void on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el) override;
+      |                                ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:123:42: error: no type named 'tchar_t' in namespace 'litehtml'
+  123 |     void on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el) override;
+      |                                ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:124:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  124 |     void set_cursor(const litehtml::tchar_t* cursor) override;
+      |                           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:124:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  124 |     void set_cursor(const litehtml::tchar_t* cursor) override;
+      |                           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:125:35: error: no type named 'tstring' in namespace 'litehtml'
+  125 |     void transform_text(litehtml::tstring& text, litehtml::text_transform tt) override;
+      |                         ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:125:35: error: no type named 'tstring' in namespace 'litehtml'
+  125 |     void transform_text(litehtml::tstring& text, litehtml::text_transform tt) override;
+      |                         ~~~~~~~~~~^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/qlithwidget.cpp:2:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:102:52: error: no type named 'tchar_t' in namespace 'litehtml'
+  102 |     litehtml::uint_ptr create_font(const litehtml::tchar_t* faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics* fm) override;
+      |                                          ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:104:36: error: no type named 'tchar_t' in namespace 'litehtml'
+  104 |     int text_width(const litehtml::tchar_t* text, litehtml::uint_ptr hFont) override;
+      |                          ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:126:31: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                     ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:31: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                     ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:105:60: error: no type named 'tchar_t' in namespace 'litehtml'
+  105 |     void draw_text(litehtml::uint_ptr hdc, const litehtml::tchar_t* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
+      |                                                  ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:126:62: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                    ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:108:21: error: no type named 'tchar_t' in namespace 'litehtml'
+  108 |     const litehtml::tchar_t* get_default_font_name() const override;
+      |           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:62: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                    ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:110:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                           ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:126:86: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46WW/../../../../src/container_qpainter.h:127:123: error: non-virtual member function marked 'override' hides virtual member function
+  127 |     void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius, bool valid_x, bool valid_y) override;
+      |                                                                                                                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h:62:19: note: hidden overloaded virtual function 'litehtml::document_container::set_clip' declared here: different number of parameters (2 vs 4)
+   62 |                 virtual void                            set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) = 0;
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:110:67: error: no type named 'tchar_t' in namespace 'litehtml'
+  110 |     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+      |                                                         ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:86: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:127:123: error: non-virtual member function marked 'override' hides virtual member function
+  127 |     void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius, bool valid_x, bool valid_y) override;
+      |                                                                                                                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h:62:19: note: hidden overloaded virtual function 'litehtml::document_container::set_clip' declared here: different number of parameters (2 vs 4)
+   62 |                 virtual void                            set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) = 0;
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:111:41: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                               ~~~~~~~~~~^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:111:71: error: no type named 'tchar_t' in namespace 'litehtml'
+  111 |     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+      |                                                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:112:66: error: no type named 'background_paint' in namespace 'litehtml'
+  112 |     void draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint& bg) override;
+      |                                                        ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:116:60: error: only virtual member functions can be marked 'override'
+  116 |     void get_client_rect(litehtml::position& client) const override;
+      |                                                            ^~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:120:38: error: no type named 'tchar_t' in namespace 'litehtml'
+  120 |     void set_caption(const litehtml::tchar_t* caption) override;
+      |                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:121:39: error: no type named 'tchar_t' in namespace 'litehtml'
+  121 |     void set_base_url(const litehtml::tchar_t* base_url) override;
+      |                             ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:123:42: error: no type named 'tchar_t' in namespace 'litehtml'
+  123 |     void on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el) override;
+      |                                ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:124:37: error: no type named 'tchar_t' in namespace 'litehtml'
+  124 |     void set_cursor(const litehtml::tchar_t* cursor) override;
+      |                           ~~~~~~~~~~^
+20 errors generated.
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:125:35: error: no type named 'tstring' in namespace 'litehtml'
+  125 |     void transform_text(litehtml::tstring& text, litehtml::text_transform tt) override;
+gmake[2]: *** [src/CMakeFiles/qlith.dir/build.make:114: src/CMakeFiles/qlith.dir/container_qpainter.cpp.o] Error 1
+      |                         ~~~~~~~~~~^
+gmake[2]: *** Waiting for unfinished jobs....
+20 errors generated.
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:31: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                     ~~~~~~~~~~^
+gmake[2]: *** [src/CMakeFiles/qlith.dir/build.make:86: src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilation.cpp.o] Error 1
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:62: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                    ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:126:86: error: no type named 'tstring' in namespace 'litehtml'
+  126 |     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+      |                                                                            ~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h:127:123: error: non-virtual member function marked 'override' hides virtual member function
+  127 |     void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius, bool valid_x, bool valid_y) override;
+      |                                                                                                                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h:62:19: note: hidden overloaded virtual function 'litehtml::document_container::set_clip' declared here: different number of parameters (2 vs 4)
+   62 |                 virtual void                            set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) = 0;
+      |                                                         ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+gmake[2]: *** [src/CMakeFiles/qlith.dir/build.make:100: src/CMakeFiles/qlith.dir/qlithwidget.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:380: src/CMakeFiles/qlith.dir/all] Error 2
+gmake: *** [Makefile:156: all] Error 2
 
 ---
+
+_**Assistant**_
 
 
 
