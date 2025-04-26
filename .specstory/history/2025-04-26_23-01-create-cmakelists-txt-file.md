@@ -183,3 +183,90 @@ Check and update @CMakeLists.txt
 
 ---
 
+Check @CMakeLists.txt and update it and @build_macos.sh 
+
+---
+
+_**Assistant**_
+
+I'll check the existing CMakeLists.txt and update both it and the build_macos.sh script.
+
+---
+
+```bash
+cmake --version | head -n 1
+```
+
+```
+adam@Hamlet qlith % cmake --version | head -n 1
+cmake version 3.31.6
+adam@Hamlet qlith %
+```
+
+---
+
+```bash
+ls -l external/gumbo-parser/src/gumbo.h 2>/dev/null || echo "Gumbo header not found in expected location"
+```
+
+```
+adam@Hamlet qlith % ls -l external/gumbo-parser/src/gumbo.h 2>/dev/null || echo 
+"Gumbo header not fols -l external/gumbo-parser/src/gumbo.h 2>/dev/null || echo 
+"Gumbo header not found in expected location"
+-rw-r--r--  1 adam  staff  23797 Apr 27 00:00 external/gumbo-parser/src/gumbo.h
+adam@Hamlet qlith %
+```
+
+---
+
+```bash
+which ninja
+```
+
+```
+adam@Hamlet qlith % which ninja
+/usr/local/bin/ninja
+adam@Hamlet qlith %
+```
+
+---
+
+```bash
+ls -la qlith-pro/src/litehtml-qt.js_plugin_import.cpp
+```
+
+```
+adam@Hamlet qlith % ls -la qlith-pro/src/litehtml-qt.js_plugin_import.cpp
+-rw-r--r--  1 adam  staff  498 Apr 27 00:18 qlith-pro/src/litehtml-qt.js_plugin_
+import.cpp
+adam@Hamlet qlith %
+```
+
+---
+
+```bash
+brew --prefix qt@5 2>/dev/null || echo "Qt5 not found via Homebrew"
+```
+
+```
+adam@Hamlet qlith % brew --prefix qt@5 2>/dev/null || echo "Qt5 not found via Ho
+mebrew"             brew --prefix qt@5 2>/dev/null || echo "Qt5 not found via Ho
+mebrew"
+/usr/local/opt/qt@5
+adam@Hamlet qlith %
+```
+
+---
+
+Let me now update the CMakeLists.txt file to ensure it's properly configured:
+
+---
+
+
+
+---
+
+
+
+---
+
