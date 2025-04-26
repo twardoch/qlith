@@ -20,14 +20,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(QLITH_DEBUG_DIR "${CMAKE_BINARY_DIR}/debug" CACHE PATH "Directory to store debug files")
 add_definitions(-DQLITH_DEBUG_DIR="${QLITH_DEBUG_DIR}")
 
+# External dependencies paths
+set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/../external")
+set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
+set(GUMBO_DIR "${EXTERNAL_DIR}/gumbo-parser")
+
 # Find Qt5 packages
 find_package(Qt5 COMPONENTS Widgets Network Svg REQUIRED)
 
 # Find or build litehtml
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/litehtml ${CMAKE_BINARY_DIR}/litehtml)
+add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
 
 # Find or build gumbo-parser
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/gumbo-parser ${CMAKE_BINARY_DIR}/gumbo-parser)
+add_subdirectory(${GUMBO_DIR} ${CMAKE_BINARY_DIR}/gumbo-parser)
 
 # Find the zlib package
 find_package(ZLIB REQUIRED)

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<!-- saved from url=(0020)https://fontlab.org/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONTLAB 8</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./fl8_files/css2" rel="stylesheet">
+    
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        /* Darker, more bluish navy gradient */
+        --g1: #0a0e1a;
+        --g2: #0e1628;
+        --g3: #131d30;
+        --accent: #40e0d0;
+        --text-color: #f1e9dc; /* Cream/ivory color instead of pure white */
+      }
+      body {
+        font-family: 'Fraunces', serif;
+        background: linear-gradient(135deg, var(--g1), var(--g2), var(--g3));
+        color: var(--text-color);
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+      .c {
+        position: relative;
+        z-index: 2;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2vh 8vw;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .l {
+        font-family: 'Roboto Flex', sans-serif;
+        font-weight: 600;
+        font-stretch: 151%;
+        font-variation-settings: 'wdth' 151, 'YTFI' 670, 'YTAS' 670, 'YTDE' -120,
+          'YTLC' 540, 'YTUC' 670, 'XTRA' 603;
+        letter-spacing: 0.2em;
+        font-size: clamp(1.4rem, 3vw, 1.8rem);
+        margin-bottom: 1vh;
+        text-transform: uppercase;
+        background: linear-gradient(
+          90deg,
+          #00e5ff,
+          #2979ff,
+          #651fff,
+          #d500f9,
+          #ff9100,
+          #00e5ff
+        );
+        background-size: 300% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: cg 8s infinite alternate ease-in-out;
+      }
+      .tc {
+        text-align: center;
+        margin-bottom: 7vh;
+        perspective: 1500px;
+      }
+      .tl {
+        font-size: clamp(1rem, 20vw, 7rem);
+        line-height: 0.85;
+        opacity: 0;
+        transform: translateY(40px) rotateX(-10deg);
+        animation: fu 1s forwards;
+        white-space: nowrap;
+      }
+      .tl:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .w {
+        display: inline-block;
+        position: relative;
+        font-optical-sizing: none;
+        transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      /* Text glow effect from glow version */
+      .s {
+        color: var(--text-color); /* Updated from cyan to cream */
+        font-style: normal;
+        text-shadow: 0 0 8px rgba(241, 233, 220, 0.3); /* Matching shadow to text color */
+        animation: wk 6s infinite alternate ease-in-out;
+      }
+      .v {
+        color: var(--text-color); /* Updated from blue to cream */
+        font-style: italic;
+        text-shadow: 0 0 8px rgba(241, 233, 220, 0.3); /* Matching shadow to text color */
+        animation: va 8s infinite alternate ease-in-out;
+      }
+      .co {
+        margin-right: 0.1em;
+        font-variation-settings: 'wght' 700, 'opsz' 48, 'SOFT' 0;
+        background: linear-gradient(
+          90deg,
+          #00e5ff,
+          #2979ff,
+          #651fff,
+          #d500f9,
+          #ff9100,
+          #00e5ff
+        );
+        background-size: 300% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: cg 8s infinite alternate ease-in-out;
+      }
+      .f {
+        font-family: 'Roboto Flex', sans-serif;
+        font-weight: 200;
+        font-stretch: 100%;
+        font-variation-settings: 'wdth' 100, 'YTFI' 670, 'YTAS' 670, 'YTDE' -120,
+          'YTLC' 480, 'YTUC' 670;
+        color: var(--text-color);
+      }
+      .d {
+        font-family: 'Literata', serif;
+        font-size: clamp(1.1rem, 2vw, 1.3rem);
+        font-variation-settings: 'wght' 380, 'opsz' 9;
+        max-width: calc(480px + 10vw);
+        width: 100%;
+        margin-bottom: 5vh;
+        margin-left: 6vw;
+        margin-right: 4vw;
+        opacity: 0;
+        animation: fu 1s forwards 0.6s;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        text-align: left;
+      }
+      
+      .d-col {
+        line-height: 1.3;
+      }
+      .d em {
+        font-family: 'Fraunces', serif;
+        font-variation-settings: 'opsz' 8, 'SOFT' 100, 'WONK' 0;
+        font-size: 1.13em;
+        font-style: italic;
+        font-weight: 350;
+        letter-spacing: 0em;
+      }
+      .btn {
+        font-family: 'Roboto Flex', sans-serif;
+        font-weight: 600;
+        font-stretch: 151%;
+        font-variation-settings: 'wdth' 151, 'YTFI' 670, 'YTAS' 670, 'YTDE' -120,
+          'YTLC' 540, 'YTUC' 670, 'XTRA' 603;
+        letter-spacing: 0.2em;
+        display: inline-block;
+        color: var(--text-color);
+        border: none;
+        padding: 15px 50px;
+        border-radius: 50px;
+        font-size: clamp(1.2rem, 2.1vw, 1.3rem);
+        text-transform: uppercase;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        animation: fu 1s forwards 0.9s, cg 8s infinite alternate ease-in-out;
+        text-decoration: none;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: linear-gradient(
+          90deg,
+          #00e5ff,
+          #2979ff,
+          #651fff,
+          #d500f9,
+          #2979ff,
+          #00e5ff
+        );
+        background-size: 300% 100%;
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+        width: fit-content;
+      }
+      .btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(100, 100, 255, 0.2);
+        letter-spacing: 0.25em;
+      }
+      @keyframes fu {
+        to {
+          opacity: 1;
+          transform: translateY(0) rotateX(0);
+        }
+      }
+      @keyframes cg {
+        0% {
+          background-position: 0% 0%;
+        }
+        100% {
+          background-position: 100% 50%;
+        }
+      }
+      @keyframes wk {
+        0% {
+          font-variation-settings: 'wght' 500, 'opsz' 144, 'SOFT' 0, 'WONK' 0;
+        }
+        50% {
+          font-variation-settings: 'wght' 500, 'opsz' 144, 'SOFT' 0, 'WONK' 1;
+        }
+        100% {
+          font-variation-settings: 'wght' 600, 'opsz' 144, 'SOFT' 100, 'WONK' 0;
+        }
+      }
+      @keyframes va {
+        0% {
+          font-variation-settings: 'wght' 100, 'opsz' 8, 'SOFT' 90, 'WONK' 0.2;
+        }
+        33% {
+          font-variation-settings: 'wght' 900, 'opsz' 60, 'SOFT' 40, 'WONK' 0.8;
+        }
+        66% {
+          font-variation-settings: 'wght' 300, 'opsz' 144, 'SOFT' 10, 'WONK' 0.5;
+        }
+        100% {
+          font-variation-settings: 'wght' 600, 'opsz' 24, 'SOFT' 70, 'WONK' 0.1;
+        }
+      }
+      @media (max-width: 768px) {
+        .c {
+          padding: 3vh 10vw;
+        }
+        .l {
+          margin-bottom: 1vh;
+        }
+        .tc {
+          margin-bottom: 3vh;
+        }
+        .d {
+          margin-bottom: 4vh;
+          grid-template-columns: 1fr;
+          gap: 0.8rem;
+          margin-left: 5vw;
+          margin-right: 2vw;
+        }
+        .d-col {
+          line-height: 1.2;
+          margin-bottom: 0.5rem;
+        }
+        .tl {
+          white-space: normal;
+          line-height: 0.8;
+        }
+        .w {
+          display: block;
+          margin-bottom: 0.05em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="cv" width="1975" height="1096"></canvas>
+    <div class="c">
+      <h3 class="l">FontLab 8</h3>
+      <div class="tc">
+        <h1 class="tl">
+          <span class="w s">Smart.</span><span class="w v">Variable.</span>
+        </h1>
+        <h1 class="tl">
+          <span class="w co">Colorful.</span> <span class="w f">Fonts.</span>
+        </h1>
+      </div>
+      <div class="d">
+        <div class="d-col">
+          Craft interstellar <em>variable fonts</em> with infinite dimensions. Transform <em>typographic visions</em> into celestial artistry that transcends the ordinary.
+        </div>
+        <div class="d-col">
+          Breathe life into <em>characters</em> that dance across digital galaxies, where each <em>glyph</em> becomes a constellation of possibilities.
+        </div>
+      </div>
+      <a href="https://www.fontlab.com/font-editor/fontlab/" class="btn">Learn More</a>
+    </div>
+
+    <script>
+      const cv = document.getElementById('cv');
+      const cx = cv.getContext('2d');
+
+      function rs() {
+        cv.width = window.innerWidth;
+        cv.height = window.innerHeight;
+      }
+
+      window.addEventListener('resize', rs);
+      rs();
+
+      class BezierNode {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 1.2 + 1.2;
+          this.sx = Math.random() * 0.1 - 0.05; // Slower movement
+          this.sy = Math.random() * 0.1 - 0.05;
+          
+          // Simplified handle types
+          this.handleType = Math.random();
+          
+          // More reasonable handle lengths
+          this.handleLength1 = Math.random() * 60 + 30; // 30-90px
+          
+          if (this.handleType < 0.5) {
+            // Balanced handles
+            this.handleLength2 = this.handleLength1 * (0.9 + Math.random() * 0.2);
+          } else {
+            // Asymmetric handles
+            this.handleLength2 = Math.random() * 40 + 20; // 20-60px
+          }
+          
+          // Simpler handle angles
+          this.handleAngle1 = Math.random() * Math.PI * 2;
+          
+          if (this.handleType < 0.5) {
+            // Traditional opposite handles
+            this.handleAngle2 = this.handleAngle1 + Math.PI;
+          } else {
+            // Some variety in handle angles
+            this.handleAngle2 = this.handleAngle1 + Math.PI * (0.8 + Math.random() * 0.4);
+          }
+          
+          // Set initial control points
+          this.cp1 = {
+            x: x + Math.cos(this.handleAngle1) * this.handleLength1,
+            y: y + Math.sin(this.handleAngle1) * this.handleLength1
+          };
+          
+          this.cp2 = {
+            x: x + Math.cos(this.handleAngle2) * this.handleLength2,
+            y: y + Math.sin(this.handleAngle2) * this.handleLength2
+          };
+          
+          // Gentler rotation
+          this.rotationSpeed1 = (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1);
+          this.rotationSpeed2 = (Math.random() * 0.003 + 0.001) * (Math.random() < 0.5 ? 1 : -1);
+          
+          // Subtler pulsing
+          this.pulseSpeed1 = Math.random() * 0.02 + 0.005;
+          this.pulseSpeed2 = Math.random() * 0.015 + 0.003;
+          this.pulsePhase1 = Math.random() * Math.PI * 2;
+          this.pulsePhase2 = Math.random() * Math.PI * 2;
+          this.pulseAmplitude1 = this.handleLength1 * 0.1; // 10% length variation
+          this.pulseAmplitude2 = this.handleLength2 * 0.1; // 10% length variation
+          
+          this.color = this.getColor();
+          this.handleColor = `rgba(100,155,255,0.25)`;
+          
+          // Simplified path system
+          this.isPathNode = Math.random() < 0.4;
+          this.isPrimaryPathNode = Math.random() < 0.2;
+          this.connectedNodes = [];
+          this.pathSegmentCount = 0;
+        }
+
+        getColor() {
+          const colors = [
+            'rgba(98,120,234,0.5)', 
+            'rgba(64,224,208,0.4)', 
+            'rgba(140,170,235,0.5)',
+            'rgba(60,105,190,0.5)',
+            'rgba(128,190,235,0.5)'
+          ];
+          return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        updateControlPoints() {
+          // Time-based animation (simplified)
+          const time = performance.now() * 0.001;
+          
+          // Gentler rotation
+          this.handleAngle1 += this.rotationSpeed1;
+          this.handleAngle2 += this.rotationSpeed2;
+          
+          // Gentler pulsing
+          const pulsedLength1 = this.handleLength1 + Math.sin(time * this.pulseSpeed1 + this.pulsePhase1) * this.pulseAmplitude1;
+          const pulsedLength2 = this.handleLength2 + Math.sin(time * this.pulseSpeed2 + this.pulsePhase2) * this.pulseAmplitude2;
+          
+          // Simpler handle behavior
+          if (this.handleType < 0.5) {
+            // Traditional handles
+            this.cp1.x = this.x + Math.cos(this.handleAngle1) * pulsedLength1;
+            this.cp1.y = this.y + Math.sin(this.handleAngle1) * pulsedLength1;
+            this.cp2.x = this.x + Math.cos(this.handleAngle2) * pulsedLength2;
+            this.cp2.y = this.y + Math.sin(this.handleAngle2) * pulsedLength2;
+          } else {
+            // Slightly more dynamic handles
+            const baseAngle = Math.atan2(this.sy, this.sx) || 0;
+            const wobble = Math.sin(time * 0.2) * Math.PI * 0.1;
+            
+            const angle1 = this.handleAngle1 + wobble;
+            const angle2 = this.handleAngle2 - wobble;
+            
+            this.cp1.x = this.x + Math.cos(angle1) * pulsedLength1;
+            this.cp1.y = this.y + Math.sin(angle1) * pulsedLength1;
+            this.cp2.x = this.x + Math.cos(angle2) * pulsedLength2;
+            this.cp2.y = this.y + Math.sin(angle2) * pulsedLength2;
+          }
+        }
+
+        update() {
+          this.x += this.sx;
+          this.y += this.sy;
+          
+          // Bounce off edges with slight randomization for more natural movement
+          if (this.x < 0 || this.x > cv.width) {
+            this.sx *= -1;
+            this.sx += (Math.random() * 0.02 - 0.01); // Add small random change
+          }
+          if (this.y < 0 || this.y > cv.height) {
+            this.sy *= -1;
+            this.sy += (Math.random() * 0.02 - 0.01);
+          }
+          
+          // Keep speed in reasonable bounds
+          const speed = Math.sqrt(this.sx * this.sx + this.sy * this.sy);
+          if (speed > 0.2) {
+            this.sx = (this.sx / speed) * 0.2;
+            this.sy = (this.sy / speed) * 0.2;
+          }
+          
+          this.updateControlPoints();
+        }
+
+        draw() {
+          // Visual style based on path importance
+          let nodeSize = this.size;
+          let nodeAlpha = 0.7;
+          let handleAlpha = 0.2;
+          
+          if (this.pathSegmentCount > 2) {
+            // Highlight nodes that are part of multiple paths
+            nodeSize += 1;
+            nodeAlpha = 0.8;
+            handleAlpha = 0.25;
+          }
+          
+          if (this.isPrimaryPathNode) {
+            // Primary path nodes are more prominent
+            nodeSize += 1;
+            nodeAlpha = 0.85;
+            handleAlpha = 0.3;
+          }
+          
+          // Draw the node point
+          cx.beginPath();
+          cx.arc(this.x, this.y, nodeSize, 0, Math.PI * 2);
+          // Adjust node color based on its role
+          const baseColor = this.color.replace(/[\d.]+\)$/, '');
+          cx.fillStyle = `${baseColor}${nodeAlpha})`;
+          cx.fill();
+          
+          // Draw handles (control point lines)
+          cx.beginPath();
+          cx.moveTo(this.x, this.y);
+          cx.lineTo(this.cp1.x, this.cp1.y);
+          cx.strokeStyle = `rgba(150,180,255,${handleAlpha})`;
+          cx.lineWidth = 1;
+          cx.stroke();
+          
+          // Second handle (some nodes might only have one)
+          if (this.handleType < 0.95) { // More nodes show both handles
+            cx.beginPath();
+            cx.moveTo(this.x, this.y);
+            cx.lineTo(this.cp2.x, this.cp2.y);
+            cx.strokeStyle = `rgba(150,180,255,${handleAlpha})`;
+            cx.lineWidth = 1;
+            cx.stroke();
+          }
+          
+          // Draw control points
+          cx.beginPath();
+          cx.arc(this.cp1.x, this.cp1.y, 2, 0, Math.PI * 2);
+          if (this.handleType < 0.95) {
+            cx.arc(this.cp2.x, this.cp2.y, 2, 0, Math.PI * 2);
+          }
+          cx.fillStyle = this.handleColor;
+          cx.fill();
+        }
+      }
+
+      // Fewer nodes for less visual complexity
+      const nodeCount = Math.min(
+        Math.floor((window.innerWidth * window.innerHeight) / 70000),
+        15
+      );
+      const nodes = [];
+
+      for (let i = 0; i < nodeCount; i++) {
+        const x = Math.random() * cv.width;
+        const y = Math.random() * cv.height;
+        nodes.push(new BezierNode(x, y));
+      }
+      
+      // Simplify setupPaths() function
+      function setupPaths() {
+        // Find path nodes and primary path nodes
+        const pathNodes = nodes.filter(node => node.isPathNode);
+        const primaryNodes = nodes.filter(node => node.isPrimaryPathNode);
+        
+        // Create primary path (if enough nodes)
+        if (primaryNodes.length >= 3) {
+          // Sort primary nodes to create a coherent path
+          primaryNodes.sort((a, b) => a.x - b.x);
+          
+          // Connect primary nodes in order
+          for (let i = 0; i < primaryNodes.length - 1; i++) {
+            const startNode = primaryNodes[i];
+            const endNode = primaryNodes[i + 1];
+            
+            startNode.connectedNodes.push(endNode);
+            endNode.connectedNodes.push(startNode);
+            startNode.pathSegmentCount++;
+            endNode.pathSegmentCount++;
+          }
+        }
+        
+        // Create vertical path (simplified)
+        pathNodes.sort((a, b) => a.y - b.y);
+        for (let i = 0; i < Math.min(pathNodes.length - 1, 6); i++) {
+          if (Math.random() < 0.6) {
+            const startNode = pathNodes[i];
+            const endNode = pathNodes[i + 1];
+            
+            if (!startNode.connectedNodes.includes(endNode)) {
+              startNode.connectedNodes.push(endNode);
+              endNode.connectedNodes.push(startNode);
+              startNode.pathSegmentCount++;
+              endNode.pathSegmentCount++;
+            }
+          }
+        }
+        
+        // Add some random connections (reduced)
+        for (let i = 0; i < nodeCount * 0.5; i++) {
+          const nodeA = nodes[Math.floor(Math.random() * nodes.length)];
+          const nodeB = nodes[Math.floor(Math.random() * nodes.length)];
+          
+          if (nodeA !== nodeB && !nodeA.connectedNodes.includes(nodeB)) {
+            nodeA.connectedNodes.push(nodeB);
+            nodeB.connectedNodes.push(nodeA);
+            nodeA.pathSegmentCount++;
+            nodeB.pathSegmentCount++;
+          }
+        }
+      }
+      
+      setupPaths();
+
+      let m = { x: undefined, y: undefined, r: 180 }; // Larger interaction radius
+
+      window.addEventListener('mousemove', (e) => {
+        m.x = e.x;
+        m.y = e.y;
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          m.x = e.touches[0].clientX;
+          m.y = e.touches[0].clientY;
+        }
+      });
+
+      window.addEventListener('mouseout', () => {
+        m.x = undefined;
+        m.y = undefined;
+      });
+
+      function drawBezierCurves() {
+        // Draw connected path curves with simpler styling
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          
+          node.connectedNodes.forEach(connectedNode => {
+            // Only draw each connection once
+            if (nodes.indexOf(node) < nodes.indexOf(connectedNode)) {
+              // Simpler curve styling
+              let curveOpacity = 0.15;
+              let curveWidth = 1;
+              
+              if (node.isPrimaryPathNode && connectedNode.isPrimaryPathNode) {
+                curveOpacity = 0.25;
+                curveWidth = 1.3;
+              }
+              
+              cx.beginPath();
+              cx.moveTo(node.x, node.y);
+              
+              // Calculate distance
+              const dx = node.x - connectedNode.x;
+              const dy = node.y - connectedNode.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Simpler curve selection
+              if (distance < cv.width * 0.08) {
+                // Very short, subtle curve
+                const midX = (node.x + connectedNode.x) / 2;
+                const midY = (node.y + connectedNode.y) / 2;
+                const perpX = -(dy) * 0.2;
+                const perpY = dx * 0.2;
+                
+                cx.quadraticCurveTo(
+                  midX + perpX,
+                  midY + perpY,
+                  connectedNode.x,
+                  connectedNode.y
+                );
+              } else {
+                // Bezier curve for longer distances
+                cx.bezierCurveTo(
+                  node.cp1.x, 
+                  node.cp1.y,
+                  connectedNode.cp2.x, 
+                  connectedNode.cp2.y,
+                  connectedNode.x, 
+                  connectedNode.y
+                );
+              }
+              
+              // Simpler colors
+              cx.strokeStyle = `rgba(150,180,255,${curveOpacity})`;
+              cx.lineWidth = curveWidth;
+              cx.stroke();
+            }
+          });
+        }
+        
+        // Fewer decorative curves
+        const time = performance.now() * 0.001;
+        for (let i = 0; i < nodes.length; i += 2) { // Skip every other node to reduce density
+          for (let j = i + 1; j < nodes.length; j += 2) {
+            // Skip if already connected
+            if (nodes[i].connectedNodes.includes(nodes[j]) || 
+                nodes[j].connectedNodes.includes(nodes[i])) {
+              continue;
+            }
+            
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            const md = cv.width * 0.2; // Reduced connection distance
+            
+            if (d < md) {
+              const o = 1 - d / md;
+              
+              // Make connections more selective
+              if (Math.random() < o * 0.3) {
+                cx.beginPath();
+                cx.moveTo(nodes[i].x, nodes[i].y);
+                
+                // Simpler curve
+                const midX = (nodes[i].x + nodes[j].x) / 2;
+                const midY = (nodes[i].y + nodes[j].y) / 2;
+                const perpX = -dy * 0.2;
+                const perpY = dx * 0.2;
+                
+                cx.quadraticCurveTo(
+                  midX + perpX,
+                  midY + perpY,
+                  nodes[j].x,
+                  nodes[j].y
+                );
+                
+                // More subtle styling
+                const alpha = Math.max(0.02, o * 0.08);
+                cx.strokeStyle = `rgba(150,180,255,${alpha})`;
+                cx.lineWidth = 0.5 + o * 0.2;
+                cx.stroke();
+              }
+            }
+          }
+        }
+      }
+
+      function animate() {
+        cx.clearRect(0, 0, cv.width, cv.height);
+
+        // Draw Bezier curves between nodes first (to be in background)
+        drawBezierCurves();
+        
+        // Update and draw nodes
+        for (let i = 0; i < nodes.length; i++) {
+          nodes[i].update();
+          nodes[i].draw();
+
+          if (m.x !== undefined && m.y !== undefined) {
+            const dx = nodes[i].x - m.x;
+            const dy = nodes[i].y - m.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+
+            if (d < m.r) {
+              const f = (m.r - d) / m.r;
+              const dirx = dx / d || 0;
+              const diry = dy / d || 0;
+
+              // More dramatic push effect
+              nodes[i].x += dirx * f * 2;
+              nodes[i].y += diry * f * 2;
+              
+              // Add slight velocity change for more organic movement
+              nodes[i].sx += dirx * f * 0.01;
+              nodes[i].sy += diry * f * 0.01;
+              
+              // Also move control points when node is moved
+              nodes[i].updateControlPoints();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      document.addEventListener('click', (e) => {
+        // Create a simpler ripple effect
+        for (let i = 0; i < 6; i++) {
+          const p = document.createElement('div');
+          p.style.position = 'absolute';
+          p.style.width = '2px';
+          p.style.height = '2px';
+          p.style.background = ['#a1cdf1', '#87d6f7', '#6ea5ff', '#9bc6ea'][
+            Math.floor(Math.random() * 4)
+          ];
+          p.style.borderRadius = '50%';
+          p.style.boxShadow = '0 0 6px rgba(255,255,255,0.4)';
+          p.style.left = `${e.clientX}px`;
+          p.style.top = `${e.clientY}px`;
+          p.style.zIndex = '10';
+          document.body.appendChild(p);
+
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 3 + 1;
+          const dx = Math.cos(angle) * speed;
+          const dy = Math.sin(angle) * speed;
+
+          p.animate(
+            [
+              { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+              {
+                transform: `translate(${dx * 12}px, ${dy * 12}px) scale(0)`,
+                opacity: 0,
+              },
+            ],
+            {
+              duration: Math.random() * 600 + 200,
+              easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)',
+            }
+          ).onfinish = () => p.remove();
+        }
+        
+        // Gentler attraction force
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+        
+        nodes.forEach(node => {
+          const dx = clickX - node.x;
+          const dy = clickY - node.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 200) {
+            const force = (200 - dist) / 200 * 0.05;
+            node.sx += (dx / dist) * force;
+            node.sy += (dy / dist) * force;
+          }
+        });
+      });
+    </script>
+  
+
+</body></html>
