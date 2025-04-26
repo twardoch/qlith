@@ -15,17 +15,7 @@
 #include <litehtml/document.h>
 #include <litehtml/document_container.h>
 
-#include "qlith_global.h"
-
-class ContainerQPainterPrivate;
-
-/**
- * @brief The ContainerQPainter class provides a litehtml document container implementation using QPainter.
- * 
- * This class implements the litehtml::document_container interface to render HTML content
- * using Qt's QPainter.
- */
-class QLITH_EXPORT ContainerQPainter : public QObject, public litehtml::document_container
+class ContainerQPainter : public QObject, public litehtml::document_container
 {
     Q_OBJECT
 
@@ -135,12 +125,9 @@ public:
                                           const litehtml::string_map& attributes,
                                           const std::shared_ptr<litehtml::document>& doc) override;
 
-    // Optional overrides for media queries
-    void get_client_rect(litehtml::position& client) const override;
-    
     // URL resolving and resource loading
-    virtual void onImageLoaded(const QString& url, const QImage& image);
-    virtual void onCssLoaded(const QString& url, const QString& css);
+    void onImageLoaded(const QString& url, const QImage& image);
+    void onCssLoaded(const QString& url, const QString& css);
 
 signals:
     void titleChanged(const QString& title);
@@ -148,15 +135,12 @@ signals:
     void cursorChanged(const QString& cursor);
 
 private:
-    QScopedPointer<ContainerQPainterPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(ContainerQPainter)
-    
     QPainter* m_painter;
     QRect m_paintRect;
+    QString m_baseUrl;
     qreal m_devicePixelRatio;
     QString m_defaultFontName;
     int m_defaultFontSize;
-    QString m_baseUrl;
     
     QMap<QString, QImage> m_images;
     QMap<int, struct font_metrics_t> m_fonts;
