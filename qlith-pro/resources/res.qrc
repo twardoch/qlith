@@ -1,15 +1,15 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/font/Cousine-Regular.ttf</file>
-        <file>res/font/DroidSans.ttf</file>
-        <file>res/font/arialuni.ttf</file>
-        <file>res/font/fa-regular-400.ttf</file>
-        <file>res/css/master.css</file>
-        <file>res/css/test1.css</file>
-        <file>res/img/test2.png</file>
-        <file>res/img/test.png</file>
-        <file>res/css/reset.css</file>
-        <file>res/css/bootstrap.css</file>
-        <file>res/img/test3.png</file>
+        <file>font/Cousine-Regular.ttf</file>
+        <file>font/DroidSans.ttf</file>
+        <file>font/arialuni.ttf</file>
+        <file>font/fa-regular-400.ttf</file>
+        <file>css/master.css</file>
+        <file>css/test1.css</file>
+        <file>img/test2.png</file>
+        <file>img/test.png</file>
+        <file>css/reset.css</file>
+        <file>css/bootstrap.css</file>
+        <file>img/test3.png</file>
     </qresource>
 </RCC>

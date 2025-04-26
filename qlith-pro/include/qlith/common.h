@@ -29,9 +29,14 @@
 #include <cmath>
 #include <string>
 #include <memory>
+#include <string>
+#include <cassert>
+
+// Define ASSERT macro
+// #define ASSERT(condition) assert(condition) // Keep Q_ASSERT below
 
 namespace litehtml {
-  class web_color;
+  struct web_color;
 }
 
 class Color;
@@ -39,7 +44,6 @@ class Color;
 Color toColor(const litehtml::web_color& clr);
 
 #include "qlith/floatpoint.h"
-#include "qlith/floatrect.h"
 #include "qlith/intpoint.h"
 #include "qlith/intsize.h"
 #include "qlith/floatsize.h"
@@ -65,7 +69,8 @@ typedef QVector<float> DashArray;
 
 /////////
 
-#define ASSERT(string) Q_ASSERT(string)
+// Use Q_ASSERT for Qt projects
+#define ASSERT(condition) Q_ASSERT(condition)
 
 #define CRASH(string) Q_ASSERT(false)
 
@@ -126,6 +131,7 @@ struct NamedColor {
     int RGBValue;
 };
 
+// Use QString as the primary String type
 typedef QString String;
 
 template <class Key>

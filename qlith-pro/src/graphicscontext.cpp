@@ -1266,7 +1266,7 @@ void GraphicsContext::clipPath(WindRule clipRule)
     p->setClipPath(newPath, Qt::IntersectClip);
 }
 
-void GraphicsContext::drawFocusRing(const QVector<Path>& paths, int width, int offset, const Color& color)
+void GraphicsContext::drawFocusRing(const QVector<Path>& /*paths*/, int /*width*/, int /*offset*/, const Color& /*color*/)
 {
     // FIXME: implement
 }
@@ -1276,7 +1276,7 @@ void GraphicsContext::drawFocusRing(const QVector<Path>& paths, int width, int o
  * RenderTheme handles drawing focus on widgets which
  * need it.
  */
-void GraphicsContext::drawFocusRing(const QVector<IntRect>& rects, int /* width */, int /* offset */, const Color& color)
+void GraphicsContext::drawFocusRing(const QVector<IntRect>& /*rects*/, int /* width */, int /* offset */, const Color& /*color*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;
@@ -1740,7 +1740,7 @@ void GraphicsContext::concatCTM(const AffineTransform& transform)
     notImplemented();
 }*/
 
-void GraphicsContext::setPlatformStrokeColor(const Color& color, ColorSpace colorSpace)
+void GraphicsContext::setPlatformStrokeColor(const Color& color, ColorSpace /*colorSpace*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;
@@ -1778,7 +1778,7 @@ void GraphicsContext::setPlatformStrokeThickness(float thickness)
     p->setPen(newPen);
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color, ColorSpace colorSpace)
+void GraphicsContext::setPlatformFillColor(const Color& color, ColorSpace /*colorSpace*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;

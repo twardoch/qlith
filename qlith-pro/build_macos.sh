@@ -20,7 +20,7 @@ cd "$BUILD_DIR"
 # Add -G Xcode potentially if you want an Xcode project, or Ninja for Ninja builds.
 # Specify Qt path if necessary, e.g., -DCMAKE_PREFIX_PATH=/path/to/qt
 echo "Configuring project..."
-cmake "$PROJECT_ROOT" -G Ninja
+cmake "$PROJECT_ROOT" -G Ninja -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)
 
 # Build the project
 echo "Building project..."

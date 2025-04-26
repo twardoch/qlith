@@ -1,10 +1,10 @@
 // this_file: qlith-pro/include/qlith/floatrect.h
 #pragma once
 
-#include "qlith/common.h"
-#include "qlith/intrect.h"
 #include "qlith/floatpoint.h"
 #include "qlith/floatsize.h"
+#include "qlith/common.h"
+#include "qlith/intrect.h"
 //#include "vector.h"
 
 QT_BEGIN_NAMESPACE

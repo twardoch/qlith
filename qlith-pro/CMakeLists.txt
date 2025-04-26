@@ -6,11 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include Qt packages
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
-if(NOT Qt6_FOUND)
-    find_package(Qt5 5.15 COMPONENTS Core Gui Widgets REQUIRED)
-endif()
+# Include Qt5 packages
+find_package(Qt5 5.15 COMPONENTS Core Gui Widgets REQUIRED)
 
 # External dependencies
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
@@ -19,11 +16,14 @@ set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
 add_subdirectory("${EXTERNAL_DIR}/litehtml" "${CMAKE_BINARY_DIR}/litehtml" EXCLUDE_FROM_ALL)
 include_directories("${EXTERNAL_DIR}/litehtml/include")
 
-# Gumbo Parser
+# Gumbo Parser - using source files directly since it might not be built as a library
 include_directories("${EXTERNAL_DIR}/gumbo-parser/src")
+file(GLOB GUMBO_SOURCES "${EXTERNAL_DIR}/gumbo-parser/src/*.c")
 
 # Set include directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 # Define source files
 set(SOURCES
@@ -65,28 +65,29 @@ set(SOURCES
     src/stillimageqt.cpp
     src/styleimage.cpp
     src/transformationmatrix.cpp
+    src/litehtml-qt.js_plugin_import.cpp
 )
 
 # Process Qt UI files
 set(UI_FILES
     resources/mainwindow.ui
 )
-qt_wrap_ui(UI_HEADERS ${UI_FILES})
+qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 
 # Process Qt resources
 set(RESOURCE_FILES
     resources/res.qrc
 )
-qt_add_resources(RESOURCES ${RESOURCE_FILES})
+qt5_add_resources(RESOURCES ${RESOURCE_FILES})
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${UI_HEADERS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${GUMBO_SOURCES} ${UI_HEADERS} ${RESOURCES})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt::Widgets
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
     litehtml
 )
 
@@ -108,8 +109,29 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Add compiler-specific flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    
+    # Add macOS-specific flags if needed
+    if(APPLE)
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
+        set(CMAKE_MACOSX_RPATH 1)
+    endif()
 elseif(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 endif()
+
+# Add preprocessor definitions
+target_compile_definitions(${PROJECT_NAME} PRIVATE 
+    QT_DEPRECATED_WARNINGS
+    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
+)
+
+# Set application properties
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.github.twardoch.qlith-pro"
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+)
 
 message(STATUS "qlith-pro configuration complete")
