@@ -23,27 +23,11 @@ add_definitions(-DQLITH_DEBUG_DIR="${QLITH_DEBUG_DIR}")
 # Find Qt5 packages
 find_package(Qt5 COMPONENTS Widgets Network Svg REQUIRED)
 
-# Option to build with system-provided litehtml
-option(USE_SYSTEM_LITEHTML "Use system-provided litehtml" OFF)
-option(USE_SYSTEM_GUMBO "Use system-provided gumbo-parser" OFF)
-
 # Find or build litehtml
-if(USE_SYSTEM_LITEHTML)
-  find_package(litehtml REQUIRED)
-else()
-  # Use litehtml from the parent directory
-  set(LITEHTML_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../litehtml" CACHE PATH "Path to litehtml source")
-  add_subdirectory(${LITEHTML_SOURCE_DIR} ${CMAKE_BINARY_DIR}/litehtml)
-endif()
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/litehtml ${CMAKE_BINARY_DIR}/litehtml)
 
 # Find or build gumbo-parser
-if(USE_SYSTEM_GUMBO)
-  find_package(gumbo REQUIRED)
-else()
-  # Use gumbo-parser from the parent directory
-  set(GUMBO_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../gumbo-parser" CACHE PATH "Path to gumbo-parser source")
-  add_subdirectory(${GUMBO_SOURCE_DIR} ${CMAKE_BINARY_DIR}/gumbo-parser)
-endif()
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/gumbo-parser ${CMAKE_BINARY_DIR}/gumbo-parser)
 
 # Find the zlib package
 find_package(ZLIB REQUIRED)

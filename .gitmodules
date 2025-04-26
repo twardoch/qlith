@@ -1,0 +1,6 @@
+[submodule "external/litehtml"]
+	path = external/litehtml
+	url = https://github.com/litehtml/litehtml.git
+[submodule "external/gumbo-parser"]
+	path = external/gumbo-parser
+	url = https://codeberg.org/gumbo-parser/gumbo-parser.git

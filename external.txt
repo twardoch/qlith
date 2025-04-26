@@ -1,0 +1,348 @@
+external
+├── gumbo-parser
+│   ├── autogen.sh
+│   ├── benchmarks
+│   │   ├── arabic_newspapers.html
+│   │   ├── baidu.html
+│   │   ├── bbc.html
+│   │   ├── benchmark.cc
+│   │   ├── google.html
+│   │   ├── hacker_news.html
+│   │   ├── html5_spec.html
+│   │   ├── wikipedia.html
+│   │   ├── xinhua.html
+│   │   └── yahoo.html
+│   ├── CHANGES.md
+│   ├── configure.ac
+│   ├── doc
+│   │   ├── bindings.md
+│   │   ├── building.md
+│   │   ├── contributing.md
+│   │   ├── COPYING
+│   │   ├── debugging.md
+│   │   ├── maintaining.md
+│   │   ├── testing.md
+│   │   └── THANKS
+│   ├── Doxyfile
+│   ├── examples
+│   │   ├── clean_text.cc
+│   │   ├── find_links.cc
+│   │   ├── get_title.c
+│   │   ├── positions_of_class.cc
+│   │   ├── prettyprint.cc
+│   │   └── serialize.cc
+│   ├── gentags.sh
+│   ├── gumbo.pc.in
+│   ├── Makefile.am
+│   ├── meson_options.txt
+│   ├── meson.build
+│   ├── python
+│   │   └── gumbo
+│   │       ├── __init__.py
+│   │       ├── gumboc_tags.py
+│   │       ├── gumboc_test.py
+│   │       ├── gumboc.py
+│   │       ├── html5lib_adapter_test.py
+│   │       ├── html5lib_adapter.py
+│   │       ├── soup_adapter_test.py
+│   │       └── soup_adapter.py
+│   ├── README.md
+│   ├── setup.py
+│   ├── src
+│   │   ├── attribute.c
+│   │   ├── attribute.h
+│   │   ├── char_ref.c
+│   │   ├── char_ref.h
+│   │   ├── char_ref.rl
+│   │   ├── error.c
+│   │   ├── error.h
+│   │   ├── gumbo.h
+│   │   ├── insertion_mode.h
+│   │   ├── parser.c
+│   │   ├── parser.h
+│   │   ├── string_buffer.c
+│   │   ├── string_buffer.h
+│   │   ├── string_piece.c
+│   │   ├── string_piece.h
+│   │   ├── tag_enum.h
+│   │   ├── tag_gperf.h
+│   │   ├── tag_sizes.h
+│   │   ├── tag_strings.h
+│   │   ├── tag.c
+│   │   ├── tag.in
+│   │   ├── token_type.h
+│   │   ├── tokenizer_states.h
+│   │   ├── tokenizer.c
+│   │   ├── tokenizer.h
+│   │   ├── utf8.c
+│   │   ├── utf8.h
+│   │   ├── util.c
+│   │   ├── util.h
+│   │   ├── vector.c
+│   │   └── vector.h
+│   ├── testdata
+│   ├── tests
+│   │   ├── attribute.cc
+│   │   ├── char_ref.cc
+│   │   ├── parser.cc
+│   │   ├── string_buffer.cc
+│   │   ├── string_piece.cc
+│   │   ├── test_utils.cc
+│   │   ├── test_utils.h
+│   │   ├── tokenizer.cc
+│   │   ├── utf8.cc
+│   │   └── vector.cc
+│   └── visualc
+│       └── include
+│           └── strings.h
+└── litehtml
+    ├── cmake
+    │   └── litehtmlConfig.cmake
+    ├── CMakeLists.txt
+    ├── containers
+    │   ├── cairo
+    │   │   ├── cairo_borders.cpp
+    │   │   ├── cairo_borders.h
+    │   │   ├── cairo_images_cache.h
+    │   │   ├── container_cairo_pango.cpp
+    │   │   ├── container_cairo_pango.h
+    │   │   ├── container_cairo.cpp
+    │   │   ├── container_cairo.h
+    │   │   ├── render2png.cpp
+    │   │   └── render2png.h
+    │   ├── haiku
+    │   │   ├── container_haiku.cpp
+    │   │   └── container_haiku.h
+    │   ├── test
+    │   │   ├── Bitmap.cpp
+    │   │   ├── Bitmap.h
+    │   │   ├── canvas_ity.hpp
+    │   │   ├── Font.cpp
+    │   │   ├── Font.h
+    │   │   ├── fonts
+    │   │   │   ├── ahem-README
+    │   │   │   ├── ahem.ttf
+    │   │   │   ├── OFL.txt
+    │   │   │   ├── readme.txt
+    │   │   │   ├── terminus-12px.yaff
+    │   │   │   ├── terminus-14px.yaff
+    │   │   │   ├── terminus-16px-bold.yaff
+    │   │   │   ├── terminus-16px.yaff
+    │   │   │   ├── terminus-18px.yaff
+    │   │   │   ├── terminus-20px.yaff
+    │   │   │   ├── terminus-22px.yaff
+    │   │   │   ├── terminus-24px.yaff
+    │   │   │   ├── terminus-28px.yaff
+    │   │   │   └── terminus-32px.yaff
+    │   │   ├── lodepng.cpp
+    │   │   ├── lodepng.h
+    │   │   ├── test_container.cpp
+    │   │   └── test_container.h
+    │   └── windows
+    │       ├── cairo
+    │       │   ├── cairo_font.cpp
+    │       │   ├── cairo_font.h
+    │       │   ├── windows_container.cpp
+    │       │   └── windows_container.h
+    │       ├── gdiplus
+    │       │   ├── gdiplus_container.cpp
+    │       │   └── gdiplus_container.h
+    │       └── win32
+    │           ├── win32_container.cpp
+    │           └── win32_container.h
+    ├── doc
+    │   └── document_createFromString.txt
+    ├── include
+    │   ├── litehtml
+    │   │   ├── background.h
+    │   │   ├── borders.h
+    │   │   ├── codepoint.h
+    │   │   ├── css_length.h
+    │   │   ├── css_margins.h
+    │   │   ├── css_offsets.h
+    │   │   ├── css_parser.h
+    │   │   ├── css_position.h
+    │   │   ├── css_properties.h
+    │   │   ├── css_selector.h
+    │   │   ├── css_tokenizer.h
+    │   │   ├── document_container.h
+    │   │   ├── document.h
+    │   │   ├── el_anchor.h
+    │   │   ├── el_base.h
+    │   │   ├── el_before_after.h
+    │   │   ├── el_body.h
+    │   │   ├── el_break.h
+    │   │   ├── el_cdata.h
+    │   │   ├── el_comment.h
+    │   │   ├── el_div.h
+    │   │   ├── el_font.h
+    │   │   ├── el_image.h
+    │   │   ├── el_link.h
+    │   │   ├── el_para.h
+    │   │   ├── el_script.h
+    │   │   ├── el_space.h
+    │   │   ├── el_style.h
+    │   │   ├── el_table.h
+    │   │   ├── el_td.h
+    │   │   ├── el_text.h
+    │   │   ├── el_title.h
+    │   │   ├── el_tr.h
+    │   │   ├── element.h
+    │   │   ├── encodings.h
+    │   │   ├── flex_item.h
+    │   │   ├── flex_line.h
+    │   │   ├── font_description.h
+    │   │   ├── formatting_context.h
+    │   │   ├── gradient.h
+    │   │   ├── html_microsyntaxes.h
+    │   │   ├── html_tag.h
+    │   │   ├── html.h
+    │   │   ├── iterators.h
+    │   │   ├── line_box.h
+    │   │   ├── master_css.h
+    │   │   ├── media_query.h
+    │   │   ├── num_cvt.h
+    │   │   ├── os_types.h
+    │   │   ├── render_block_context.h
+    │   │   ├── render_block.h
+    │   │   ├── render_flex.h
+    │   │   ├── render_image.h
+    │   │   ├── render_inline_context.h
+    │   │   ├── render_inline.h
+    │   │   ├── render_item.h
+    │   │   ├── render_table.h
+    │   │   ├── string_id.h
+    │   │   ├── style.h
+    │   │   ├── stylesheet.h
+    │   │   ├── table.h
+    │   │   ├── tstring_view.h
+    │   │   ├── types.h
+    │   │   ├── url_path.h
+    │   │   ├── url.h
+    │   │   ├── utf8_strings.h
+    │   │   └── web_color.h
+    │   └── litehtml.h
+    ├── LICENSE
+    ├── litehtml.vcxproj
+    ├── litehtml.vcxproj.filters
+    ├── README.md
+    ├── src
+    │   ├── background.cpp
+    │   ├── codepoint.cpp
+    │   ├── css_borders.cpp
+    │   ├── css_length.cpp
+    │   ├── css_parser.cpp
+    │   ├── css_properties.cpp
+    │   ├── css_selector.cpp
+    │   ├── css_tokenizer.cpp
+    │   ├── document_container.cpp
+    │   ├── document.cpp
+    │   ├── el_anchor.cpp
+    │   ├── el_base.cpp
+    │   ├── el_before_after.cpp
+    │   ├── el_body.cpp
+    │   ├── el_break.cpp
+    │   ├── el_cdata.cpp
+    │   ├── el_comment.cpp
+    │   ├── el_div.cpp
+    │   ├── el_font.cpp
+    │   ├── el_image.cpp
+    │   ├── el_link.cpp
+    │   ├── el_para.cpp
+    │   ├── el_script.cpp
+    │   ├── el_space.cpp
+    │   ├── el_style.cpp
+    │   ├── el_table.cpp
+    │   ├── el_td.cpp
+    │   ├── el_text.cpp
+    │   ├── el_title.cpp
+    │   ├── el_tr.cpp
+    │   ├── element.cpp
+    │   ├── encodings.cpp
+    │   ├── flex_item.cpp
+    │   ├── flex_line.cpp
+    │   ├── formatting_context.cpp
+    │   ├── gradient.cpp
+    │   ├── gumbo
+    │   │   ├── attribute.c
+    │   │   ├── char_ref.c
+    │   │   ├── char_ref.rl
+    │   │   ├── CMakeLists.txt
+    │   │   ├── error.c
+    │   │   ├── include
+    │   │   │   ├── gumbo
+    │   │   │   │   ├── attribute.h
+    │   │   │   │   ├── char_ref.h
+    │   │   │   │   ├── error.h
+    │   │   │   │   ├── insertion_mode.h
+    │   │   │   │   ├── parser.h
+    │   │   │   │   ├── string_buffer.h
+    │   │   │   │   ├── string_piece.h
+    │   │   │   │   ├── tag_enum.h
+    │   │   │   │   ├── tag_gperf.h
+    │   │   │   │   ├── tag_sizes.h
+    │   │   │   │   ├── tag_strings.h
+    │   │   │   │   ├── token_type.h
+    │   │   │   │   ├── tokenizer_states.h
+    │   │   │   │   ├── tokenizer.h
+    │   │   │   │   ├── utf8.h
+    │   │   │   │   ├── util.h
+    │   │   │   │   └── vector.h
+    │   │   │   └── gumbo.h
+    │   │   ├── LICENSE
+    │   │   ├── parser.c
+    │   │   ├── string_buffer.c
+    │   │   ├── string_piece.c
+    │   │   ├── tag.c
+    │   │   ├── tag.in
+    │   │   ├── tokenizer.c
+    │   │   ├── utf8.c
+    │   │   ├── util.c
+    │   │   ├── vector.c
+    │   │   └── visualc
+    │   │       └── include
+    │   │           └── strings.h
+    │   ├── html_microsyntaxes.cpp
+    │   ├── html_tag.cpp
+    │   ├── html.cpp
+    │   ├── internal.h
+    │   ├── iterators.cpp
+    │   ├── line_box.cpp
+    │   ├── media_query.cpp
+    │   ├── num_cvt.cpp
+    │   ├── render_block_context.cpp
+    │   ├── render_block.cpp
+    │   ├── render_flex.cpp
+    │   ├── render_image.cpp
+    │   ├── render_inline_context.cpp
+    │   ├── render_item.cpp
+    │   ├── render_table.cpp
+    │   ├── string_id.cpp
+    │   ├── strtod.cpp
+    │   ├── style.cpp
+    │   ├── stylesheet.cpp
+    │   ├── table.cpp
+    │   ├── tstring_view.cpp
+    │   ├── url_path.cpp
+    │   ├── url.cpp
+    │   ├── utf8_strings.cpp
+    │   └── web_color.cpp
+    └── support
+        ├── gtkmm4
+        │   ├── html_widget.cpp
+        │   └── html_widget.h
+        ├── README.md
+        └── webpage
+            ├── draw_buffer.cpp
+            ├── draw_buffer.h
+            ├── html_host.h
+            ├── http_request.cpp
+            ├── http_request.h
+            ├── http_requests_pool.cpp
+            ├── http_requests_pool.h
+            ├── web_history.cpp
+            ├── web_history.h
+            ├── web_page.cpp
+            └── web_page.h
+
+35 directories, 311 files
