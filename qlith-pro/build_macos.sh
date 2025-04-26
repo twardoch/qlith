@@ -4,10 +4,38 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Define the project root and build directory relative to the script location
+# Set script to print each command as it is executed
+set -x
+
+# Default build type
+BUILD_TYPE=${BUILD_TYPE:-Release}
+
+# Define paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 BUILD_DIR="$PROJECT_ROOT/build"
+EXTERNAL_DIR="$PROJECT_ROOT/../external"
+
+# Check for external dependencies
+if [ ! -d "$EXTERNAL_DIR/litehtml" ]; then
+    echo "Error: litehtml dependency not found at $EXTERNAL_DIR/litehtml"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+if [ ! -d "$EXTERNAL_DIR/gumbo-parser" ]; then
+    echo "Error: gumbo-parser dependency not found at $EXTERNAL_DIR/gumbo-parser"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+# Check for Qt5
+QT_PATH=$(brew --prefix qt@5 2>/dev/null || echo "")
+if [ -z "$QT_PATH" ]; then
+    echo "Error: Qt5 not found. Please install Qt5 using Homebrew (brew install qt@5)"
+    exit 1
+fi
+echo "Using Qt5 from: $QT_PATH"
 
 # Create the build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
@@ -16,14 +44,22 @@ mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
 # Configure the project using CMake
-# Pass the project root directory to CMake
-# Add -G Xcode potentially if you want an Xcode project, or Ninja for Ninja builds.
-# Specify Qt path if necessary, e.g., -DCMAKE_PREFIX_PATH=/path/to/qt
 echo "Configuring project..."
-cmake "$PROJECT_ROOT" -G Ninja -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)
+cmake "$PROJECT_ROOT" \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_PREFIX_PATH="$QT_PATH" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Build the project
 echo "Building project..."
-cmake --build .
+cmake --build . -- -j$(sysctl -n hw.ncpu)
 
-echo "Build complete. Executable might be in $BUILD_DIR or a subdirectory."
+echo "Build complete."
+echo "Executable is located at: $BUILD_DIR/bin/qlith-pro"
+
+# Create an alias script for easy launching
+if [ -f "$BUILD_DIR/bin/qlith-pro" ]; then
+    ln -sf "$BUILD_DIR/bin/qlith-pro" "$PROJECT_ROOT/qlith-pro-run"
+    chmod +x "$PROJECT_ROOT/qlith-pro-run"
+    echo "Created launch script: $PROJECT_ROOT/qlith-pro-run"
+fi

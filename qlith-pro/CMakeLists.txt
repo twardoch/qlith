@@ -1,29 +1,33 @@
 cmake_minimum_required(VERSION 3.16)
-project(qlith-pro VERSION 0.1.0 LANGUAGES CXX)
+project(qlith-pro VERSION 0.1.0 LANGUAGES CXX C)
+
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+# Enable Qt features
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+# Set UI search paths
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include Qt5 packages
-find_package(Qt5 5.15 COMPONENTS Core Gui Widgets REQUIRED)
-
-# External dependencies
+# External dependencies paths
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
+set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
 
-# Litehtml
-add_subdirectory("${EXTERNAL_DIR}/litehtml" "${CMAKE_BINARY_DIR}/litehtml" EXCLUDE_FROM_ALL)
-include_directories("${EXTERNAL_DIR}/litehtml/include")
+# Find Qt5 packages
+find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network REQUIRED)
 
-# Gumbo Parser - using source files directly since it might not be built as a library
-include_directories("${EXTERNAL_DIR}/gumbo-parser/src")
-file(GLOB GUMBO_SOURCES "${EXTERNAL_DIR}/gumbo-parser/src/*.c")
-
-# Set include directories
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+# Build external dependencies - litehtml (which includes gumbo)
+add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
 
 # Define source files
 set(SOURCES
@@ -81,25 +85,42 @@ set(RESOURCE_FILES
 qt5_add_resources(RESOURCES ${RESOURCE_FILES})
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${GUMBO_SOURCES} ${UI_HEADERS} ${RESOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${UI_HEADERS} ${RESOURCES})
+
+# Include directories
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/qlith
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
+        ${CMAKE_CURRENT_BINARY_DIR}  # For UI headers
+        ${LITEHTML_DIR}/include
+        ${LITEHTML_DIR}/include/litehtml
+        ${LITEHTML_DIR}/src/gumbo/include
+)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
+    Qt5::Network
     litehtml
+    gumbo
+)
+
+# Add preprocessor definitions
+target_compile_definitions(${PROJECT_NAME} PRIVATE 
+    QT_DEPRECATED_WARNINGS
+    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
 )
 
 # Install rules
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    BUNDLE DESTINATION .
 )
-
-# Optional: Enable IDE folders for Visual Studio and Xcode
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -118,12 +139,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 elseif(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 endif()
-
-# Add preprocessor definitions
-target_compile_definitions(${PROJECT_NAME} PRIVATE 
-    QT_DEPRECATED_WARNINGS
-    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
-)
 
 # Set application properties
 set_target_properties(${PROJECT_NAME} PROPERTIES
