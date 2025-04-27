@@ -24,6 +24,7 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <QFile>
+#include <QProgressBar>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -195,234 +196,11 @@ void MainWindow::updateTitle(const QString &title)
     setWindowTitle(windowTitle);
 }
 
-void MainWindow::createActions()
+void MainWindow::onLoadStarted()
 {
-    // File menu
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    
-    m_openAction = fileMenu->addAction(tr("&Open..."), this, &MainWindow::openFile);
-    m_openAction->setShortcut(QKeySequence::Open);
-    
-    fileMenu->addSeparator();
-    
-    m_exitAction = fileMenu->addAction(tr("E&xit"), this, &QWidget::close);
-    m_exitAction->setShortcut(QKeySequence::Quit);
-    
-    // View menu
-    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-    
-    m_zoomInAction = viewMenu->addAction(tr("Zoom &In"), this, &MainWindow::zoomIn);
-    m_zoomInAction->setShortcut(QKeySequence::ZoomIn);
-    
-    m_zoomOutAction = viewMenu->addAction(tr("Zoom &Out"), this, &MainWindow::zoomOut);
-    m_zoomOutAction->setShortcut(QKeySequence::ZoomOut);
-    
-    m_resetZoomAction = viewMenu->addAction(tr("&Reset Zoom"), this, &MainWindow::resetZoom);
-    m_resetZoomAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_0));
-    
-    viewMenu->addSeparator();
-    
-    m_darkModeAction = viewMenu->addAction(tr("&Dark Mode"));
-    m_darkModeAction->setCheckable(true);
-    connect(m_darkModeAction, &QAction::triggered, this, &MainWindow::toggleDarkMode);
-    
-    // Navigation actions (for toolbar)
-    m_backAction = new QAction(tr("Back"), this);
-    m_backAction->setShortcut(QKeySequence::Back);
-    connect(m_backAction, &QAction::triggered, this, &MainWindow::goBack);
-    
-    m_forwardAction = new QAction(tr("Forward"), this);
-    m_forwardAction->setShortcut(QKeySequence::Forward);
-    connect(m_forwardAction, &QAction::triggered, this, &MainWindow::goForward);
-    
-    m_reloadAction = new QAction(tr("Reload"), this);
-    m_reloadAction->setShortcut(QKeySequence::Refresh);
-    connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reload);
-    
-    // Help menu
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-    
-    m_aboutAction = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-}
-
-void MainWindow::createToolBar()
-{
-    QToolBar *navigationBar = addToolBar(tr("Navigation"));
-    navigationBar->setMovable(false);
-    
-    navigationBar->addAction(m_backAction);
-    navigationBar->addAction(m_forwardAction);
-    navigationBar->addAction(m_reloadAction);
-    
-    navigationBar->addSeparator();
-    
-    m_urlEdit = new QLineEdit(this);
-    m_urlEdit->setClearButtonEnabled(true);
-    connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::updateUrlBar);
-    navigationBar->addWidget(m_urlEdit);
-}
-
-void MainWindow::createStatusBar()
-{
-    m_statusLabel = new QLabel(tr("Ready"), this);
-    statusBar()->addWidget(m_statusLabel, 1);
-    
-    m_zoomLabel = new QLabel(tr("Zoom: 100%"), this);
-    statusBar()->addPermanentWidget(m_zoomLabel);
-}
-
-void MainWindow::readSettings()
-{
-    QSettings settings;
-    
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("windowState").toByteArray());
-    
-    bool darkMode = settings.value("darkMode", false).toBool();
-    setDarkMode(darkMode);
-    
-    qreal zoom = settings.value("zoom", 1.0).toDouble();
-    m_htmlWidget->setZoom(zoom);
-}
-
-void MainWindow::writeSettings()
-{
-    QSettings settings;
-    
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("windowState", saveState());
-    settings.setValue("darkMode", m_darkModeEnabled);
-    settings.setValue("zoom", m_htmlWidget->zoom());
-}
-
-void MainWindow::updateNavigationActions()
-{
-    m_backAction->setEnabled(m_historyIndex > 0);
-    m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
-}
-
-void MainWindow::saveAsPng(const QString &filename)
-{
-    if (!m_htmlWidget) {
-        qWarning() << "Cannot save PNG: HTML widget is null";
-        return;
-    }
-    
-    // Use a safer size calculation
-    QSize size = m_htmlWidget->size();
-    if (size.width() <= 0 || size.height() <= 0) {
-        size = QSize(800, 600); // fallback to a reasonable size
-    }
-    
-    try {
-        // Create an offscreen QImage instead of QPixmap for better compatibility
-        QImage image(size, QImage::Format_ARGB32_Premultiplied);
-        image.fill(Qt::white);
-        
-        QPainter painter(&image);
-        
-        // Use safer rendering settings
-        painter.setRenderHint(QPainter::Antialiasing, false);
-        painter.setRenderHint(QPainter::TextAntialiasing, false);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-        
-        // Safely check HTML widget state before rendering
-        if (!m_htmlWidget->isVisible()) {
-            // If widget isn't visible, make sure it has valid dimensions
-            m_htmlWidget->resize(size);
-        }
-        
-        // Safer rendering call with error handling
-        try {
-            m_htmlWidget->render(&painter);
-        } catch (const std::exception& e) {
-            qWarning() << "Exception during rendering:" << e.what();
-            painter.setPen(Qt::red);
-            painter.drawText(QRect(0, 0, size.width(), size.height()), Qt::AlignCenter,
-                            "Error during rendering: " + QString(e.what()));
-        } catch (...) {
-            qWarning() << "Unknown exception during rendering";
-            painter.setPen(Qt::red);
-            painter.drawText(QRect(0, 0, size.width(), size.height()), Qt::AlignCenter,
-                            "Unknown error during rendering");
-        }
-        
-        painter.end();
-        
-        // Save the image
-        if (image.save(filename, "PNG")) {
-            qDebug() << "Successfully saved PNG to:" << filename;
-        } else {
-            qWarning() << "Failed to save PNG to:" << filename;
-        }
-    } catch (const std::exception& e) {
-        qWarning() << "Exception while saving PNG:" << e.what();
-    } catch (...) {
-        qWarning() << "Unknown exception while saving PNG";
-    }
-}
-
-void MainWindow::saveAsSvg(const QString &filename)
-{
-    if (!m_htmlWidget) {
-        qWarning() << "Cannot save SVG: HTML widget is null";
-        return;
-    }
-    
-    // Use a safer size calculation
-    QSize size = m_htmlWidget->size();
-    if (size.width() <= 0 || size.height() <= 0) {
-        size = QSize(800, 600); // fallback to a reasonable size
-    }
-    
-    try {
-        QSvgGenerator generator;
-        generator.setFileName(filename);
-        generator.setSize(size);
-        generator.setViewBox(QRect(0, 0, size.width(), size.height()));
-        generator.setTitle(m_htmlWidget->documentTitle().isEmpty() ? "Generated Document" : m_htmlWidget->documentTitle());
-        generator.setDescription("Generated by QLiteHTML Browser");
-        
-        // Safely check HTML widget state before rendering
-        if (!m_htmlWidget->isVisible()) {
-            // If widget isn't visible, make sure it has valid dimensions
-            m_htmlWidget->resize(size);
-        }
-        
-        QPainter painter;
-        if (painter.begin(&generator)) {
-            // Fill with white background first
-            painter.fillRect(QRect(0, 0, size.width(), size.height()), Qt::white);
-            
-            // Use low-quality rendering to avoid unsupported paint engine issues
-            painter.setRenderHint(QPainter::Antialiasing, false);
-            painter.setRenderHint(QPainter::TextAntialiasing, false);
-            painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-            
-            // Safer rendering call with error handling
-            try {
-                m_htmlWidget->render(&painter);
-            } catch (const std::exception& e) {
-                qWarning() << "Exception during SVG rendering:" << e.what();
-                painter.setPen(Qt::red);
-                painter.drawText(QRect(0, 0, size.width(), size.height()), Qt::AlignCenter,
-                                "Error during rendering: " + QString(e.what()));
-            } catch (...) {
-                qWarning() << "Unknown exception during SVG rendering";
-                painter.setPen(Qt::red);
-                painter.drawText(QRect(0, 0, size.width(), size.height()), Qt::AlignCenter,
-                                "Unknown error during rendering");
-            }
-            
-            painter.end();
-            qDebug() << "Successfully saved SVG to:" << filename;
-        } else {
-            qWarning() << "Failed to begin painter for SVG generation";
-        }
-    } catch (const std::exception& e) {
-        qWarning() << "Exception while saving SVG:" << e.what();
-    } catch (...) {
-        qWarning() << "Unknown exception while saving SVG";
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Loading..."));
     }
 }
 
@@ -436,7 +214,7 @@ void MainWindow::setupConnections()
     
     // Connect URL bar
     if (m_urlEdit) {
-        connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::updateUrlBar);
+        connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::loadUrl);
     }
     
     // Connect actions
@@ -488,22 +266,159 @@ void MainWindow::load(const QUrl& url)
     }
 }
 
-void MainWindow::loadFile(const QString &filePath)
+void MainWindow::stop()
 {
-    loadUrl(QUrl::fromLocalFile(filePath));
+    if (m_htmlWidget) {
+        m_htmlWidget->stop();
+    }
+    
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Stopped"));
+    }
 }
 
-void MainWindow::urlEntered()
+void MainWindow::setupUi()
 {
-    QString text = m_urlEdit->text().trimmed();
-    if (text.isEmpty())
-        return;
-        
-    QUrl url = QUrl::fromUserInput(text);
-    loadUrl(url);
+    // Main widget is already set in constructor
+    // Additional UI setup if needed
 }
 
-void MainWindow::linkClicked(const QUrl &url)
+void MainWindow::setupActions()
 {
-    loadUrl(url);
+    m_backAction = new QAction(tr("Back"), this);
+    m_backAction->setIcon(QIcon::fromTheme("go-previous"));
+    m_backAction->setShortcut(QKeySequence::Back);
+    m_backAction->setToolTip(tr("Go back to previous page"));
+    
+    m_forwardAction = new QAction(tr("Forward"), this);
+    m_forwardAction->setIcon(QIcon::fromTheme("go-next"));
+    m_forwardAction->setShortcut(QKeySequence::Forward);
+    m_forwardAction->setToolTip(tr("Go forward to next page"));
+    
+    m_reloadAction = new QAction(tr("Reload"), this);
+    m_reloadAction->setIcon(QIcon::fromTheme("view-refresh"));
+    m_reloadAction->setShortcut(QKeySequence::Refresh);
+    m_reloadAction->setToolTip(tr("Reload current page"));
+    
+    m_stopAction = new QAction(tr("Stop"), this);
+    m_stopAction->setIcon(QIcon::fromTheme("process-stop"));
+    m_stopAction->setShortcut(Qt::Key_Escape);
+    m_stopAction->setToolTip(tr("Stop loading page"));
+    
+    m_viewSourceAction = new QAction(tr("View Source"), this);
+    m_viewSourceAction->setToolTip(tr("View page source"));
+    
+    m_zoomInAction = new QAction(tr("Zoom In"), this);
+    m_zoomInAction->setIcon(QIcon::fromTheme("zoom-in"));
+    m_zoomInAction->setShortcut(QKeySequence::ZoomIn);
+    
+    m_zoomOutAction = new QAction(tr("Zoom Out"), this);
+    m_zoomOutAction->setIcon(QIcon::fromTheme("zoom-out"));
+    m_zoomOutAction->setShortcut(QKeySequence::ZoomOut);
+    
+    m_resetZoomAction = new QAction(tr("Reset Zoom"), this);
+    m_resetZoomAction->setIcon(QIcon::fromTheme("zoom-original"));
+    m_resetZoomAction->setShortcut(QKeySequence(tr("Ctrl+0")));
+    
+    m_exitAction = new QAction(tr("Exit"), this);
+    m_exitAction->setShortcut(QKeySequence::Quit);
+    connect(m_exitAction, &QAction::triggered, this, &QWidget::close);
+    
+    m_aboutAction = new QAction(tr("About"), this);
+    connect(m_aboutAction, &QAction::triggered, this, &MainWindow::about);
+    
+    // Update initial state
+    m_backAction->setEnabled(false);
+    m_forwardAction->setEnabled(false);
+}
+
+void MainWindow::setupMenus()
+{
+    m_fileMenu = menuBar()->addMenu(tr("&File"));
+    m_fileMenu->addAction(m_exitAction);
+    
+    m_viewMenu = menuBar()->addMenu(tr("&View"));
+    m_viewMenu->addAction(m_backAction);
+    m_viewMenu->addAction(m_forwardAction);
+    m_viewMenu->addAction(m_reloadAction);
+    m_viewMenu->addAction(m_stopAction);
+    m_viewMenu->addSeparator();
+    m_viewMenu->addAction(m_zoomInAction);
+    m_viewMenu->addAction(m_zoomOutAction);
+    m_viewMenu->addAction(m_resetZoomAction);
+    m_viewMenu->addSeparator();
+    m_viewMenu->addAction(m_viewSourceAction);
+    
+    m_helpMenu = menuBar()->addMenu(tr("&Help"));
+    m_helpMenu->addAction(m_aboutAction);
+}
+
+void MainWindow::setupToolbar()
+{
+    m_navigationToolBar = addToolBar(tr("Navigation"));
+    m_navigationToolBar->addAction(m_backAction);
+    m_navigationToolBar->addAction(m_forwardAction);
+    m_navigationToolBar->addAction(m_reloadAction);
+    m_navigationToolBar->addAction(m_stopAction);
+    
+    // Add URL bar
+    m_urlEdit = new QLineEdit(this);
+    m_urlEdit->setClearButtonEnabled(true);
+    m_urlEdit->setPlaceholderText(tr("Enter URL..."));
+    m_navigationToolBar->addWidget(m_urlEdit);
+}
+
+void MainWindow::setupStatusBar()
+{
+    m_statusBar = statusBar();
+    m_statusBar->showMessage(tr("Ready"));
+    
+    // Add progress bar
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->setMaximumWidth(150);
+    m_progressBar->setMaximumHeight(16);
+    m_progressBar->setVisible(false);
+    m_statusBar->addPermanentWidget(m_progressBar);
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+    
+    // Window geometry
+    const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    }
+    
+    // Start URL
+    m_startUrl = settings.value("startUrl", QUrl("about:blank")).toUrl();
+    if (m_startUrl.isValid()) {
+        load(m_startUrl);
+    }
+}
+
+void MainWindow::saveSettings()
+{
+    QSettings settings;
+    
+    // Window geometry
+    settings.setValue("geometry", saveGeometry());
+    
+    // Current URL
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        settings.setValue("startUrl", m_history.at(m_historyIndex));
+    }
+}
+
+void MainWindow::viewSource()
+{
+    // Simple implementation to view the HTML source
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        // Get the HTML from the current page
+        // This would require access to the raw HTML content
+        QMessageBox::information(this, tr("View Source"), 
+                              tr("View source not implemented yet."));
+    }
 } 
