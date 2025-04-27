@@ -1,6 +1,6 @@
 // -*- coding: utf-8 -*-
 
-#include "fontcache.h"
+#include "qlith/fontcache.h"
 
 #include <QFontInfo>
 

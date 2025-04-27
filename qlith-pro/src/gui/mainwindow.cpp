@@ -144,7 +144,7 @@ jkljkljkljkl
 
 MainWindow::~MainWindow()
 {
-delete ui;
+  delete ui;
 }
 
 void MainWindow::loadExample()

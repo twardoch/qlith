@@ -73,11 +73,24 @@ set(SOURCES
     # src/litehtml-qt.js_plugin_import.cpp
 )
 
+# Define header files with Q_OBJECT macro for Qt MOC
+set(MOC_HEADERS
+    include/qlith/container_qt5.h
+    include/qlith/litehtmlwidget.h
+    include/qlith/mainwindow.h
+)
+
 # Process Qt UI files
 set(UI_FILES
     resources/mainwindow.ui
 )
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
+
+# Instead of using qt5_wrap_ui directly, we'll rely on AUTOUIC
+# Make sure the UI files are included in the sources list
+set(ALL_SOURCES
+    ${SOURCES}
+    ${MOC_HEADERS}
+)
 
 # Process Qt resources
 set(RESOURCE_FILES
@@ -86,16 +99,17 @@ set(RESOURCE_FILES
 qt5_add_resources(RESOURCES ${RESOURCE_FILES})
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${UI_HEADERS} ${RESOURCES})
+add_executable(${PROJECT_NAME}
+    ${ALL_SOURCES}
+    ${UI_FILES}
+    ${RESOURCES}
+)
 
 # Include directories
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/qlith
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
-        ${CMAKE_CURRENT_BINARY_DIR}  # For UI headers
+        ${CMAKE_CURRENT_BINARY_DIR}  # For auto-generated files including UI headers
         ${LITEHTML_DIR}/include
         ${LITEHTML_DIR}/include/litehtml
         ${LITEHTML_DIR}/src/gumbo/include

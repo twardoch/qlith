@@ -12,7 +12,7 @@
 #include <QTimer>
 
 #include "litehtml.h"
-#include "container_qt5.h"
+#include "qlith/container_qt5.h"
 
 /**
  * @brief Widget for displaying HTML content using litehtml

@@ -2,15 +2,18 @@
 
 #include <QApplication>
 #include <QFile>
-#include "container_qt5.h"
+#include "qlith/container_qt5.h"
 #include "qlith/context.h"
-#include "mainwindow.h"
+#include "qlith/mainwindow.h"
 #include <QDebug>
 
-#include "fontcache.h"
+#include "qlith/fontcache.h"
 
 int main (int argc, char **argv) {
   QApplication app(argc, argv);
+
+  // Register metatype for proper signal/slot connections
+  qRegisterMetaType<container_qt5*>("container_qt5*");
 
   FontCache::getInstance()->addFont(":/res/font/Cousine-Regular.ttf", R"raw("Cousine Regular")raw", container_qt5::getDefaultFontSize());
   FontCache::getInstance()->addFont(":/res/font/arialuni.ttf", R"raw("Arial Unicode MS")raw", container_qt5::getDefaultFontSize());
