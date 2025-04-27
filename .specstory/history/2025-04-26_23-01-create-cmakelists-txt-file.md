@@ -6600,13 +6600,15 @@ Read file: qlith-mini/src/qlithwidget.cpp
 
 ---
 
+Now let's look at the container implementation:
 
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
 
 ---
 
 
-
----
 
 
 
@@ -6923,6 +6925,1876 @@ gmake: *** [Makefile:156: all] Error 2
 ---
 
 _**Assistant**_
+
+Looking at the compilation errors, the main issue is related to missing type definitions in the litehtml namespace. The errors show that the code is trying to use types like `tchar_t`, `tstring`, and `background_paint` which don't exist in the current version of litehtml being used.
+
+Let's check the litehtml header files to understand what changed between versions:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/types.h
+
+---
+
+Let's examine how litehtml is used in the header file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h
+
+---
+
+The issue is clear now. The version of litehtml being used has different type definitions than what is expected in the container_qpainter.h implementation:
+
+1. The current litehtml version uses simple `char*` for string parameters instead of `tchar_t*`
+2. It uses `string` instead of `tstring`
+3. The container_qpainter is overriding the wrong interface signature for `set_clip` with extra parameters
+4. The background drawing API has changed, using `background_layer` instead of `background_paint`
+
+Let's fix the container_qpainter.h file:
+
+---
+
+```diff
+  
+  #include <QColor>
++ #include <QFont>
++ #include <QFontMetrics>
+  #include <QImage>
+  #include <QMap>
+  #include <QObject>
+  #include <QPainter>
+- #include <QString>
+- #include <QtGlobal>
++ #include <QRect>
++ #include <QUrl>
+  
+- #include <litehtml.h>
++ #include <litehtml/document.h>
++ #include <litehtml/document_container.h>
+  
+  #include "qlith_global.h"
+```
+
+```diff
+  
+      // litehtml::document_container implementation
+-     litehtml::uint_ptr create_font(const litehtml::tchar_t* faceName, int size, int weight, litehtml::font_style italic, unsigned int decoration, litehtml::font_metrics* fm) override;
++     litehtml::uint_ptr create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm) override;
+      void delete_font(litehtml::uint_ptr hFont) override;
+-     int text_width(const litehtml::tchar_t* text, litehtml::uint_ptr hFont) override;
+-     void draw_text(litehtml::uint_ptr hdc, const litehtml::tchar_t* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
++     int text_width(const char* text, litehtml::uint_ptr hFont) override;
++     void draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
+      int pt_to_px(int pt) const override;
+      int get_default_font_size() const override;
+-     const litehtml::tchar_t* get_default_font_name() const override;
++     const char* get_default_font_name() const override;
+      void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;
+-     void load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready) override;
+-     void get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz) override;
+-     void draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint& bg) override;
++     void load_image(const char* src, const char* baseurl, bool redraw_on_ready) override;
++     void get_image_size(const char* src, const char* baseurl, litehtml::size& sz) override;
++     void draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url) override;
++     void draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color) override;
++     void draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient) override;
++     void draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient) override;
++     void draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient) override;
+      void draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root) override;
+-     
++     void get_viewport(litehtml::position& viewport) const override;
++     void get_media_features(litehtml::media_features& media) const override;
++     void set_caption(const char* caption) override;
++     void set_base_url(const char* base_url) override;
++     void link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el) override;
++     void on_anchor_click(const char* url, const litehtml::element::ptr& el) override;
++     void on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event) override;
++     void set_cursor(const char* cursor) override;
++     void transform_text(litehtml::string& text, litehtml::text_transform tt) override;
++     void import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl) override;
++     void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) override;
++     void del_clip() override;
++     void get_language(litehtml::string& language, litehtml::string& culture) const override;
++     litehtml::element::ptr create_element(const char* tag_name, 
++                                           const litehtml::string_map& attributes,
++                                           const std::shared_ptr<litehtml::document>& doc) override;
++ 
+      // Optional overrides for media queries
+      void get_client_rect(litehtml::position& client) const override;
+-     void get_media_features(litehtml::media_features& media) const override;
+      
+      // URL resolving and resource loading
+-     void set_caption(const litehtml::tchar_t* caption) override;
+-     void set_base_url(const litehtml::tchar_t* base_url) override;
+-     void link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el) override;
+-     void on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el) override;
+-     void set_cursor(const litehtml::tchar_t* cursor) override;
+-     void transform_text(litehtml::tstring& text, litehtml::text_transform tt) override;
+-     void import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl) override;
+-     void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius, bool valid_x, bool valid_y) override;
+-     void del_clip() override;
+-     
+-     // Callbacks for resource loading
+      virtual void onImageLoaded(const QString& url, const QImage& image);
+      virtual void onCssLoaded(const QString& url, const QString& css);
+```
+
+```diff
+      
+      QMap<QString, QImage> m_images;
+-     QMap<int, font_metrics_t> m_fonts;
++     QMap<int, struct font_metrics_t> m_fonts;
+      int m_nextFontId;
+  };
+```
+
+---
+
+There's an error in the updated file. Let's fix it properly:
+
+---
+
+```diff
+  #include <litehtml/document_container.h>
+  
+- #include "qlith_global.h"
+- 
+- class ContainerQPainterPrivate;
+- 
+- /**
+-  * @brief The ContainerQPainter class provides a litehtml document container implementation using QPainter.
+-  * 
+-  * This class implements the litehtml::document_container interface to render HTML content
+-  * using Qt's QPainter.
+-  */
+- class QLITH_EXPORT ContainerQPainter : public QObject, public litehtml::document_container
++ class ContainerQPainter : public QObject, public litehtml::document_container
+  {
+      Q_OBJECT
+```
+
+```diff
+                                            const litehtml::string_map& attributes,
+                                            const std::shared_ptr<litehtml::document>& doc) override;
+- 
+-     // Optional overrides for media queries
+-     void get_client_rect(litehtml::position& client) const override;
+  
+      // URL resolving and resource loading
+-     virtual void onImageLoaded(const QString& url, const QImage& image);
+-     virtual void onCssLoaded(const QString& url, const QString& css);
++     void onImageLoaded(const QString& url, const QImage& image);
++     void onCssLoaded(const QString& url, const QString& css);
+  
+  signals:
+```
+
+```diff
+  
+  private:
+-     QScopedPointer<ContainerQPainterPrivate> d_ptr;
+-     Q_DECLARE_PRIVATE(ContainerQPainter)
+-     
+      QPainter* m_painter;
+      QRect m_paintRect;
++     QString m_baseUrl;
+      qreal m_devicePixelRatio;
+      QString m_defaultFontName;
+      int m_defaultFontSize;
+-     QString m_baseUrl;
+      
+      QMap<QString, QImage> m_images;
+```
+
+---
+
+Now let's check and update the container_qpainter_p.h file:
+
+---
+
+Read file: qlith-mini/src/container_qpainter_p.h
+
+---
+
+Now let's update the container_qpainter.cpp file to match the new interface:
+
+---
+
+```diff
+  
+  // Create a font for use with the container
+- litehtml::uint_ptr ContainerQPainter::create_font(const litehtml::tchar_t* faceName, 
+-                                                  int size, 
+-                                                  int weight, 
+-                                                  litehtml::font_style italic, 
+-                                                  unsigned int decoration, 
+-                                                  litehtml::font_metrics* fm)
++ litehtml::uint_ptr ContainerQPainter::create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+  {
+      // Create a QFont from the parameters
+      QFont font;
+-     font.setFamily(QString::fromUtf8(faceName));
+-     font.setPixelSize(size);
+-     font.setWeight(weight);
+-     font.setItalic(italic == litehtml::font_style_italic);
+-     font.setUnderline(decoration & litehtml::font_decoration_underline);
+-     font.setStrikeOut(decoration & litehtml::font_decoration_linethrough);
++     font.setFamily(QString::fromUtf8(descr.name.c_str()));
++     font.setPixelSize(descr.size);
++     font.setWeight(descr.weight);
++     font.setItalic(descr.italic == litehtml::font_style_italic);
++     font.setUnderline(descr.decoration & litehtml::text_decoration_line_underline);
++     font.setStrikeOut(descr.decoration & litehtml::text_decoration_line_line_through);
+      
+      // Store font metrics
+```
+
+```diff
+  
+  // Get text width for measurement
+- int ContainerQPainter::text_width(const litehtml::tchar_t* text, litehtml::uint_ptr hFont)
++ int ContainerQPainter::text_width(const char* text, litehtml::uint_ptr hFont)
+  {
+      int fontId = static_cast<int>(hFont);
+```
+
+```diff
+  
+  // Draw text with the given font and color
+- void ContainerQPainter::draw_text(litehtml::uint_ptr hdc, 
+-                                  const litehtml::tchar_t* text, 
+-                                  litehtml::uint_ptr hFont, 
+-                                  litehtml::web_color color, 
+-                                  const litehtml::position& pos)
++ void ContainerQPainter::draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos)
+  {
+      if (!m_painter) return;
+```
+
+```diff
+  
+  // Get the default font name
+- const litehtml::tchar_t* ContainerQPainter::get_default_font_name() const
++ const char* ContainerQPainter::get_default_font_name() const
+  {
+      static QByteArray fontName;
+```
+
+```diff
+              default:
+                  // For other types (decimal, alpha, roman, etc.), draw the text
+-                 if (!marker.text.empty()) {
+-                     m_painter->drawText(rect, Qt::AlignCenter, QString::fromUtf8(marker.text.c_str()));
++                 if (marker.index >= 0) {
++                     QString indexStr = QString::number(marker.index);
++                     m_painter->drawText(rect, Qt::AlignCenter, indexStr);
+                  }
+                  break;
+```
+
+```diff
+  
+  // Load image from URL
+- void ContainerQPainter::load_image(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, bool redraw_on_ready)
++ void ContainerQPainter::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
+  {
+      QString url = QString::fromUtf8(src);
+```
+
+```diff
+  
+  // Get image size for layout
+- void ContainerQPainter::get_image_size(const litehtml::tchar_t* src, const litehtml::tchar_t* baseurl, litehtml::size& sz)
++ void ContainerQPainter::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
+  {
+      QString url = QString::fromUtf8(src);
+```
+
+```diff
+  }
+  
+- // Draw background (color, image, gradient)
+- void ContainerQPainter::draw_background(litehtml::uint_ptr hdc, const litehtml::background_paint& bg)
++ // Draw image background
++ void ContainerQPainter::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
+  {
+      if (!m_painter) return;
+      
+      m_painter->save();
+      
+-     // Draw background color
+-     if (bg.color.alpha > 0) {
+-         QColor bgColor(bg.color.red, bg.color.green, bg.color.blue, bg.color.alpha);
+-         m_painter->fillRect(bg.clip_box.x, bg.clip_box.y, bg.clip_box.width, bg.clip_box.height, bgColor);
+-     }
+-     
+-     // Draw background image if available
+-     if (!bg.image.empty() && m_images.contains(QString::fromUtf8(bg.image.c_str()))) {
+-         const QImage& img = m_images[QString::fromUtf8(bg.image.c_str())];
++     QString imgUrl = QString::fromStdString(url);
++     if (m_images.contains(imgUrl)) {
++         const QImage& img = m_images[imgUrl];
+          
+-         QRect destRect(bg.position_x, bg.position_y, bg.img_width, bg.img_height);
+-         QRect clipRect(bg.clip_box.x, bg.clip_box.y, bg.clip_box.width, bg.clip_box.height);
+-         
++         QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+          m_painter->setClipRect(clipRect);
++         
++         QRect destRect(layer.position_x, layer.position_y, layer.background_size.width, layer.background_size.height);
+          
+          // Handle different background-repeat values
+-         if (bg.repeat == litehtml::background_repeat_no_repeat) {
++         if (layer.repeat == litehtml::background_repeat_no_repeat) {
+              m_painter->drawImage(destRect, img);
+-         } else if (bg.repeat == litehtml::background_repeat_repeat_x) {
+-             for (int x = bg.position_x; x < clipRect.right(); x += bg.img_width) {
+-                 m_painter->drawImage(QRect(x, bg.position_y, bg.img_width, bg.img_height), img);
++         } else if (layer.repeat == litehtml::background_repeat_repeat_x) {
++             for (int x = layer.position_x; x < clipRect.right(); x += layer.background_size.width) {
++                 m_painter->drawImage(QRect(x, layer.position_y, layer.background_size.width, layer.background_size.height), img);
+              }
+-         } else if (bg.repeat == litehtml::background_repeat_repeat_y) {
+-             for (int y = bg.position_y; y < clipRect.bottom(); y += bg.img_height) {
+-                 m_painter->drawImage(QRect(bg.position_x, y, bg.img_width, bg.img_height), img);
++         } else if (layer.repeat == litehtml::background_repeat_repeat_y) {
++             for (int y = layer.position_y; y < clipRect.bottom(); y += layer.background_size.height) {
++                 m_painter->drawImage(QRect(layer.position_x, y, layer.background_size.width, layer.background_size.height), img);
+              }
+-         } else if (bg.repeat == litehtml::background_repeat_repeat) {
+-             for (int y = bg.position_y; y < clipRect.bottom(); y += bg.img_height) {
+-                 for (int x = bg.position_x; x < clipRect.right(); x += bg.img_width) {
+-                     m_painter->drawImage(QRect(x, y, bg.img_width, bg.img_height), img);
++         } else if (layer.repeat == litehtml::background_repeat_repeat) {
++             for (int y = layer.position_y; y < clipRect.bottom(); y += layer.background_size.height) {
++                 for (int x = layer.position_x; x < clipRect.right(); x += layer.background_size.width) {
++                     m_painter->drawImage(QRect(x, y, layer.background_size.width, layer.background_size.height), img);
+                  }
+              }
+```
+
+```diff
+      m_painter->restore();
+  }
++ 
++ // Draw solid fill background
++ void ContainerQPainter::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color)
++ {
++     if (!m_painter) return;
++     
++     m_painter->save();
++     
++     QColor bgColor(color.red, color.green, color.blue, color.alpha);
++     m_painter->fillRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height, bgColor);
++     
++     m_painter->restore();
++ }
++ 
++ // Draw linear gradient
++ void ContainerQPainter::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient)
++ {
++     if (!m_painter) return;
++     
++     m_painter->save();
++     
++     QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
++     m_painter->setClipRect(clipRect);
++     
++     // Create a linear gradient
++     QLinearGradient qgradient;
++     qgradient.setStart(gradient.start_x, gradient.start_y);
++     qgradient.setFinalStop(gradient.end_x, gradient.end_y);
++     
++     // Add color stops
++     for (const auto& stop : gradient.colors) {
++         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
++         qgradient.setColorAt(stop.position, stopColor);
++     }
++     
++     // Draw the gradient
++     m_painter->fillRect(clipRect, qgradient);
++     
++     m_painter->restore();
++ }
++ 
++ // Draw radial gradient
++ void ContainerQPainter::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient)
++ {
++     if (!m_painter) return;
++     
++     m_painter->save();
++     
++     QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
++     m_painter->setClipRect(clipRect);
++     
++     // Create a radial gradient
++     QRadialGradient qgradient(gradient.center_x, gradient.center_y, gradient.radius_x);
++     
++     // Add color stops
++     for (const auto& stop : gradient.colors) {
++         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
++         qgradient.setColorAt(stop.position, stopColor);
++     }
++     
++     // Draw the gradient
++     m_painter->fillRect(clipRect, qgradient);
++     
++     m_painter->restore();
++ }
++ 
++ // Draw conic gradient (not fully supported in Qt, approximated)
++ void ContainerQPainter::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
++ {
++     if (!m_painter) return;
++     
++     m_painter->save();
++     
++     QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
++     m_painter->setClipRect(clipRect);
++     
++     // Qt doesn't have direct support for conic gradients. This is a simplified implementation.
++     // For a more accurate implementation, we would need to draw a custom shader or image.
++     QConicalGradient qgradient(gradient.center_x, gradient.center_y, gradient.angle);
++     
++     // Add color stops
++     for (const auto& stop : gradient.colors) {
++         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
++         qgradient.setColorAt(stop.position, stopColor);
++     }
++     
++     // Draw the gradient
++     m_painter->fillRect(clipRect, qgradient);
++     
++     m_painter->restore();
++ }
+  
+  // Draw borders
+```
+
+```diff
+  }
+  
+- // Get client rect for viewport
+- void ContainerQPainter::get_client_rect(litehtml::position& client) const
++ // Get viewport dimensions
++ void ContainerQPainter::get_viewport(litehtml::position& viewport) const
+  {
+      if (m_painter) {
+-         QRect viewport = m_painter->viewport();
+-         client.x = viewport.x();
+-         client.y = viewport.y();
+-         client.width = viewport.width();
+-         client.height = viewport.height();
++         QRect viewRect = m_painter->viewport();
++         viewport.x = viewRect.x();
++         viewport.y = viewRect.y();
++         viewport.width = viewRect.width();
++         viewport.height = viewRect.height();
+      } else {
+-         client.x = 0;
+-         client.y = 0;
+-         client.width = 800;  // Default fallback width
+-         client.height = 600; // Default fallback height
++         viewport.x = 0;
++         viewport.y = 0;
++         viewport.width = 800;  // Default fallback width
++         viewport.height = 600; // Default fallback height
+      }
+  }
+```
+
+```diff
+  
+  // Handle document title
+- void ContainerQPainter::set_caption(const litehtml::tchar_t* caption)
++ void ContainerQPainter::set_caption(const char* caption)
+  {
+      QString title = QString::fromUtf8(caption);
+```
+
+```diff
+  
+  // Set base URL for document
+- void ContainerQPainter::set_base_url(const litehtml::tchar_t* base_url)
++ void ContainerQPainter::set_base_url(const char* base_url)
+  {
+      m_baseUrl = QString::fromUtf8(base_url);
+```
+
+```diff
+  
+  // Handle anchor clicks
+- void ContainerQPainter::on_anchor_click(const litehtml::tchar_t* url, const litehtml::element::ptr& el)
++ void ContainerQPainter::on_anchor_click(const char* url, const litehtml::element::ptr& el)
+  {
+      QString linkUrl = QString::fromUtf8(url);
+      emit anchorClicked(linkUrl);
+  }
++ 
++ // Handle mouse events
++ void ContainerQPainter::on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event)
++ {
++     // Implementation for mouse events if needed
++ }
+  
+  // Set cursor based on element
+- void ContainerQPainter::set_cursor(const litehtml::tchar_t* cursor)
++ void ContainerQPainter::set_cursor(const char* cursor)
+  {
+      QString cursorName = QString::fromUtf8(cursor);
+```
+
+```diff
+  
+  // Transform text based on CSS text-transform
+- void ContainerQPainter::transform_text(litehtml::tstring& text, litehtml::text_transform tt)
++ void ContainerQPainter::transform_text(litehtml::string& text, litehtml::text_transform tt)
+  {
+      if (text.empty()) return;
+```
+
+```diff
+  
+  // Import CSS from URL
+- void ContainerQPainter::import_css(litehtml::tstring& text, const litehtml::tstring& url, litehtml::tstring& baseurl)
++ void ContainerQPainter::import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl)
+  {
+      // Implementation for CSS loading if needed
+```
+
+```diff
+  
+  // Set clipping region
+- void ContainerQPainter::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius, bool valid_x, bool valid_y)
++ void ContainerQPainter::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius)
+  {
+      if (!m_painter) return;
+```
+
+```diff
+      // QPainter handles clipping stack via save/restore, so we don't need explicit implementation
+  }
++ 
++ // Get language settings
++ void ContainerQPainter::get_language(litehtml::string& language, litehtml::string& culture) const
++ {
++     // Use the system locale for language
++     QLocale locale = QLocale::system();
++     
++     // Convert language code to string
++     language = locale.name().left(2).toStdString(); // e.g., "en"
++     culture = locale.name().toStdString();          // e.g., "en_US"
++ }
++ 
++ // Create custom element
++ litehtml::element::ptr ContainerQPainter::create_element(const char* tag_name, 
++                                                         const litehtml::string_map& attributes,
++                                                         const std::shared_ptr<litehtml::document>& doc)
++ {
++     // We don't need to create custom elements, let litehtml handle it
++     return nullptr;
++ }
+  
+  // Callback for image loading
+```
+
+```diff
+      // Implementation for CSS loading callback if needed
+  } 
++     // Implementation for CSS loading callback if needed
++ } 
+```
+
+---
+
+Let's also update the QlithWidget.cpp file to fix any issues related to the litehtml interface changes:
+
+---
+
+```diff
+              document = litehtml::document::createFromString(
+                  htmlData.constData(), 
+-                 container, 
+-                 cssData.constData()
++                 container
+              );
+              
+```
+
+---
+
+Now let's try to build the project:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini && mkdir -p build && cd build && cmake .. && make
+```
+
+```
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-mini/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 86%] Built target litehtml
+[ 86%] Built target qlith_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith
+[ 87%] Built target qlith_autogen
+[ 89%] Building CXX object src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilati
+on.cpp.o
+[ 90%] Building CXX object src/CMakeFiles/qlith.dir/qlithwidget.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/qlithwidget.c
+pp:209:61: error: use of undeclared identifier 'sender'
+  209 |         QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+      |                                                             ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/src/qlithwidget.cpp:1:
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/src/qlithwidget.h:5:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework/H
+eaders/QWidget:1:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework/H
+eaders/qwidget.h:45:
+/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Headers/qobject.h:265:28: 
+error: cannot initialize a parameter of type 'const QObject *' with an lvalue of
+ type 'const typename QtPrivate::FunctionPointer<void (QlithWidgetPrivate::*)()>
+::Object *' (aka 'const QlithWidgetPrivate *')
+  265 |                            receiver, reinterpret_cast<void **>(&slot),
+      |                            ^~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/qlithwidget.c
+pp:82:18: note: in instantiation of function template specialization 'QObject::c
+onnect<void (QNetworkAccessManager::*)(QNetworkReply *), void (QlithWidgetPrivat
+e::*)()>' requested here
+   82 |         QObject::connect(networkManager, &QNetworkAccessManager::finishe
+d,
+      |                  ^
+/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Headers/qobject.h:472:63: 
+note: passing argument to parameter 'receiver' here
+  472 |                                                const QObject *receiver, 
+void **slotPtr,
+      |                                                               ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/src/qlithwidget.cpp:1:
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/src/qlithwidget.h:5:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework/H
+eaders/QWidget:1:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework/H
+eaders/qwidget.h:44:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Heade
+rs/qwindowdefs.h:44:
+In file included from /usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Head
+ers/qobjectdefs.h:50:
+/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Headers/qobjectdefs_impl.h
+:418:94: error: static_cast from 'QObject *' to 'typename FuncType::Object *' (a
+ka 'QlithWidgetPrivate *'), which are not related by inheritance, is not allowed
+  418 |                 FuncType::template call<Args, R>(static_cast<QSlotObject
+*>(this_)->function, static_cast<typename FuncType::Object *>(r), a);
+      |
+
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Headers/qobjectdefs_impl.h
+:427:57: note: in instantiation of member function 'QtPrivate::QSlotObject<void
+(QlithWidgetPrivate::*)(), QtPrivate::List<>, void>::impl' requested here
+  427 |         explicit QSlotObject(Func f) : QSlotObjectBase(&impl), function(
+f) {}
+      |                                                         ^
+/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Headers/qobject.h:266:32: 
+note: in instantiation of member function 'QtPrivate::QSlotObject<void (QlithWid
+getPrivate::*)(), QtPrivate::List<>, void>::QSlotObject' requested here
+  266 |                            new QtPrivate::QSlotObject<Func2, typename Qt
+Private::List_Left<typename SignalType::Arguments, SlotType::ArgumentCount>::Val
+ue,
+      |                                ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/qlithwidget.c
+pp:82:18: note: in instantiation of function template specialization 'QObject::c
+onnect<void (QNetworkAccessManager::*)(QNetworkReply *), void (QlithWidgetPrivat
+e::*)()>' requested here
+   82 |         QObject::connect(networkManager, &QNetworkAccessManager::finishe
+d,
+      |                  ^
+3 errors generated.
+make[2]: *** [src/CMakeFiles/qlith.dir/qlithwidget.cpp.o] Error 1
+make[1]: *** [src/CMakeFiles/qlith.dir/all] Error 2
+make: *** [all] Error 2
+
+```
+
+---
+
+There's an issue with Qt's signal/slot connection. Let's fix the QlithWidgetPrivate class in qlithwidget.cpp:
+
+---
+
+```diff
+  
+  // Private implementation class
+- class QlithWidgetPrivate {
++ class QlithWidgetPrivate : public QObject {
++     Q_OBJECT
+  public:
+      QlithWidgetPrivate(QlithWidget *owner)
+-         : q(owner)
++         : QObject(owner)
++         , q(owner)
+          , container(new ContainerQPainter(owner))
+          , networkManager(new QNetworkAccessManager(owner))
+```
+
+```diff
+          // Implementation depends on the litehtml version, here's a simplified approach
+          QByteArray htmlData = html.toUtf8();
+-         QByteArray cssData = masterCss.toUtf8();
+          
+          try {
+```
+
+```diff
+      
+      // Handle network reply for assets (images, CSS, etc.)
+-     void handleNetworkReply() {
+-         QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
++ public slots:
++     void handleNetworkReply(QNetworkReply *reply) {
+          if (!reply) return;
+          
+```
+
+```diff
+      QWidget::keyPressEvent(event);
+  }
++ 
++ #include "qlithwidget.moc" 
+```
+
+---
+
+Now let's update the project CMakeLists.txt to make sure it's properly configured:
+
+---
+
+Read file: qlith-mini/CMakeLists.txt
+
+---
+
+Let's update the browser CMakeLists.txt:
+
+---
+
+Read file: qlith-mini/browser/CMakeLists.txt
+
+---
+
+Let's update the src CMakeLists.txt:
+
+---
+
+Read file: qlith-mini/src/CMakeLists.txt
+
+---
+
+Let's check the qlith_global.h file:
+
+---
+
+Read file: qlith-mini/src/qlith_global.h
+
+---
+
+Let's try to build the project again:
+
+---
+
+```diff
+  #include <QTimer>
+  #include <QColor>
++ #include <QScopedPointer>
+  #include <memory>
+  
+- #include <litehtml.h>
++ #include <litehtml/document.h>
+  #include "qlith_global.h"
+  
+```
+
+---
+
+Let's try to build the project again:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini && rm -rf build && mkdir -p build && cd build && cmake .. && make
+```
+
+```
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/To
+olchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:14 (message):
+  The imported target "Qt5::Gui" references the file
+
+     "/usr/local/plugins/platforms/libqcocoa.dylib"
+
+  but this file does not exist.  Possible reasons include:
+
+  * The file was deleted, renamed, or moved to another location.
+
+  * An install or uninstall procedure did not complete successfully.
+
+  * The installation package was faulty and contained
+
+     "/usr/local/lib/cmake/Qt5Gui/Qt5Gui_QCocoaIntegrationPlugin.cmake"
+
+  but not all the files it references.
+
+Call Stack (most recent call first):
+  /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:214 (_qt5_Gui_check_file_exists
+)
+  /usr/local/lib/cmake/Qt5Gui/Qt5Gui_QCocoaIntegrationPlugin.cmake:5 (_populate_
+Gui_plugin_properties)
+  /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:223 (include)
+  /usr/local/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake:93 (find_package)
+  /usr/local/lib/cmake/Qt5/Qt5Config.cmake:28 (find_package)
+  CMakeLists.txt:29 (find_package)
+
+
+-- Configuring incomplete, errors occurred!
+
+```
+
+---
+
+There's an issue with the Qt5 installation. Let's check the actual path and update the CMake configuration:
+
+---
+
+```bash
+find /usr/local -name "libqcocoa.dylib"
+```
+
+```
+/usr/local/Cellar/qt@5/5.15.16_1/plugins/platforms/libqcocoa.dylib
+/usr/local/Cellar/qt/6.9.0/share/qt/plugins/platforms/libqcocoa.dylib
+
+```
+
+---
+
+Let's update the project configuration:
+
+---
+
+```diff
+  set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
+  set(GUMBO_DIR "${EXTERNAL_DIR}/gumbo-parser")
++ 
++ # Set the correct Qt5 path
++ set(Qt5_DIR "/usr/local/Cellar/qt@5/5.15.16_1/lib/cmake/Qt5")
+  
+  # Find Qt5 packages
+```
+
+---
+
+Let's try building again:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini && rm -rf build && mkdir -p build && cd build && cmake .. && make
+```
+
+---
+
+Let's check the status of the build:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && ls -la
+```
+
+```
+adam@Hamlet qlith % cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build && ls -lcd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build && ls -la
+total 128
+drwxr-xr-x  12 adam  staff    384 Apr 27 02:04 .
+drwxr-xr-x  11 adam  staff    352 Apr 27 02:03 ..
+drwxr-xr-x   6 adam  staff    192 Apr 27 02:04 browser
+-rw-r--r--   1 adam  staff   2570 Apr 27 02:03 cmake_install.cmake
+-rw-r--r--   1 adam  staff  21512 Apr 27 02:04 CMakeCache.txt
+drwxr-xr-x  15 adam  staff    480 Apr 27 02:04 CMakeFiles
+-rwxr-xr-x   1 adam  staff   4372 Apr 27 02:04 CPackConfig.cmake
+-rwxr-xr-x   1 adam  staff   4852 Apr 27 02:04 CPackSourceConfig.cmake
+drwxr-xr-x   8 adam  staff    256 Apr 27 02:04 litehtml
+-rw-r--r--   1 adam  staff  14576 Apr 27 02:04 Makefile
+-rwxr-xr-x   1 adam  staff   2756 Apr 27 02:03 qlithConfigVersion.cmake
+drwxr-xr-x   8 adam  staff    256 Apr 27 02:04 src
+adam@Hamlet build %
+```
+
+---
+
+Let's see what's happening with the build:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && make VERBOSE=1
+```
+
+```
+adam@Hamlet build % cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build && make cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build && make VERBOSE=1
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/
+cmake/data/bin/cmake -S/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini -B/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build --c
+heck-build-system CMakeFiles/Makefile.cmake 0
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/
+cmake/data/bin/cmake -E cmake_progress_start /Users/adam/Developer/vcs/github.tw
+ardoch/pub/qlith/qlith-mini/build/CMakeFiles /Users/adam/Developer/vcs/github.tw
+ardoch/pub/qlith/qlith-mini/build//CMakeFiles/progress.marks
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/Makefile2
+ all
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo_autogen_timestamp_deps.dir/build.make litehtml/src/gumbo/CMakeFi
+les/gumbo_autogen_timestamp_deps.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/qlit
+h/qlith-mini/build/litehtml/src/gumbo/CMakeFiles/gumbo_autogen_timestamp_deps.di
+r/DependInfo.cmake "--color="
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo_autogen_timestamp_deps.dir/build.make litehtml/src/gumbo/CMakeFi
+les/gumbo_autogen_timestamp_deps.dir/build
+make[2]: Nothing to be done for `litehtml/src/gumbo/CMakeFiles/gumbo_autogen_tim
+estamp_deps.dir/build'.
+[  0%] Built target gumbo_autogen_timestamp_deps
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo_autogen.dir/build.make litehtml/src/gumbo/CMakeFiles/gumbo_autog
+en.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/qlit
+h/qlith-mini/build/litehtml/src/gumbo/CMakeFiles/gumbo_autogen.dir/DependInfo.cm
+ake "--color="
+Dependencies file "litehtml/src/gumbo/gumbo_autogen/deps" is newer than depends 
+file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/liteh
+tml/src/gumbo/CMakeFiles/gumbo_autogen.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target gumbo_autogen
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo_autogen.dir/build.make litehtml/src/gumbo/CMakeFiles/gumbo_autog
+en.dir/build
+make[2]: Nothing to be done for `litehtml/src/gumbo/CMakeFiles/gumbo_autogen.dir
+/build'.
+[  1%] Built target gumbo_autogen
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo.dir/build.make litehtml/src/gumbo/CMakeFiles/gumbo.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/src/gumbo /Users/adam/Developer/vcs/github.twardoch/pub/qlit
+h/qlith-mini/build/litehtml/src/gumbo/CMakeFiles/gumbo.dir/DependInfo.cmake "--c
+olor="
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/src/gumbo/C
+MakeFiles/gumbo.dir/build.make litehtml/src/gumbo/CMakeFiles/gumbo.dir/build
+make[2]: Nothing to be done for `litehtml/src/gumbo/CMakeFiles/gumbo.dir/build'.
+[ 16%] Built target gumbo
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml_autogen_timestamp_deps.dir/build.make litehtml/CMakeFiles/litehtml_auto
+gen_timestamp_deps.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build
+/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/l
+itehtml/CMakeFiles/litehtml_autogen_timestamp_deps.dir/DependInfo.cmake "--color
+="
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml_autogen_timestamp_deps.dir/build.make litehtml/CMakeFiles/litehtml_auto
+gen_timestamp_deps.dir/build
+make[2]: Nothing to be done for `litehtml/CMakeFiles/litehtml_autogen_timestamp_
+deps.dir/build'.
+[ 16%] Built target litehtml_autogen_timestamp_deps
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml_autogen.dir/build.make litehtml/CMakeFiles/litehtml_autogen.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build
+/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/l
+itehtml/CMakeFiles/litehtml_autogen.dir/DependInfo.cmake "--color="
+Dependencies file "litehtml/litehtml_autogen/deps" is newer than depends file "/
+Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/litehtml/CMa
+keFiles/litehtml_autogen.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target litehtml_autogen
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml_autogen.dir/build.make litehtml/CMakeFiles/litehtml_autogen.dir/build
+make[2]: Nothing to be done for `litehtml/CMakeFiles/litehtml_autogen.dir/build'
+.
+[ 17%] Built target litehtml_autogen
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml.dir/build.make litehtml/CMakeFiles/litehtml.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/external/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build
+/litehtml /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/l
+itehtml/CMakeFiles/litehtml.dir/DependInfo.cmake "--color="
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o.d" is n
+ewer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlit
+h-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.o.d" is 
+newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qli
+th-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/css_properties.cpp.o.d" 
+is newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/
+qlith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o.d" is ne
+wer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o.d" is ne
+wer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/formatting_context.cpp.o
+.d" is newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/ql
+ith/qlith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o.d" is new
+er than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o.d" is newer t
+han depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini
+/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/html_microsyntaxes.cpp.o
+.d" is newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/ql
+ith/qlith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o.d" is new
+er than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o.d" is ne
+wer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o.d" is new
+er than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.o.d" is 
+newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qli
+th-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o.d" is newe
+r than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-m
+ini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp.o.d" is
+ newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_block_context.cpp
+.o.d" is newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/
+qlith/qlith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal
+".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.o.d" is 
+newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qli
+th-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp.o.d" is
+ newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_inline_context.cp
+p.o.d" is newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub
+/qlith/qlith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.interna
+l".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.o.d" is 
+newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qli
+th-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp.o.d" is
+ newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o.d" is ne
+wer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o.d" is newer
+ than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mi
+ni/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o.d" is newer 
+than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-min
+i/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o.d" is n
+ewer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlit
+h-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o.d" is newer 
+than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-min
+i/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp.o.d" is
+ newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o.d" is newer th
+an depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/
+build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o.d" is new
+er than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp.o.d" is
+ newer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o.d" is ne
+wer than depends file "/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/litehtml/CMakeFiles/litehtml.dir/compiler_depend.internal".
+Consolidate compiler generated dependencies of target litehtml
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f litehtml/CMakeFiles/
+litehtml.dir/build.make litehtml/CMakeFiles/litehtml.dir/build
+make[2]: Nothing to be done for `litehtml/CMakeFiles/litehtml.dir/build'.
+[ 86%] Built target litehtml
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f src/CMakeFiles/qlith
+_autogen_timestamp_deps.dir/build.make src/CMakeFiles/qlith_autogen_timestamp_de
+ps.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/src /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mi
+ni/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/sr
+c /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/CMake
+Files/qlith_autogen_timestamp_deps.dir/DependInfo.cmake "--color="
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f src/CMakeFiles/qlith
+_autogen_timestamp_deps.dir/build.make src/CMakeFiles/qlith_autogen_timestamp_de
+ps.dir/build
+make[2]: Nothing to be done for `src/CMakeFiles/qlith_autogen_timestamp_deps.dir
+/build'.
+[ 86%] Built target qlith_autogen_timestamp_deps
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f src/CMakeFiles/qlith
+_autogen.dir/build.make src/CMakeFiles/qlith_autogen.dir/depend
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build && /Libr
+ary/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/cmake
+/data/bin/cmake -E cmake_depends "Unix Makefiles" /Users/adam/Developer/vcs/gith
+ub.twardoch/pub/qlith/qlith-mini /Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/src /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mi
+ni/build /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/sr
+c /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/CMake
+Files/qlith_autogen.dir/DependInfo.cmake "--color="
+/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f src/CMakeFiles/qlith
+_autogen.dir/build.make src/CMakeFiles/qlith_autogen.dir/build
+[ 87%] Automatic MOC and UIC for target qlith
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src && /
+Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/c
+make/data/bin/cmake -E cmake_autogen /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-mini/build/src/CMakeFiles/qlith_autogen.dir/AutogenInfo.json Rele
+ase
+AutoGen: Refreshing parse cache because it doesn't exist.
+AutoMoc: Generating "SRC:/build/src/qlith_autogen/moc_predefs.h", because the mo
+c settings changed.
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/c++ -std=c++17 -dM -E -c /Library/Frameworks/Python.framework/Versions/3.
+12/lib/python3.12/site-packages/cmake/data/share/cmake-3.31/Modules/CMakeCXXComp
+ilerABI.cpp "-DQLITH_DEBUG_DIR=\"/Users/adam/Developer/vcs/github.twardoch/pub/q
+lith/qlith-mini/build/debug\"" -DQLITH_LIBRARY -DQT_CORE_LIB -DQT_GUI_LIB -DQT_N
+ETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -Dqlith_EXPORTS -I/Users/adam/Develope
+r/vcs/github.twardoch/pub/qlith/qlith-mini/src -I/Users/adam/Developer/vcs/githu
+b.twardoch/pub/qlith/qlith-mini/build/src -I/Users/adam/Developer/vcs/github.twa
+rdoch/pub/qlith/external/litehtml/src -I/Users/adam/Developer/vcs/github.twardoc
+h/pub/qlith/external/litehtml/include -I/Users/adam/Developer/vcs/github.twardoc
+h/pub/qlith/external/litehtml/src/gumbo/include -I/usr/local/Cellar/qt@5/5.15.16
+_1/lib/QtWidgets.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.fram
+ework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework -I/usr/loca
+l/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Headers -I/Applications/Xcode.app/Co
+ntents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/System/
+Library/Frameworks/OpenGL.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/l
+ib/QtCore.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework/Head
+ers -I/usr/local/Cellar/qt@5/5.15.16_1/mkspecs/macx-clang -I/usr/local/Cellar/qt
+@5/5.15.16_1/lib/QtNetwork.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtNe
+twork.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/M
+acOSX.platform/Developer/SDKs/MacOSX15.4.sdk/usr/include -I/Applications/Xcode.a
+pp/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/us
+r/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDe
+fault.xctoolchain/usr/lib/clang/17/include -I/Applications/Xcode.app/Contents/De
+veloper/Toolchains/XcodeDefault.xctoolchain/usr/include -F /Applications/Xcode.a
+pp/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/Sy
+stem/Library/Frameworks -F /usr/local/Cellar/qt@5/5.15.16_1/lib
+AutoMoc: Touching "SRC:/build/src/qlith_autogen/moc_predefs.h"
+AutoGen: Parsing "SRC:/src/container_qpainter.h"
+AutoGen: Parsing "SRC:/src/container_qpainter_p.h"
+AutoGen: Parsing "SRC:/src/qlithwidget.cpp"
+AutoGen: Parsing "SRC:/src/qlithwidget.h"
+AutoGen: Parsing "SRC:/src/qlith_global.h"
+AutoGen: Parsing "SRC:/src/container_qpainter.cpp"
+AutoMoc: Generating "SRC:/build/src/qlith_autogen/include/qlithwidget.moc", beca
+use it doesn't exist, from "SRC:/src/qlithwidget.cpp"
+/usr/local/Cellar/qt@5/5.15.16_1/bin/moc "-DQLITH_DEBUG_DIR=\"/Users/adam/Develo
+per/vcs/github.twardoch/pub/qlith/qlith-mini/build/debug\"" -DQLITH_LIBRARY -DQT
+_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -Dqlith_E
+XPORTS -I/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src -I/U
+sers/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src -I/Users/
+adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/include -I/
+usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework -I/usr/local/Cellar/qt@5
+/5.15.16_1/lib/QtWidgets.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/li
+b/QtGui.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Headers
+ -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Develope
+r/SDKs/MacOSX15.4.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/usr/
+local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework -I/usr/local/Cellar/qt@5/5.15.1
+6_1/lib/QtCore.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/mkspecs/macx
+-clang -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtNetwork.framework -I/usr/local/C
+ellar/qt@5/5.15.16_1/lib/QtNetwork.framework/Headers -I/Applications/Xcode.app/C
+ontents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/usr/in
+clude -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents
+/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -I/Appli
+cations/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/inc
+lude -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/System/Library/Frameworks -F /usr/local/Cellar/qt@5/5
+.15.16_1/lib --include /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/src/qlith_autogen/moc_predefs.h --output-dep-file -o /Users/adam/Dev
+eloper/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/include/
+qlithwidget.moc /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/s
+rc/qlithwidget.cpp
+AutoMoc: Generating "SRC:/build/src/qlith_autogen/EWIEGA46WW/moc_container_qpain
+ter.cpp", because the moc settings changed, from "SRC:/src/container_qpainter.h"
+/usr/local/Cellar/qt@5/5.15.16_1/bin/moc "-DQLITH_DEBUG_DIR=\"/Users/adam/Develo
+per/vcs/github.twardoch/pub/qlith/qlith-mini/build/debug\"" -DQLITH_LIBRARY -DQT
+_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -Dqlith_E
+XPORTS -I/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src -I/U
+sers/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src -I/Users/
+adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/include -I/
+usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework -I/usr/local/Cellar/qt@5
+/5.15.16_1/lib/QtWidgets.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/li
+b/QtGui.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Headers
+ -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Develope
+r/SDKs/MacOSX15.4.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/usr/
+local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework -I/usr/local/Cellar/qt@5/5.15.1
+6_1/lib/QtCore.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/mkspecs/macx
+-clang -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtNetwork.framework -I/usr/local/C
+ellar/qt@5/5.15.16_1/lib/QtNetwork.framework/Headers -I/Applications/Xcode.app/C
+ontents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/usr/in
+clude -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents
+/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -I/Appli
+cations/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/inc
+lude -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/System/Library/Frameworks -F /usr/local/Cellar/qt@5/5
+.15.16_1/lib --include /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/src/qlith_autogen/moc_predefs.h --output-dep-file -o /Users/adam/Dev
+eloper/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46
+WW/moc_container_qpainter.cpp /Users/adam/Developer/vcs/github.twardoch/pub/qlit
+h/qlith-mini/src/container_qpainter.h
+AutoMoc: Generating "SRC:/build/src/qlith_autogen/EWIEGA46WW/moc_qlithwidget.cpp
+", because the moc settings changed, from "SRC:/src/qlithwidget.h"
+/usr/local/Cellar/qt@5/5.15.16_1/bin/moc "-DQLITH_DEBUG_DIR=\"/Users/adam/Develo
+per/vcs/github.twardoch/pub/qlith/qlith-mini/build/debug\"" -DQLITH_LIBRARY -DQT
+_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -Dqlith_E
+XPORTS -I/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src -I/U
+sers/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src -I/Users/
+adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/include -I/
+usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework -I/usr/local/Cellar/qt@5
+/5.15.16_1/lib/QtWidgets.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/li
+b/QtGui.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Headers
+ -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Develope
+r/SDKs/MacOSX15.4.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/usr/
+local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework -I/usr/local/Cellar/qt@5/5.15.1
+6_1/lib/QtCore.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/mkspecs/macx
+-clang -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtNetwork.framework -I/usr/local/C
+ellar/qt@5/5.15.16_1/lib/QtNetwork.framework/Headers -I/Applications/Xcode.app/C
+ontents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/usr/in
+clude -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents
+/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -I/Appli
+cations/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/inc
+lude -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/System/Library/Frameworks -F /usr/local/Cellar/qt@5/5
+.15.16_1/lib --include /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/src/qlith_autogen/moc_predefs.h --output-dep-file -o /Users/adam/Dev
+eloper/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/EWIEGA46
+WW/moc_qlithwidget.cpp /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/src/qlithwidget.h
+AutoMoc: Reading dependencies from "SRC:/build/src/qlith_autogen/EWIEGA46WW/moc_
+container_qpainter.cpp.d"
+AutoMoc: Reading dependencies from "SRC:/build/src/qlith_autogen/EWIEGA46WW/moc_
+qlithwidget.cpp.d"
+
+AutoMoc subprocess error
+------------------------
+The moc process failed to compile
+  "SRC:/src/qlithwidget.cpp"
+into
+  "SRC:/build/src/qlith_autogen/include/qlithwidget.moc"
+included by
+  "SRC:/src/qlithwidget.cpp"
+Process failed with return value 1
+
+Command
+-------
+/usr/local/Cellar/qt@5/5.15.16_1/bin/moc "-DQLITH_DEBUG_DIR=\"/Users/adam/Develo
+per/vcs/github.twardoch/pub/qlith/qlith-mini/build/debug\"" -DQLITH_LIBRARY -DQT
+_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -Dqlith_E
+XPORTS -I/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src -I/U
+sers/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src -I/Users/
+adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include -I/Users/adam
+/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/include -I/
+usr/local/Cellar/qt@5/5.15.16_1/lib/QtWidgets.framework -I/usr/local/Cellar/qt@5
+/5.15.16_1/lib/QtWidgets.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/li
+b/QtGui.framework -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtGui.framework/Headers
+ -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Develope
+r/SDKs/MacOSX15.4.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/usr/
+local/Cellar/qt@5/5.15.16_1/lib/QtCore.framework -I/usr/local/Cellar/qt@5/5.15.1
+6_1/lib/QtCore.framework/Headers -I/usr/local/Cellar/qt@5/5.15.16_1/mkspecs/macx
+-clang -I/usr/local/Cellar/qt@5/5.15.16_1/lib/QtNetwork.framework -I/usr/local/C
+ellar/qt@5/5.15.16_1/lib/QtNetwork.framework/Headers -I/Applications/Xcode.app/C
+ontents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/usr/in
+clude -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents
+/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -I/Appli
+cations/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/inc
+lude -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Dev
+eloper/SDKs/MacOSX15.4.sdk/System/Library/Frameworks -F /usr/local/Cellar/qt@5/5
+.15.16_1/lib --include /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith
+-mini/build/src/qlith_autogen/moc_predefs.h --output-dep-file -o /Users/adam/Dev
+eloper/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/include/
+qlithwidget.moc /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/s
+rc/qlithwidget.cpp
+
+Output
+------
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/qlithwidget.c
+pp:258: Error: Not a signal or slot declaration
+
+make[2]: *** [src/qlith_autogen/timestamp] Error 1
+make[1]: *** [src/CMakeFiles/qlith_autogen.dir/all] Error 2
+make: *** [all] Error 2
+adam@Hamlet build %
+```
+
+---
+
+The error is in the qlithwidget.cpp file: "Not a signal or slot declaration" at line 258. Let's fix it:
+
+---
+
+Read file: qlith-mini/src/qlithwidget.cpp
+
+---
+
+Let's fix the issue in the qlithwidget.cpp file:
+
+---
+
+```diff
+  #include <QBuffer>
+  #include <QTemporaryFile>
++ #include <QLocale>
+  
+  // Helper function for debugging
+```
+
+```diff
+  #endif
+  }
++ 
++ // Forward declaration
++ class QlithWidget;
+  
+  // Private implementation class
+  class QlithWidgetPrivate : public QObject {
+      Q_OBJECT
+  public:
+-     QlithWidgetPrivate(QlithWidget *owner)
++     QlithWidgetPrivate(QlithWidget *owner);
++     ~QlithWidgetPrivate();
++     
++     // Content loading methods
++     void loadHtml(const QString &html, const QUrl &url);
++     void loadUrl(const QUrl &url);
++     void loadLocalFile(const QString &filePath);
++     void loadRemoteUrl(const QUrl &url);
++     
++     // Layout handling
++     void updateWithLayout();
++ 
++ public slots:
++     // Handle network reply for assets (images, CSS, etc.)
++     void handleNetworkReply(QNetworkReply *reply);
++ 
++ public:
++     QlithWidget *q;
++     ContainerQPainter *container;
++     QNetworkAccessManager *networkManager;
++     std::shared_ptr<litehtml::document> document;
++     QMap<QUrl, QNetworkReply*> pendingResources;
++     
++     QString currentHtml;
++     QUrl currentUrl;
++     QUrl baseUrl;
++     QColor backgroundColor;
++     QString defaultCss;
++     
++     bool loading;
++     bool needsLayout;
++ };
++ 
++ // Implementation of QlithWidgetPrivate methods
++ QlithWidgetPrivate::QlithWidgetPrivate(QlithWidget *owner)
+      : QObject(owner)
+      , q(owner)
+```
+
+```diff
+  }
+  
+-     ~QlithWidgetPrivate() {
++ QlithWidgetPrivate::~QlithWidgetPrivate() {
+      // Clear any pending requests
+      for (QNetworkReply* reply : pendingResources.values()) {
+```
+
+```diff
+  
+  // Load HTML content
+-     void loadHtml(const QString &html, const QUrl &url) {
++ void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
+      currentHtml = html;
+      currentUrl = url;
+```
+
+```diff
+  
+  // Load URL
+-     void loadUrl(const QUrl &url) {
++ void QlithWidgetPrivate::loadUrl(const QUrl &url) {
+      // Skip if same URL and already loaded
+      if (url == currentUrl && !needsLayout) {
+```
+
+```diff
+  
+  // Load local file
+-     void loadLocalFile(const QString &filePath) {
++ void QlithWidgetPrivate::loadLocalFile(const QString &filePath) {
+      QFile file(filePath);
+      if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+```
+
+```diff
+  
+  // Load remote URL
+-     void loadRemoteUrl(const QUrl &url) {
++ void QlithWidgetPrivate::loadRemoteUrl(const QUrl &url) {
+      QNetworkRequest request(url);
+      request.setHeader(QNetworkRequest::UserAgentHeader, "Qlith/1.0");
+```
+
+```diff
+  
+  // Handle network reply for assets (images, CSS, etc.)
+- public slots:
+-     void handleNetworkReply(QNetworkReply *reply) {
++ void QlithWidgetPrivate::handleNetworkReply(QNetworkReply *reply) {
+      if (!reply) return;
+      
+```
+
+```diff
+  
+  // Redraw with layout if needed
+-     void updateWithLayout() {
++ void QlithWidgetPrivate::updateWithLayout() {
+      if (needsLayout && document) {
+          document->render(q->width());
+```
+
+```diff
+      q->update();
+  }
+- 
+-     QlithWidget *q;
+-     ContainerQPainter *container;
+-     QNetworkAccessManager *networkManager;
+-     std::shared_ptr<litehtml::document> document;
+-     QMap<QUrl, QNetworkReply*> pendingResources;
+-     
+-     QString currentHtml;
+-     QUrl currentUrl;
+-     QUrl baseUrl;
+-     QColor backgroundColor;
+-     QString defaultCss;
+-     
+-     bool loading;
+-     bool needsLayout;
+- };
+  
+  //
+```
+
+---
+
+Now let's try to build the project again:
+
+---
+
+```bash
+cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini && rm -rf build && mkdir -p build && cd build && cmake .. && make
+```
+
+```
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/To
+olchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Tool
+chains/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found ZLIB: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platf
+orm/Developer/SDKs/MacOSX15.4.sdk/usr/lib/libz.tbd (found version "1.2.12")
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Configuring done (2.4s)
+-- Generating done (0.5s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-mini/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen
+/mocs_compilation.cpp.o
+[  3%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  5%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+error.c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-
+Wvoid-pointer-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+[  6%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+parser.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from
+ 'void *' [-Wvoid-pointer-to-enum-cast]
+  747 |   return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length -
+ 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+1 warning generated.
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c
+.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.
+o
+[  9%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[ 10%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 12%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/moc
+s_compilation.cpp.o
+[ 19%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp
+.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cp
+p.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 25%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 26%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_contain
+er.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 29%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.
+cpp.o
+[ 30%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 39%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 49%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntax
+es.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.
+o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 59%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp
+.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp
+.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 69%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.c
+pp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.
+o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.
+o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_con
+text.cpp.o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp
+.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_co
+ntext.cpp.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp
+.o
+[ 78%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.
+o
+[ 79%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp
+.o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_conte
+xt.cpp.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 85%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 86%] Built target litehtml
+[ 86%] Built target qlith_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith
+[ 87%] Built target qlith_autogen
+[ 89%] Building CXX object src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilati
+on.cpp.o
+[ 90%] Building CXX object src/CMakeFiles/qlith.dir/qlithwidget.cpp.o
+[ 91%] Building CXX object src/CMakeFiles/qlith.dir/container_qpainter.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:126:44: error: no member named 'name' in 'litehtml::font_description'
+  126 |     font.setFamily(QString::fromUtf8(descr.name.c_str()));
+      |                                      ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:129:26: error: no member named 'italic' in 'litehtml::font_description
+'
+  129 |     font.setItalic(descr.italic == litehtml::font_style_italic);
+      |                    ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:130:29: error: no member named 'decoration' in 'litehtml::font_descrip
+tion'
+  130 |     font.setUnderline(descr.decoration & litehtml::text_decoration_line_
+underline);
+      |                       ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:131:29: error: no member named 'decoration' in 'litehtml::font_descrip
+tion'
+  131 |     font.setStrikeOut(descr.decoration & litehtml::text_decoration_line_
+line_through);
+      |                       ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:344:30: error: no member named 'position_x' in 'litehtml::background_l
+ayer'
+  344 |         QRect destRect(layer.position_x, layer.position_y, layer.backgro
+und_size.width, layer.background_size.height);
+      |                        ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:344:48: error: no member named 'position_y' in 'litehtml::background_l
+ayer'
+  344 |         QRect destRect(layer.position_x, layer.position_y, layer.backgro
+und_size.width, layer.background_size.height);
+      |                                          ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:344:66: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  344 |         QRect destRect(layer.position_x, layer.position_y, layer.backgro
+und_size.width, layer.background_size.height);
+      |                                                            ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:344:95: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  344 |         QRect destRect(layer.position_x, layer.position_y, layer.backgro
+und_size.width, layer.background_size.height);
+      |
+
+                ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:350:32: error: no member named 'position_x' in 'litehtml::background_l
+ayer'
+  350 |             for (int x = layer.position_x; x < clipRect.right(); x += la
+yer.background_size.width) {
+      |                          ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:350:77: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  350 |             for (int x = layer.position_x; x < clipRect.right(); x += la
+yer.background_size.width) {
+      |                                                                       ~~
+~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:351:53: error: no member named 'position_y' in 'litehtml::background_l
+ayer'
+  351 |                 m_painter->drawImage(QRect(x, layer.position_y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |                                               ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:351:71: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  351 |                 m_painter->drawImage(QRect(x, layer.position_y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |                                                                 ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:351:100: error: no member named 'background_size' in 'litehtml::backgr
+ound_layer'
+  351 |                 m_painter->drawImage(QRect(x, layer.position_y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |
+
+                     ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:354:32: error: no member named 'position_y' in 'litehtml::background_l
+ayer'
+  354 |             for (int y = layer.position_y; y < clipRect.bottom(); y += l
+ayer.background_size.height) {
+      |                          ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:354:78: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  354 |             for (int y = layer.position_y; y < clipRect.bottom(); y += l
+ayer.background_size.height) {
+      |                                                                        ~
+~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:355:50: error: no member named 'position_x' in 'litehtml::background_l
+ayer'
+  355 |                 m_painter->drawImage(QRect(layer.position_x, y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |                                            ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:355:71: error: no member named 'background_size' in 'litehtml::backgro
+und_layer'
+  355 |                 m_painter->drawImage(QRect(layer.position_x, y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |                                                                 ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:355:100: error: no member named 'background_size' in 'litehtml::backgr
+ound_layer'
+  355 |                 m_painter->drawImage(QRect(layer.position_x, y, layer.ba
+ckground_size.width, layer.background_size.height), img);
+      |
+
+                     ~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpa
+inter.cpp:358:32: error: no member named 'position_y' in 'litehtml::background_l
+ayer'
+  358 |             for (int y = layer.position_y; y < clipRect.bottom(); y += l
+ayer.background_size.height) {
+      |                          ~~~~~ ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+make[2]: *** [src/CMakeFiles/qlith.dir/container_qpainter.cpp.o] Error 1
+make[1]: *** [src/CMakeFiles/qlith.dir/all] Error 2
+make: *** [all] Error 2
+
+```
+
+---
+
+Now we need to fix the container_qpainter.cpp file to match the actual litehtml API structure:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/font_description.h
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/background.h
+
+---
+
+Let's fix the container_qpainter.cpp file to use the current litehtml API:
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
 
 
 

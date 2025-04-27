@@ -8,9 +8,10 @@
 #include <QNetworkReply>
 #include <QTimer>
 #include <QColor>
+#include <QScopedPointer>
 #include <memory>
 
-#include <litehtml.h>
+#include <litehtml/document.h>
 #include "qlith_global.h"
 
 class ContainerQPainter;

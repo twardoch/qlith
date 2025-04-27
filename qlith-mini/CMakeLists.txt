@@ -25,6 +25,9 @@ set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/../external")
 set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
 set(GUMBO_DIR "${EXTERNAL_DIR}/gumbo-parser")
 
+# Set the correct Qt5 path
+set(Qt5_DIR "/usr/local/Cellar/qt@5/5.15.16_1/lib/cmake/Qt5")
+
 # Find Qt5 packages
 find_package(Qt5 COMPONENTS Widgets Network Svg REQUIRED)
 

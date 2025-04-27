@@ -123,12 +123,12 @@ litehtml::uint_ptr ContainerQPainter::create_font(const litehtml::font_descripti
 {
     // Create a QFont from the parameters
     QFont font;
-    font.setFamily(QString::fromUtf8(descr.name.c_str()));
+    font.setFamily(QString::fromUtf8(descr.family.c_str()));
     font.setPixelSize(descr.size);
     font.setWeight(descr.weight);
-    font.setItalic(descr.italic == litehtml::font_style_italic);
-    font.setUnderline(descr.decoration & litehtml::text_decoration_line_underline);
-    font.setStrikeOut(descr.decoration & litehtml::text_decoration_line_line_through);
+    font.setItalic(descr.style == litehtml::font_style_italic);
+    font.setUnderline(descr.decoration_line & litehtml::text_decoration_line_underline);
+    font.setStrikeOut(descr.decoration_line & litehtml::text_decoration_line_line_through);
     
     // Store font metrics
     font_metrics_t metrics(font);
@@ -341,23 +341,25 @@ void ContainerQPainter::draw_image(litehtml::uint_ptr hdc, const litehtml::backg
         QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
         m_painter->setClipRect(clipRect);
         
-        QRect destRect(layer.position_x, layer.position_y, layer.background_size.width, layer.background_size.height);
+        // Calculate image position and size based on background-position and background-size
+        // In this simplified implementation, we just place it at the origin_box position
+        QRect imgRect(layer.origin_box.x, layer.origin_box.y, img.width(), img.height());
         
         // Handle different background-repeat values
         if (layer.repeat == litehtml::background_repeat_no_repeat) {
-            m_painter->drawImage(destRect, img);
+            m_painter->drawImage(imgRect, img);
         } else if (layer.repeat == litehtml::background_repeat_repeat_x) {
-            for (int x = layer.position_x; x < clipRect.right(); x += layer.background_size.width) {
-                m_painter->drawImage(QRect(x, layer.position_y, layer.background_size.width, layer.background_size.height), img);
+            for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                m_painter->drawImage(QRect(x, layer.origin_box.y, img.width(), img.height()), img);
             }
         } else if (layer.repeat == litehtml::background_repeat_repeat_y) {
-            for (int y = layer.position_y; y < clipRect.bottom(); y += layer.background_size.height) {
-                m_painter->drawImage(QRect(layer.position_x, y, layer.background_size.width, layer.background_size.height), img);
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                m_painter->drawImage(QRect(layer.origin_box.x, y, img.width(), img.height()), img);
             }
         } else if (layer.repeat == litehtml::background_repeat_repeat) {
-            for (int y = layer.position_y; y < clipRect.bottom(); y += layer.background_size.height) {
-                for (int x = layer.position_x; x < clipRect.right(); x += layer.background_size.width) {
-                    m_painter->drawImage(QRect(x, y, layer.background_size.width, layer.background_size.height), img);
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                    m_painter->drawImage(QRect(x, y, img.width(), img.height()), img);
                 }
             }
         }
@@ -391,13 +393,13 @@ void ContainerQPainter::draw_linear_gradient(litehtml::uint_ptr hdc, const liteh
     
     // Create a linear gradient
     QLinearGradient qgradient;
-    qgradient.setStart(gradient.start_x, gradient.start_y);
-    qgradient.setFinalStop(gradient.end_x, gradient.end_y);
+    qgradient.setStart(gradient.start.x, gradient.start.y);
+    qgradient.setFinalStop(gradient.end.x, gradient.end.y);
     
     // Add color stops
-    for (const auto& stop : gradient.colors) {
+    for (const auto& stop : gradient.color_points) {
         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
-        qgradient.setColorAt(stop.position, stopColor);
+        qgradient.setColorAt(stop.offset, stopColor);
     }
     
     // Draw the gradient
@@ -417,12 +419,12 @@ void ContainerQPainter::draw_radial_gradient(litehtml::uint_ptr hdc, const liteh
     m_painter->setClipRect(clipRect);
     
     // Create a radial gradient
-    QRadialGradient qgradient(gradient.center_x, gradient.center_y, gradient.radius_x);
+    QRadialGradient qgradient(gradient.position.x, gradient.position.y, gradient.radius.x);
     
     // Add color stops
-    for (const auto& stop : gradient.colors) {
+    for (const auto& stop : gradient.color_points) {
         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
-        qgradient.setColorAt(stop.position, stopColor);
+        qgradient.setColorAt(stop.offset, stopColor);
     }
     
     // Draw the gradient
@@ -443,12 +445,12 @@ void ContainerQPainter::draw_conic_gradient(litehtml::uint_ptr hdc, const liteht
     
     // Qt doesn't have direct support for conic gradients. This is a simplified implementation.
     // For a more accurate implementation, we would need to draw a custom shader or image.
-    QConicalGradient qgradient(gradient.center_x, gradient.center_y, gradient.angle);
+    QConicalGradient qgradient(gradient.position.x, gradient.position.y, gradient.angle);
     
     // Add color stops
-    for (const auto& stop : gradient.colors) {
+    for (const auto& stop : gradient.color_points) {
         QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
-        qgradient.setColorAt(stop.position, stopColor);
+        qgradient.setColorAt(stop.offset, stopColor);
     }
     
     // Draw the gradient

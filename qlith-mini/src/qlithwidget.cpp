@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include <QBuffer>
 #include <QTemporaryFile>
+#include <QLocale>
 
 // Helper function for debugging
 static void saveDebugContent(const QString &content, const QString &identifier, const QString &extension)
@@ -46,215 +47,30 @@ static void saveDebugContent(const QString &content, const QString &identifier, 
 #endif
 }
 
+// Forward declaration
+class QlithWidget;
+
 // Private implementation class
 class QlithWidgetPrivate : public QObject {
     Q_OBJECT
 public:
-    QlithWidgetPrivate(QlithWidget *owner)
-        : QObject(owner)
-        , q(owner)
-        , container(new ContainerQPainter(owner))
-        , networkManager(new QNetworkAccessManager(owner))
-        , loading(false)
-        , needsLayout(true)
-        , currentUrl("about:blank")
-        , backgroundColor(Qt::white)
-        , defaultCss(
-            "html { background-color: white; color: black; font-family: Arial, sans-serif; }"
-            "body { margin: 8px; }"
-            "a { color: blue; text-decoration: underline; }"
-            "img { border: none; }"
-        )
-    {
-        // Connect container signals
-        QObject::connect(container, &ContainerQPainter::titleChanged, 
-                        owner, &QlithWidget::titleChanged);
-        
-        QObject::connect(container, &ContainerQPainter::anchorClicked, 
-                        [this](const QString &url) {
-                            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
-                                emit q->linkClicked(QUrl(url));
-                            } else {
-                                QUrl resolved = currentUrl.resolved(QUrl(url));
-                                emit q->linkClicked(resolved);
-                            }
-                        });
-        
-        // Connect network manager signals
-        QObject::connect(networkManager, &QNetworkAccessManager::finished,
-                        this, &QlithWidgetPrivate::handleNetworkReply);
-    }
+    QlithWidgetPrivate(QlithWidget *owner);
+    ~QlithWidgetPrivate();
     
-    ~QlithWidgetPrivate() {
-        // Clear any pending requests
-        for (QNetworkReply* reply : pendingResources.values()) {
-            reply->abort();
-            reply->deleteLater();
-        }
-        pendingResources.clear();
-    }
+    // Content loading methods
+    void loadHtml(const QString &html, const QUrl &url);
+    void loadUrl(const QUrl &url);
+    void loadLocalFile(const QString &filePath);
+    void loadRemoteUrl(const QUrl &url);
     
-    // Load HTML content
-    void loadHtml(const QString &html, const QUrl &url) {
-        currentHtml = html;
-        currentUrl = url;
-        
-        // Set base URL for the container
-        container->setBaseUrl(url.toString());
-        
-        // Create and render document
-        if (document) {
-            document.reset();
-        }
-        
-        // Prepare master CSS
-        QString masterCss = defaultCss;
-        
-        // Create context for litehtml
-        // Implementation depends on the litehtml version, here's a simplified approach
-        QByteArray htmlData = html.toUtf8();
-        
-        try {
-            // Create litehtml document
-            document = litehtml::document::createFromString(
-                htmlData.constData(), 
-                container
-            );
-            
-            if (document) {
-                document->render(q->width());
-                needsLayout = false;
-                q->update();
-                emit q->loadFinished(true);
-            } else {
-                qWarning() << "Failed to create litehtml document";
-                emit q->loadFinished(false);
-            }
-        } catch (const std::exception &e) {
-            qWarning() << "Exception creating document:" << e.what();
-            emit q->loadFinished(false);
-        }
-    }
-    
-    // Load URL
-    void loadUrl(const QUrl &url) {
-        // Skip if same URL and already loaded
-        if (url == currentUrl && !needsLayout) {
-            return;
-        }
-        
-        currentUrl = url;
-        loading = true;
-        needsLayout = true;
-        
-        emit q->loadStarted();
-        
-        // Handle different URL schemes
-        if (url.scheme() == "file") {
-            loadLocalFile(url.toLocalFile());
-        } else if (url.scheme() == "http" || url.scheme() == "https") {
-            loadRemoteUrl(url);
-        } else if (url.scheme() == "about" && url.path() == "blank") {
-            loadHtml("<html><body></body></html>", url);
-        } else {
-            qWarning() << "Unsupported URL scheme:" << url.scheme();
-            emit q->loadFinished(false);
-        }
-    }
-    
-    // Load local file
-    void loadLocalFile(const QString &filePath) {
-        QFile file(filePath);
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QString html = QString::fromUtf8(file.readAll());
-            loadHtml(html, QUrl::fromLocalFile(filePath));
-        } else {
-            qWarning() << "Failed to open file:" << filePath << " - " << file.errorString();
-            emit q->loadFinished(false);
-        }
-    }
-    
-    // Load remote URL
-    void loadRemoteUrl(const QUrl &url) {
-        QNetworkRequest request(url);
-        request.setHeader(QNetworkRequest::UserAgentHeader, "Qlith/1.0");
-        
-        QNetworkReply *reply = networkManager->get(request);
-        
-        QObject::connect(reply, &QNetworkReply::finished, [this, reply, url]() {
-            if (reply->error() == QNetworkReply::NoError) {
-                QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-                QByteArray data = reply->readAll();
-                
-                if (contentType.contains("text/html", Qt::CaseInsensitive) || 
-                    url.path().endsWith(".html", Qt::CaseInsensitive) ||
-                    url.path().endsWith(".htm", Qt::CaseInsensitive)) {
-                    
-                    QString html = QString::fromUtf8(data);
-                    loadHtml(html, url);
-                } else {
-                    qWarning() << "URL did not return HTML content:" << url;
-                    emit q->loadFinished(false);
-                }
-            } else {
-                qWarning() << "Failed to load URL:" << url << " - " << reply->errorString();
-                emit q->loadFinished(false);
-            }
-            
-            reply->deleteLater();
-        });
-    }
-    
-    // Handle network reply for assets (images, CSS, etc.)
-public slots:
-    void handleNetworkReply(QNetworkReply *reply) {
-        if (!reply) return;
-        
-        QUrl url = reply->url();
-        QString urlStr = url.toString();
-        
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray data = reply->readAll();
-            
-            // Handle based on content type
-            QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-            
-            if (contentType.startsWith("image/", Qt::CaseInsensitive) ||
-                url.path().endsWith(".png", Qt::CaseInsensitive) ||
-                url.path().endsWith(".jpg", Qt::CaseInsensitive) ||
-                url.path().endsWith(".jpeg", Qt::CaseInsensitive) ||
-                url.path().endsWith(".gif", Qt::CaseInsensitive)) {
-                
-                // Handle image
-                QImage image;
-                if (image.loadFromData(data)) {
-                    container->onImageLoaded(urlStr, image);
-                    q->update();
-                }
-            } else if (contentType.contains("text/css", Qt::CaseInsensitive) ||
-                       url.path().endsWith(".css", Qt::CaseInsensitive)) {
-                
-                // Handle CSS
-                QString css = QString::fromUtf8(data);
-                container->onCssLoaded(urlStr, css);
-                q->update();
-            }
-        }
-        
-        // Remove reply from pending list
-        pendingResources.remove(url);
-        reply->deleteLater();
-    }
-    
-    // Redraw with layout if needed
-    void updateWithLayout() {
-        if (needsLayout && document) {
-            document->render(q->width());
-            needsLayout = false;
-        }
-        q->update();
-    }
+    // Layout handling
+    void updateWithLayout();
 
+public slots:
+    // Handle network reply for assets (images, CSS, etc.)
+    void handleNetworkReply(QNetworkReply *reply);
+
+public:
     QlithWidget *q;
     ContainerQPainter *container;
     QNetworkAccessManager *networkManager;
@@ -270,6 +86,211 @@ public slots:
     bool loading;
     bool needsLayout;
 };
+
+// Implementation of QlithWidgetPrivate methods
+QlithWidgetPrivate::QlithWidgetPrivate(QlithWidget *owner)
+    : QObject(owner)
+    , q(owner)
+    , container(new ContainerQPainter(owner))
+    , networkManager(new QNetworkAccessManager(owner))
+    , loading(false)
+    , needsLayout(true)
+    , currentUrl("about:blank")
+    , backgroundColor(Qt::white)
+    , defaultCss(
+        "html { background-color: white; color: black; font-family: Arial, sans-serif; }"
+        "body { margin: 8px; }"
+        "a { color: blue; text-decoration: underline; }"
+        "img { border: none; }"
+    )
+{
+    // Connect container signals
+    QObject::connect(container, &ContainerQPainter::titleChanged, 
+                    owner, &QlithWidget::titleChanged);
+    
+    QObject::connect(container, &ContainerQPainter::anchorClicked, 
+                    [this](const QString &url) {
+                        if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
+                            emit q->linkClicked(QUrl(url));
+                        } else {
+                            QUrl resolved = currentUrl.resolved(QUrl(url));
+                            emit q->linkClicked(resolved);
+                        }
+                    });
+    
+    // Connect network manager signals
+    QObject::connect(networkManager, &QNetworkAccessManager::finished,
+                    this, &QlithWidgetPrivate::handleNetworkReply);
+}
+
+QlithWidgetPrivate::~QlithWidgetPrivate() {
+    // Clear any pending requests
+    for (QNetworkReply* reply : pendingResources.values()) {
+        reply->abort();
+        reply->deleteLater();
+    }
+    pendingResources.clear();
+}
+
+// Load HTML content
+void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
+    currentHtml = html;
+    currentUrl = url;
+    
+    // Set base URL for the container
+    container->setBaseUrl(url.toString());
+    
+    // Create and render document
+    if (document) {
+        document.reset();
+    }
+    
+    // Prepare master CSS
+    QString masterCss = defaultCss;
+    
+    // Create context for litehtml
+    // Implementation depends on the litehtml version, here's a simplified approach
+    QByteArray htmlData = html.toUtf8();
+    
+    try {
+        // Create litehtml document
+        document = litehtml::document::createFromString(
+            htmlData.constData(), 
+            container
+        );
+        
+        if (document) {
+            document->render(q->width());
+            needsLayout = false;
+            q->update();
+            emit q->loadFinished(true);
+        } else {
+            qWarning() << "Failed to create litehtml document";
+            emit q->loadFinished(false);
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Exception creating document:" << e.what();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load URL
+void QlithWidgetPrivate::loadUrl(const QUrl &url) {
+    // Skip if same URL and already loaded
+    if (url == currentUrl && !needsLayout) {
+        return;
+    }
+    
+    currentUrl = url;
+    loading = true;
+    needsLayout = true;
+    
+    emit q->loadStarted();
+    
+    // Handle different URL schemes
+    if (url.scheme() == "file") {
+        loadLocalFile(url.toLocalFile());
+    } else if (url.scheme() == "http" || url.scheme() == "https") {
+        loadRemoteUrl(url);
+    } else if (url.scheme() == "about" && url.path() == "blank") {
+        loadHtml("<html><body></body></html>", url);
+    } else {
+        qWarning() << "Unsupported URL scheme:" << url.scheme();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load local file
+void QlithWidgetPrivate::loadLocalFile(const QString &filePath) {
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString html = QString::fromUtf8(file.readAll());
+        loadHtml(html, QUrl::fromLocalFile(filePath));
+    } else {
+        qWarning() << "Failed to open file:" << filePath << " - " << file.errorString();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load remote URL
+void QlithWidgetPrivate::loadRemoteUrl(const QUrl &url) {
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, "Qlith/1.0");
+    
+    QNetworkReply *reply = networkManager->get(request);
+    
+    QObject::connect(reply, &QNetworkReply::finished, [this, reply, url]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+            QByteArray data = reply->readAll();
+            
+            if (contentType.contains("text/html", Qt::CaseInsensitive) || 
+                url.path().endsWith(".html", Qt::CaseInsensitive) ||
+                url.path().endsWith(".htm", Qt::CaseInsensitive)) {
+                
+                QString html = QString::fromUtf8(data);
+                loadHtml(html, url);
+            } else {
+                qWarning() << "URL did not return HTML content:" << url;
+                emit q->loadFinished(false);
+            }
+        } else {
+            qWarning() << "Failed to load URL:" << url << " - " << reply->errorString();
+            emit q->loadFinished(false);
+        }
+        
+        reply->deleteLater();
+    });
+}
+
+// Handle network reply for assets (images, CSS, etc.)
+void QlithWidgetPrivate::handleNetworkReply(QNetworkReply *reply) {
+    if (!reply) return;
+    
+    QUrl url = reply->url();
+    QString urlStr = url.toString();
+    
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        
+        // Handle based on content type
+        QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+        
+        if (contentType.startsWith("image/", Qt::CaseInsensitive) ||
+            url.path().endsWith(".png", Qt::CaseInsensitive) ||
+            url.path().endsWith(".jpg", Qt::CaseInsensitive) ||
+            url.path().endsWith(".jpeg", Qt::CaseInsensitive) ||
+            url.path().endsWith(".gif", Qt::CaseInsensitive)) {
+            
+            // Handle image
+            QImage image;
+            if (image.loadFromData(data)) {
+                container->onImageLoaded(urlStr, image);
+                q->update();
+            }
+        } else if (contentType.contains("text/css", Qt::CaseInsensitive) ||
+                  url.path().endsWith(".css", Qt::CaseInsensitive)) {
+            
+            // Handle CSS
+            QString css = QString::fromUtf8(data);
+            container->onCssLoaded(urlStr, css);
+            q->update();
+        }
+    }
+    
+    // Remove reply from pending list
+    pendingResources.remove(url);
+    reply->deleteLater();
+}
+
+// Redraw with layout if needed
+void QlithWidgetPrivate::updateWithLayout() {
+    if (needsLayout && document) {
+        document->render(q->width());
+        needsLayout = false;
+    }
+    q->update();
+}
 
 //
 // QlithWidget implementation
