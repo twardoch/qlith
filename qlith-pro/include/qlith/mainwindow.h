@@ -5,6 +5,7 @@
 
 #include <QMainWindow>
 #include <QResizeEvent>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +27,18 @@ protected:
    * @param event The resize event
    */
   void resizeEvent(QResizeEvent* event) override;
+
+private slots:
+  /**
+   * @brief Navigate to the URL entered in the address bar
+   */
+  void navigateToUrl();
+  
+  /**
+   * @brief Handle URL navigation
+   * @param url The URL to navigate to
+   */
+  void loadUrl(const QString& url);
 
 private:
   /**

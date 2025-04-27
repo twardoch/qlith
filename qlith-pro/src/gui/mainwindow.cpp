@@ -13,12 +13,36 @@
 #include <QSlider>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
 QMainWindow(parent),
 ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+
+  // Create address bar components
+  QLineEdit* urlEdit = new QLineEdit(this);
+  urlEdit->setPlaceholderText("Enter URL (file:// or https://)");
+  QPushButton* goButton = new QPushButton("Go", this);
+  
+  // Create address bar layout
+  QHBoxLayout* addressBarLayout = new QHBoxLayout();
+  addressBarLayout->addWidget(urlEdit);
+  addressBarLayout->addWidget(goButton);
+  
+  // Add address bar to the UI
+  ui->verticalLayout_6->insertLayout(0, addressBarLayout);
+  
+  // Connect the go button and enter key in the URL field
+  connect(goButton, &QPushButton::clicked, this, &MainWindow::navigateToUrl);
+  connect(urlEdit, &QLineEdit::returnPressed, this, &MainWindow::navigateToUrl);
+  
+  // Make the existing button load the example page
+  connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::loadExample);
+  ui->pushButton->setText("Load Example");
 
   m_litehtmlWidget = new litehtmlWidget();
 
@@ -33,79 +57,25 @@ ui(new Ui::MainWindow)
   setCentralWidget(scrollArea);
   
   // Connect the linkClicked signal
-  connect(m_litehtmlWidget, &litehtmlWidget::linkClicked, this, [](const QString& url) {
-    QDesktopServices::openUrl(QUrl(url));
-  });
+  connect(m_litehtmlWidget, &litehtmlWidget::linkClicked, this, &MainWindow::loadUrl);
 
   // Create a litehtml context
   litehtml_context context;
 
   // Load master CSS
-  QFile master_css_fh("://res/css/master.css");
-  master_css_fh.open(QIODevice::ReadOnly);
-  QByteArray master_css = master_css_fh.readAll();
-  context.load_master_stylesheet(master_css.constData());
+  QFile master_css_fh(":/css/master.css");
+  if (!master_css_fh.open(QIODevice::ReadOnly)) {
+    qWarning() << "Failed to open master CSS file:" << master_css_fh.errorString();
+    // Create an empty CSS if file cannot be opened
+    context.load_master_stylesheet("");
+  } else {
+    QByteArray master_css = master_css_fh.readAll();
+    context.load_master_stylesheet(master_css.constData());
+    master_css_fh.close();
+  }
 
-  std::string htmlStr = u8"";
-
-  htmlStr += R"raw(
-  <html>
-  <head>
-  <link rel="stylesheet" href="://res/css/reset.css">
-  <link rel="stylesheet" href="://res/css/test1.css">
-  </head>
-  <body>
-
-  <style>
-    h1{
-      color: green;
-      text-align: center;
-    }
-    div.one{
-      margin-top: 40px;
-      text-align: center;
-    }
-    button{
-      margin-top: 10px;
-    }
-  </style>
-
-  <div class="container">
-    <h1>Geek</h1>
-
-jkljkljkl
-
-    <div style="box-shadow: -4px -10px 5px 0px rgba(0,0,0,0.75) , 4px 10px 5px 0px rgba(110,0,0,0.75) , 18px 10px 5px 0px rgba(10,220,0,0.75);">
-      <div> box-shadow </div>
-    </div>
-
-jkljkljkljkl
-
-    <!-- Bootstrap Button Classes -->
-    <div class="one">
-      <button type="button" class="btn btn-primary">Primary</button>
-      <button type="button" class="btn btn-secondary">Secondary</button>
-      <button type="button" class="btn btn-success">Success</button>
-      <button type="button" class="btn btn-danger">Danger</button>
-      <button type="button" class="btn btn-warning">Warning</button>
-      <button type="button" class="btn btn-info">Info</button>
-      <button type="button" class="btn btn-light">Light</button>
-      <button type="button" class="btn btn-dark">Dark</button>
-      <button type="button" class="btn btn-link">Link</button>
-    </div>
-
-  </div>
-
-  </body>
-  </html>)raw";
-
-  const char* html = htmlStr.c_str();
-  
-  // Create document
-  auto doc = litehtml::document::createFromString(html, m_litehtmlWidget->getContainer(), context.get_master_css());
-  m_litehtmlWidget->getContainer()->set_document(doc);
-
-  m_litehtmlWidget->show();
+  // Load the example page by default
+  loadExample();
 
   ui->scrollAreaVerticalLayout->addWidget(m_litehtmlWidget);
 
@@ -147,12 +117,57 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
+void MainWindow::navigateToUrl()
+{
+  // Get the URL from the line edit
+  QLineEdit* urlEdit = findChild<QLineEdit*>();
+  if (urlEdit) {
+    QString url = urlEdit->text();
+    if (!url.isEmpty()) {
+      loadUrl(url);
+    }
+  }
+}
+
+void MainWindow::loadUrl(const QString& url)
+{
+  QUrl qurl(url);
+  
+  // Update the address bar with the current URL
+  QLineEdit* urlEdit = findChild<QLineEdit*>();
+  if (urlEdit) {
+    urlEdit->setText(url);
+  }
+  
+  // Handle different URL schemes
+  if (qurl.scheme() == "file") {
+    // Load local file
+    QFile file(qurl.toLocalFile());
+    if (file.open(QIODevice::ReadOnly)) {
+      QString html = QString::fromUtf8(file.readAll());
+      m_litehtmlWidget->loadHtml(html, url);
+      file.close();
+    } else {
+      // Show error message if file can't be opened
+      m_litehtmlWidget->loadHtml("<html><body><h1>Error</h1><p>Could not open file: " + qurl.toLocalFile() + "</p></body></html>");
+    }
+  } else if (qurl.scheme() == "http" || qurl.scheme() == "https") {
+    // Load remote URL
+    m_litehtmlWidget->loadUrl(url);
+  } else {
+    // For other schemes and invalid URLs, just try to load it directly
+    m_litehtmlWidget->loadUrl(url);
+  }
+}
+
 void MainWindow::loadExample()
 {
   // Example HTML content
   QString html = R"(
   <html>
   <head>
+    <link rel="stylesheet" href=":/css/reset.css">
+    <link rel="stylesheet" href=":/css/bootstrap.css">
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -232,6 +247,8 @@ void MainWindow::loadExample()
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
       
       <p style="text-align: center;"><a href="https://example.com">Visit Example Website</a></p>
+      
+      <p style="text-align: center;"><img src=":/img/test.png" alt="Test Image"></p>
     </div>
   </body>
   </html>
