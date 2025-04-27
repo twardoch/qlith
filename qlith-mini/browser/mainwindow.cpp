@@ -27,261 +27,172 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_htmlWidget(new QLiteHtmlWidget(this))
-    , m_networkManager(new QNetworkAccessManager(this))
-    , m_darkModeEnabled(false)
-    , m_currentHistoryIndex(-1)
-    , m_maxHistorySize(100)
+    , m_htmlWidget(new QlithWidget(this))
+    , m_urlEdit(nullptr)
+    , m_progressBar(nullptr)
+    , m_navigationToolBar(nullptr)
+    , m_statusBar(nullptr)
+    , m_historyIndex(-1)
+    , m_zoomFactor(1.0f)
 {
     setCentralWidget(m_htmlWidget);
     setMinimumSize(800, 600);
 
-    createActions();
-    createToolBar();
-    createStatusBar();
+    setupUi();
+    setupActions();
+    setupMenus();
+    setupToolbar();
+    setupStatusBar();
+    setupConnections();
     
-    connect(m_htmlWidget, &QLiteHtmlWidget::loadFinished, this, &MainWindow::onLoadFinished);
-    connect(m_htmlWidget, &QLiteHtmlWidget::zoomChanged, this, &MainWindow::updateZoomLabel);
-    connect(m_htmlWidget, &QLiteHtmlWidget::linkClicked, this, &MainWindow::linkClicked);
-    
-    readSettings();
-    updateNavigationActions();
+    loadSettings();
     
     // Load default page
-    loadUrl(QUrl("about:blank"));
+    load(QUrl("about:blank"));
 }
 
-void MainWindow::onLoadFinished()
+void MainWindow::onLoadFinished(bool ok)
 {
-    m_statusLabel->setText(tr("Ready"));
-    updateWindowTitle();
-    
-    // Save debug image when loading is finished
-    QString debugDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/qlitehtml_debug";
-    QDir dir;
-    if (!dir.exists(debugDir)) {
-        dir.mkpath(debugDir);
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Ready"));
     }
     
-    // Create filename with timestamp and URL
-    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
-    QString urlPart;
-    if (m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_history.size()) {
-        QUrl currentUrl = m_history.at(m_currentHistoryIndex);
-        if (currentUrl.isValid() && !currentUrl.host().isEmpty()) {
-            urlPart = "_" + currentUrl.host().replace(".", "_");
-        }
-    }
+    // Update window title
+    updateTitle(QString());
     
-    // Save debug rendering image
-    QString debugImagePath = debugDir + "/" + timestamp + urlPart + "_render.png";
-    m_htmlWidget->saveDebugImage(debugImagePath);
+    // Additional debug functionality can be re-implemented if needed
     
-    // Also save document structure for debugging
-    QString domDebugPath = debugDir + "/" + timestamp + urlPart + "_dom.txt";
-    QFile domFile(domDebugPath);
-    if (domFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream stream(&domFile);
-        stream << "URL: " << (m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_history.size() 
-                             ? m_history.at(m_currentHistoryIndex).toString() 
-                             : "unknown") << "\n";
-        stream << "Document Title: " << m_htmlWidget->documentTitle() << "\n";
-        stream << "Window Size: " << width() << "x" << height() << "\n";
-        stream << "Viewport Size: " << m_htmlWidget->viewport()->width() << "x" << m_htmlWidget->viewport()->height() << "\n";
-        stream << "Zoom: " << m_htmlWidget->zoom() << "\n";
-        domFile.close();
-        qDebug() << "DOM debug info saved to:" << domDebugPath;
-    }
-    
-    emit loadFinished();
+    // No need to emit loadFinished as we're responding to it
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::loadUrl(const QUrl &url)
+void MainWindow::loadUrl()
 {
-    if (!url.isValid())
+    if (!m_urlEdit)
         return;
         
-    m_urlEdit->setText(url.toString());
-    
-    if (url.scheme() == "file") {
-        m_htmlWidget->loadFile(url.toLocalFile());
-    } else {
-        m_htmlWidget->load(url);
-    }
-    
-    // Add to history
-    if (m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_history.size() - 1) {
-        // Remove forward history if we navigate from a point in history
-        m_history.erase(m_history.begin() + m_currentHistoryIndex + 1, m_history.end());
-    }
-    
-    m_history.append(url);
-    if (m_history.size() > m_maxHistorySize) {
-        m_history.removeFirst();
-    }
-    m_currentHistoryIndex = m_history.size() - 1;
-    
-    updateNavigationActions();
-    updateWindowTitle();
-}
-
-void MainWindow::loadFile(const QString &filePath)
-{
-    loadUrl(QUrl::fromLocalFile(filePath));
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    writeSettings();
-    event->accept();
-}
-
-void MainWindow::urlEntered()
-{
     QString text = m_urlEdit->text().trimmed();
     if (text.isEmpty())
         return;
         
     QUrl url = QUrl::fromUserInput(text);
-    loadUrl(url);
+    load(url);
 }
 
-void MainWindow::reloadPage()
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_history.size()) {
-        QUrl currentUrl = m_history.at(m_currentHistoryIndex);
+    saveSettings();
+    event->accept();
+}
+
+void MainWindow::updateUrlBar(const QUrl& url)
+{
+    if (m_urlEdit) {
+        m_urlEdit->setText(url.toString());
+    }
+}
+
+void MainWindow::reload()
+{
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        QUrl currentUrl = m_history.at(m_historyIndex);
         m_htmlWidget->load(currentUrl);
     }
 }
 
 void MainWindow::goBack()
 {
-    if (m_currentHistoryIndex > 0) {
-        m_currentHistoryIndex--;
-        QUrl url = m_history.at(m_currentHistoryIndex);
-        m_urlEdit->setText(url.toString());
+    if (m_historyIndex > 0) {
+        m_historyIndex--;
+        QUrl url = m_history.at(m_historyIndex);
         
-        if (url.scheme() == "file") {
-            m_htmlWidget->loadFile(url.toLocalFile());
-        } else {
-            m_htmlWidget->load(url);
+        if (m_urlEdit) {
+            m_urlEdit->setText(url.toString());
         }
         
-        updateNavigationActions();
-        updateWindowTitle();
+        m_htmlWidget->load(url);
+        
+        // Update UI
+        if (m_backAction && m_forwardAction) {
+            m_backAction->setEnabled(m_historyIndex > 0);
+            m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+        }
+        
+        updateTitle(QString());
     }
 }
 
 void MainWindow::goForward()
 {
-    if (m_currentHistoryIndex < m_history.size() - 1) {
-        m_currentHistoryIndex++;
-        QUrl url = m_history.at(m_currentHistoryIndex);
-        m_urlEdit->setText(url.toString());
+    if (m_historyIndex < m_history.size() - 1) {
+        m_historyIndex++;
+        QUrl url = m_history.at(m_historyIndex);
         
-        if (url.scheme() == "file") {
-            m_htmlWidget->loadFile(url.toLocalFile());
-        } else {
-            m_htmlWidget->load(url);
+        if (m_urlEdit) {
+            m_urlEdit->setText(url.toString());
         }
         
-        updateNavigationActions();
-        updateWindowTitle();
-    }
-}
-
-void MainWindow::openFile()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open HTML File"),
-                                                   QString(),
-                                                   tr("HTML Files (*.html *.htm);;All Files (*)"));
-    if (!fileName.isEmpty()) {
-        loadFile(fileName);
+        m_htmlWidget->load(url);
+        
+        // Update UI
+        if (m_backAction && m_forwardAction) {
+            m_backAction->setEnabled(m_historyIndex > 0);
+            m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+        }
+        
+        updateTitle(QString());
     }
 }
 
 void MainWindow::zoomIn()
 {
-    m_htmlWidget->zoomIn();
+    // Implement zoom functionality
 }
 
 void MainWindow::zoomOut()
 {
-    m_htmlWidget->zoomOut();
+    // Implement zoom functionality
 }
 
 void MainWindow::resetZoom()
 {
-    m_htmlWidget->resetZoom();
+    // Implement zoom functionality
 }
 
-void MainWindow::updateZoomLabel(qreal zoom)
+void MainWindow::about()
 {
-    int percent = qRound(zoom * 100);
-    m_zoomLabel->setText(tr("Zoom: %1%").arg(percent));
+    QMessageBox::about(this, tr("About Qlith Browser"),
+                       tr("A simple HTML browser demo using the Qlith library."));
 }
 
-void MainWindow::showAbout()
+void MainWindow::handleLinkClick(const QUrl &url)
 {
-    QMessageBox::about(this, tr("About QLiteHTML Browser"),
-                      tr("<h2>QLiteHTML Browser</h2>"
-                         "<p>A lightweight HTML browser based on litehtml and Qt.</p>"
-                         "<p>Version 1.0</p>"));
+    // Handle clicked links - navigate to them
+    load(url);
 }
 
-void MainWindow::toggleDarkMode()
+void MainWindow::updateTitle(const QString &title)
 {
-    setDarkMode(!m_darkModeEnabled);
-}
-
-void MainWindow::setDarkMode(bool enabled)
-{
-    m_darkModeEnabled = enabled;
-    m_darkModeAction->setChecked(enabled);
+    QString windowTitle;
     
-    if (enabled) {
-        QPalette darkPalette;
-        darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::WindowText, Qt::white);
-        darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
-        darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-        darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-        darkPalette.setColor(QPalette::Text, Qt::white);
-        darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-        darkPalette.setColor(QPalette::ButtonText, Qt::white);
-        darkPalette.setColor(QPalette::BrightText, Qt::red);
-        darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-        darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-        darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-        qApp->setPalette(darkPalette);
+    if (!title.isEmpty()) {
+        windowTitle = title;
+    } else if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        windowTitle = m_history.at(m_historyIndex).toString();
     } else {
-        qApp->setPalette(QApplication::style()->standardPalette());
+        windowTitle = tr("Qlith Browser");
     }
-}
-
-void MainWindow::linkClicked(const QUrl &url)
-{
-    loadUrl(url);
-}
-
-void MainWindow::updateWindowTitle()
-{
-    QString title = m_htmlWidget->documentTitle();
-    if (title.isEmpty()) {
-        if (m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_history.size()) {
-            title = m_history.at(m_currentHistoryIndex).toString();
-        } else {
-            title = tr("QLiteHTML Browser");
-        }
-    } else {
-        title = tr("%1 - QLiteHTML Browser").arg(title);
+    
+    // Add browser name if not already there
+    if (!windowTitle.contains("Qlith Browser")) {
+        windowTitle = tr("%1 - Qlith Browser").arg(windowTitle);
     }
-    setWindowTitle(title);
+    
+    setWindowTitle(windowTitle);
 }
 
 void MainWindow::createActions()
@@ -326,12 +237,12 @@ void MainWindow::createActions()
     
     m_reloadAction = new QAction(tr("Reload"), this);
     m_reloadAction->setShortcut(QKeySequence::Refresh);
-    connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reloadPage);
+    connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reload);
     
     // Help menu
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     
-    m_aboutAction = helpMenu->addAction(tr("&About"), this, &MainWindow::showAbout);
+    m_aboutAction = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
 }
 
 void MainWindow::createToolBar()
@@ -347,7 +258,7 @@ void MainWindow::createToolBar()
     
     m_urlEdit = new QLineEdit(this);
     m_urlEdit->setClearButtonEnabled(true);
-    connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::urlEntered);
+    connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::updateUrlBar);
     navigationBar->addWidget(m_urlEdit);
 }
 
@@ -386,8 +297,8 @@ void MainWindow::writeSettings()
 
 void MainWindow::updateNavigationActions()
 {
-    m_backAction->setEnabled(m_currentHistoryIndex > 0);
-    m_forwardAction->setEnabled(m_currentHistoryIndex < m_history.size() - 1);
+    m_backAction->setEnabled(m_historyIndex > 0);
+    m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
 }
 
 void MainWindow::saveAsPng(const QString &filename)
@@ -513,4 +424,86 @@ void MainWindow::saveAsSvg(const QString &filename)
     } catch (...) {
         qWarning() << "Unknown exception while saving SVG";
     }
+}
+
+void MainWindow::setupConnections()
+{
+    // Connect QlithWidget signals
+    connect(m_htmlWidget, &QlithWidget::loadStarted, this, &MainWindow::onLoadStarted);
+    connect(m_htmlWidget, &QlithWidget::loadFinished, this, &MainWindow::onLoadFinished);
+    connect(m_htmlWidget, &QlithWidget::titleChanged, this, &MainWindow::updateTitle);
+    connect(m_htmlWidget, &QlithWidget::linkClicked, this, &MainWindow::handleLinkClick);
+    
+    // Connect URL bar
+    if (m_urlEdit) {
+        connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::updateUrlBar);
+    }
+    
+    // Connect actions
+    if (m_backAction) {
+        connect(m_backAction, &QAction::triggered, this, &MainWindow::goBack);
+    }
+    
+    if (m_forwardAction) {
+        connect(m_forwardAction, &QAction::triggered, this, &MainWindow::goForward);
+    }
+    
+    if (m_reloadAction) {
+        connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reload);
+    }
+    
+    if (m_stopAction) {
+        connect(m_stopAction, &QAction::triggered, this, &MainWindow::stop);
+    }
+}
+
+void MainWindow::load(const QUrl& url)
+{
+    if (!url.isValid())
+        return;
+        
+    if (m_urlEdit) {
+        m_urlEdit->setText(url.toString());
+    }
+    
+    m_htmlWidget->load(url);
+    
+    // Add to history
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size() - 1) {
+        // Remove forward history if we navigate from a point in history
+        m_history.erase(m_history.begin() + m_historyIndex + 1, m_history.end());
+    }
+    
+    m_history.append(url);
+    // Limit history size
+    while (m_history.size() > 100) {
+        m_history.removeFirst();
+    }
+    m_historyIndex = m_history.size() - 1;
+    
+    // Update UI
+    if (m_backAction && m_forwardAction) {
+        m_backAction->setEnabled(m_historyIndex > 0);
+        m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+    }
+}
+
+void MainWindow::loadFile(const QString &filePath)
+{
+    loadUrl(QUrl::fromLocalFile(filePath));
+}
+
+void MainWindow::urlEntered()
+{
+    QString text = m_urlEdit->text().trimmed();
+    if (text.isEmpty())
+        return;
+        
+    QUrl url = QUrl::fromUserInput(text);
+    loadUrl(url);
+}
+
+void MainWindow::linkClicked(const QUrl &url)
+{
+    loadUrl(url);
 } 

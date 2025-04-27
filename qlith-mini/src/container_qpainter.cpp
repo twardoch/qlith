@@ -729,5 +729,3 @@ void ContainerQPainter::onCssLoaded(const QString& url, const QString& css)
 {
     // Implementation for CSS loading callback if needed
 } 
-    // Implementation for CSS loading callback if needed
-} 
