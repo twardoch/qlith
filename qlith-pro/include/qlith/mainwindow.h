@@ -4,12 +4,13 @@
 #pragma once
 
 #include <QMainWindow>
-
-#include "qlith/container_qt5.h"
+#include <QResizeEvent>
 
 namespace Ui {
 class MainWindow;
 }
+
+class litehtmlWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -19,8 +20,19 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
+protected:
+  /**
+   * @brief Handle window resize events
+   * @param event The resize event
+   */
+  void resizeEvent(QResizeEvent* event) override;
+
 private:
+  /**
+   * @brief Load example HTML content
+   */
+  void loadExample();
+
   Ui::MainWindow *ui;
-  litehtmlWidget* m_litehtmlWidget;
-  litehtml::context ctxt;
+  litehtmlWidget *m_litehtmlWidget;
 };

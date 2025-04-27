@@ -1,11 +1,10 @@
 // this_file: qlith-pro/src/gui/litehtmlwidget.h
 #pragma once
 
+#include "container_qt5.h"
 #include <QWidget>
 #include <QPoint>
 #include <QSize>
-
-class container_qt5;
 
 /**
  * @brief Widget for rendering HTML content using litehtml
@@ -60,6 +59,13 @@ public:
      * @return Size of the document
      */
     QSize documentSize() const;
+
+signals:
+    /**
+     * @brief Signal emitted when a link is clicked
+     * @param url The URL of the clicked link
+     */
+    void linkClicked(const QString& url);
 
 protected:
     /**

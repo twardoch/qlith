@@ -75,7 +75,7 @@ public:
 
   litehtml::element::ptr elementUnderCursor()
   {
-    return _doc->root()->get_element_by_point(lastCursorX, lastCursorY, lastCursorClientX, lastCursorClientY);
+    return _doc->root()->find_element_by_point(lastCursorX, lastCursorY, lastCursorClientX, lastCursorClientY);
   }
 
   std::shared_ptr<litehtml::document> getDocument()

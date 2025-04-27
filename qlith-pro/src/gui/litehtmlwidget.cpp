@@ -21,15 +21,16 @@ litehtmlWidget::litehtmlWidget(QWidget* parent)
     // Set attributes
     setAttribute(Qt::WA_OpaquePaintEvent);
     setFocusPolicy(Qt::StrongFocus);
+    setMouseTracking(true);
     
     // Connect signals
     connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
-    connect(m_container, &container_qt5::anchorClicked, this, [this](const QString& url) {
-        emit linkClicked(url);
-    });
+    connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::linkClicked);
     connect(m_container, &container_qt5::cursorChanged, this, [this](const QString& cursor) {
         if (cursor == "pointer") {
             setCursor(Qt::PointingHandCursor);
+        } else if (cursor == "text") {
+            setCursor(Qt::IBeamCursor);
         } else {
             setCursor(Qt::ArrowCursor);
         }
@@ -62,32 +63,28 @@ void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
 {
     m_isLoading = true;
     
-    // Create the document context if not already created
-    if (!m_container->_doc) {
-        // Create new document with the HTML content
-        m_container->_doc = litehtml::document::createFromString(
-            html.toUtf8().constData(),
-            this->width(),
-            m_container,
-            baseUrl.toUtf8().constData()
-        );
-        
-        m_needsLayout = true;
-        update();
-    } else {
-        // Replace content in existing document
-        m_container->_doc = litehtml::document::createFromString(
-            html.toUtf8().constData(),
-            this->width(),
-            m_container,
-            baseUrl.toUtf8().constData()
-        );
-        
-        m_needsLayout = true;
-        update();
+    // Create document context
+    litehtml::context ctx;
+    
+    // Create new document with the HTML content
+    m_container->_doc = litehtml::document::createFromString(
+        html.toUtf8().constData(),
+        m_container,
+        &ctx
+    );
+    
+    // Set base URL if provided
+    if (!baseUrl.isEmpty()) {
+        m_container->set_base_url(baseUrl.toUtf8().constData());
     }
     
+    // Reset scroll position
+    setScrollPosition(QPoint(0, 0));
+    
+    // Mark for layout
+    m_needsLayout = true;
     m_isLoading = false;
+    update();
 }
 
 /**
@@ -179,19 +176,17 @@ void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
             event->y()
         );
         
-        // Check if mouse is over an element
-        litehtml::element::ptr element = m_container->elementUnderCursor();
+        // Trigger hover event
+        m_container->_doc->on_mouse_over(
+            event->x() + m_scrollPos.x(),
+            event->y() + m_scrollPos.y(),
+            event->x(),
+            event->y(),
+            m_container->elementUnderCursor()
+        );
         
-        if (element) {
-            // Trigger hover event
-            m_container->_doc->on_mouse_over(
-                event->x() + m_scrollPos.x(),
-                event->y() + m_scrollPos.y(),
-                event->x(),
-                event->y(),
-                element
-            );
-        }
+        // Update the view
+        update();
     }
 }
 
@@ -210,19 +205,17 @@ void litehtmlWidget::mousePressEvent(QMouseEvent* event)
             event->y()
         );
         
-        // Find element under cursor
-        litehtml::element::ptr element = m_container->elementUnderCursor();
+        // Trigger click event
+        m_container->_doc->on_lbutton_down(
+            event->x() + m_scrollPos.x(),
+            event->y() + m_scrollPos.y(),
+            event->x(),
+            event->y(),
+            m_container->elementUnderCursor()
+        );
         
-        if (element) {
-            // Trigger click event
-            m_container->_doc->on_lbutton_down(
-                event->x() + m_scrollPos.x(),
-                event->y() + m_scrollPos.y(),
-                event->x(),
-                event->y(),
-                element
-            );
-        }
+        // Update the view
+        update();
     }
 }
 
@@ -241,19 +234,17 @@ void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
             event->y()
         );
         
-        // Find element under cursor
-        litehtml::element::ptr element = m_container->elementUnderCursor();
+        // Trigger click event
+        m_container->_doc->on_lbutton_up(
+            event->x() + m_scrollPos.x(),
+            event->y() + m_scrollPos.y(),
+            event->x(),
+            event->y(),
+            m_container->elementUnderCursor()
+        );
         
-        if (element) {
-            // Trigger click event
-            m_container->_doc->on_lbutton_up(
-                event->x() + m_scrollPos.x(),
-                event->y() + m_scrollPos.y(),
-                event->x(),
-                event->y(),
-                element
-            );
-        }
+        // Update the view
+        update();
     }
 }
 

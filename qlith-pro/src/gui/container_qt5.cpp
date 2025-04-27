@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QDir>
 #include <QUrl>
+#include <cmath>
 
 // Default font settings
 static const int DEFAULT_FONT_SIZE = 16;
@@ -377,7 +378,7 @@ void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::backgroun
     QString sourceUrl = QString::fromStdString(url);
     auto it = m_images.find(sourceUrl);
     if (it != m_images.end()) {
-        QRect rc = positionToRect(layer.position);
+        QRect rc = positionToRect(layer.clip_box);
         
         switch (layer.repeat) {
             case litehtml::background_repeat_no_repeat:
@@ -415,7 +416,7 @@ void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::back
         return;
     }
     
-    QRect rc = positionToRect(layer.position);
+    QRect rc = positionToRect(layer.clip_box);
     m_painter->fillRect(rc, webColorToQColor(color));
 }
 
@@ -427,38 +428,25 @@ void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml:
         return;
     }
     
-    QRect rc = positionToRect(layer.position);
+    m_painter->save();
     
-    // Create gradient
+    QRect rc = positionToRect(layer.clip_box);
+    m_painter->setClipRect(rc);
+    
+    // Create a linear gradient using the start and end points directly from the gradient object
     QLinearGradient qGradient;
-    
-    // Set gradient direction
-    qGradient.setStart(rc.left(), rc.top());
-    
-    // Calculate end point based on angle
-    double angle = gradient.angle;
-    if (angle == 0) {
-        qGradient.setFinalStop(rc.left(), rc.bottom());
-    } else if (angle == 90) {
-        qGradient.setFinalStop(rc.right(), rc.top());
-    } else if (angle == 180) {
-        qGradient.setFinalStop(rc.left(), rc.top());
-    } else if (angle == 270) {
-        qGradient.setFinalStop(rc.left(), rc.top());
-    } else {
-        double radians = angle * M_PI / 180.0;
-        double dx = cos(radians);
-        double dy = sin(radians);
-        qGradient.setFinalStop(rc.left() + dx * rc.width(), rc.top() + dy * rc.height());
-    }
+    qGradient.setStart(gradient.start.x, gradient.start.y);
+    qGradient.setFinalStop(gradient.end.x, gradient.end.y);
     
     // Add color stops
     for (const auto& stop : gradient.color_points) {
-        qGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
     
     // Draw the gradient
     m_painter->fillRect(rc, qGradient);
+    
+    m_painter->restore();
 }
 
 // Draw a radial gradient
@@ -469,22 +457,23 @@ void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml:
         return;
     }
     
-    QRect rc = positionToRect(layer.position);
+    m_painter->save();
     
-    // Calculate center and radius
-    QPointF center(rc.left() + rc.width() / 2.0, rc.top() + rc.height() / 2.0);
-    qreal radius = std::max(rc.width(), rc.height()) / 2.0;
+    QRect rc = positionToRect(layer.clip_box);
+    m_painter->setClipRect(rc);
     
-    // Create gradient
-    QRadialGradient qGradient(center, radius);
+    // Create a radial gradient using the position and radius directly from the gradient object
+    QRadialGradient qGradient(gradient.position.x, gradient.position.y, gradient.radius.x);
     
     // Add color stops
     for (const auto& stop : gradient.color_points) {
-        qGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
     
     // Draw the gradient
     m_painter->fillRect(rc, qGradient);
+    
+    m_painter->restore();
 }
 
 // Draw a conic gradient
@@ -495,14 +484,23 @@ void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::
         return;
     }
     
-    QRect rc = positionToRect(layer.position);
+    m_painter->save();
     
-    // Qt doesn't have built-in conic gradients
-    // For now, we'll implement a simple fallback using a solid color
-    // A better implementation would draw pie segments for each color stop
-    if (!gradient.color_points.empty()) {
-        m_painter->fillRect(rc, webColorToQColor(gradient.color_points.front().second));
+    QRect rc = positionToRect(layer.clip_box);
+    m_painter->setClipRect(rc);
+    
+    // Qt uses QConicalGradient for conic gradients
+    QConicalGradient qGradient(gradient.position.x, gradient.position.y, gradient.angle);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
+    
+    // Draw the gradient
+    m_painter->fillRect(rc, qGradient);
+    
+    m_painter->restore();
 }
 
 // Draw borders around an element
@@ -732,13 +730,6 @@ litehtml::element::ptr container_qt5::create_element(const char* tag_name,
     return nullptr;
 }
 
-// Process color CSS functions (like rgb, rgba)
-litehtml::string container_qt5::resolve_color(const litehtml::string& color) const
-{
-    // Return the original color string for litehtml to process it
-    return color;
-}
-
 // Handle image loading callback
 void container_qt5::onImageLoaded(const QString& url, const QImage& image)
 {
@@ -765,10 +756,7 @@ litehtmlWidget::litehtmlWidget(QWidget* parent)
     setFocusPolicy(Qt::StrongFocus);
     
     connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
-    connect(m_container, &container_qt5::anchorClicked, [this](const QString& url) {
-        // Handle link clicks (e.g., open in browser)
-        QDesktopServices::openUrl(QUrl(url));
-    });
+    connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::linkClicked);
     connect(m_container, &container_qt5::cursorChanged, [this](const QString& cursor) {
         // Set appropriate cursor
         if (cursor == "pointer") {
@@ -795,9 +783,8 @@ void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
 {
     m_isLoading = true;
     
-    // Create document
-    litehtml::context ctx;
-    m_container->_doc = litehtml::document::createFromString(html.toUtf8().constData(), m_container, &ctx);
+    // Create document without using the context class
+    m_container->_doc = litehtml::document::createFromString(html.toUtf8().constData(), m_container);
     
     // Set base URL
     if (!baseUrl.isEmpty()) {
@@ -863,9 +850,15 @@ void litehtmlWidget::mousePressEvent(QMouseEvent* event)
         // Track coordinates
         m_container->setLastMouseCoords(x, y, event->x(), event->y());
         
+        // Get the element under the cursor
+        litehtml::element::ptr el = m_container->elementUnderCursor();
+        
         // Handle click
-        m_container->_doc->on_lbutton_down(x, y, event->x(), event->y(), 0);
-        update();
+        if (el) {
+            litehtml::position::vector redraw_boxes;
+            m_container->_doc->on_lbutton_down(x, y, event->x(), event->y(), redraw_boxes);
+            update();
+        }
     }
 }
 
@@ -879,9 +872,15 @@ void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
         // Track coordinates
         m_container->setLastMouseCoords(x, y, event->x(), event->y());
         
+        // Get the element under the cursor
+        litehtml::element::ptr el = m_container->elementUnderCursor();
+        
         // Handle release
-        m_container->_doc->on_lbutton_up(x, y, event->x(), event->y(), 0);
-        update();
+        if (el) {
+            litehtml::position::vector redraw_boxes;
+            m_container->_doc->on_lbutton_up(x, y, event->x(), event->y(), redraw_boxes);
+            update();
+        }
     }
 }
 
@@ -895,9 +894,15 @@ void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
         // Track coordinates
         m_container->setLastMouseCoords(x, y, event->x(), event->y());
         
+        // Get the element under the cursor
+        litehtml::element::ptr el = m_container->elementUnderCursor();
+        
         // Handle hover
-        m_container->_doc->on_mouse_over(x, y, event->x(), event->y(), 0);
-        update();
+        if (el) {
+            litehtml::position::vector redraw_boxes;
+            m_container->_doc->on_mouse_over(x, y, event->x(), event->y(), redraw_boxes);
+            update();
+        }
     }
 }
 
