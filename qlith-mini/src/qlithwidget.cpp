@@ -47,10 +47,12 @@ static void saveDebugContent(const QString &content, const QString &identifier, 
 }
 
 // Private implementation class
-class QlithWidgetPrivate {
+class QlithWidgetPrivate : public QObject {
+    Q_OBJECT
 public:
     QlithWidgetPrivate(QlithWidget *owner)
-        : q(owner)
+        : QObject(owner)
+        , q(owner)
         , container(new ContainerQPainter(owner))
         , networkManager(new QNetworkAccessManager(owner))
         , loading(false)
@@ -111,7 +113,6 @@ public:
         // Create context for litehtml
         // Implementation depends on the litehtml version, here's a simplified approach
         QByteArray htmlData = html.toUtf8();
-        QByteArray cssData = masterCss.toUtf8();
         
         try {
             // Create litehtml document
@@ -205,8 +206,8 @@ public:
     }
     
     // Handle network reply for assets (images, CSS, etc.)
-    void handleNetworkReply() {
-        QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+public slots:
+    void handleNetworkReply(QNetworkReply *reply) {
         if (!reply) return;
         
         QUrl url = reply->url();
@@ -475,4 +476,6 @@ void QlithWidget::keyPressEvent(QKeyEvent* event)
 {
     // Handle key events if needed
     QWidget::keyPressEvent(event);
-} 
+}
+
+#include "qlithwidget.moc" 
