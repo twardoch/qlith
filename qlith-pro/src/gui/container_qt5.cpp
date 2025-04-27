@@ -279,7 +279,7 @@ void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::lis
     
     m_painter->setPen(webColorToQColor(marker.color));
     
-    switch (marker.type) {
+    switch (marker.marker_type) {
         case litehtml::list_style_type_circle:
             m_painter->setBrush(Qt::NoBrush);
             m_painter->drawEllipse(rect);
@@ -293,10 +293,13 @@ void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::lis
             m_painter->drawRect(rect);
             break;
         default:
-            // For other types (like numbers or letters), we draw the text
-            if (!marker.text.empty()) {
-                m_painter->setFont(m_fonts[1].font);  // Use default font
-                m_painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString::fromUtf8(marker.text.c_str()));
+            // For other types (like numbers or letters), draw numbered markers
+            if (marker.index >= 0) {
+                m_painter->setFont(m_fonts[static_cast<int>(marker.font)].font);
+                // Just draw the index as a string - in a more complete implementation
+                // we would format this according to the list style
+                QString indexText = QString::number(marker.index) + ".";
+                m_painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, indexText);
             }
             break;
     }
@@ -394,16 +397,16 @@ void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml:
     
     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
-    // Calculate the start and end points
-    QPointF startPoint(rect.x() + gradient.start_x * rect.width(), rect.y() + gradient.start_y * rect.height());
-    QPointF endPoint(rect.x() + gradient.end_x * rect.width(), rect.y() + gradient.end_y * rect.height());
+    // Calculate the start and end points using the gradient points
+    QPointF startPoint(rect.x() + gradient.start.x * rect.width(), rect.y() + gradient.start.y * rect.height());
+    QPointF endPoint(rect.x() + gradient.end.x * rect.width(), rect.y() + gradient.end.y * rect.height());
     
     // Create the gradient
     QLinearGradient linearGradient(startPoint, endPoint);
     
     // Add color stops
-    for (const auto& stop : gradient.color_stops) {
-        linearGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+    for (const auto& stop : gradient.color_points) {
+        linearGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
     
     // Draw the gradient
@@ -424,15 +427,17 @@ void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml:
     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
     // Calculate the center point and radius
-    QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
-    qreal radius = gradient.radius_x * std::min(rect.width(), rect.height());
+    QPointF centerPoint(rect.x() + gradient.position.x * rect.width(), rect.y() + gradient.position.y * rect.height());
+    qreal radiusX = gradient.radius.x * rect.width();
+    qreal radiusY = gradient.radius.y * rect.height();
+    qreal radius = std::max(radiusX, radiusY);
     
     // Create the gradient
     QRadialGradient radialGradient(centerPoint, radius);
     
     // Add color stops
-    for (const auto& stop : gradient.color_stops) {
-        radialGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+    for (const auto& stop : gradient.color_points) {
+        radialGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
     
     // Draw the gradient
@@ -453,14 +458,14 @@ void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::
     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
     // Calculate the center point
-    QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
+    QPointF centerPoint(rect.x() + gradient.position.x * rect.width(), rect.y() + gradient.position.y * rect.height());
     
     // Qt doesn't have a direct conic gradient, so we'll use a QConicalGradient
     QConicalGradient conicGradient(centerPoint, gradient.angle);
     
     // Add color stops
-    for (const auto& stop : gradient.color_stops) {
-        conicGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+    for (const auto& stop : gradient.color_points) {
+        conicGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
     }
     
     // Draw the gradient

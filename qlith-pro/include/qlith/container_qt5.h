@@ -138,5 +138,4 @@ public:
   void onImageLoaded(const QString& url, const QImage& image);
 };
 
-//Q_DECLARE_METATYPE(container_qt5);
-//Q_DECLARE_METATYPE(container_qt5*);
+Q_DECLARE_METATYPE(container_qt5*)
