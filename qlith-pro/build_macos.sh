@@ -55,11 +55,11 @@ echo "Building project..."
 cmake --build . -- -j$(sysctl -n hw.ncpu)
 
 echo "Build complete."
-echo "Executable is located at: $BUILD_DIR/bin/qlith-pro"
+echo "Executable is located at: $BUILD_DIR/qlith-pro.app/Contents/MacOS/qlith-pro"
 
 # Create an alias script for easy launching
-if [ -f "$BUILD_DIR/bin/qlith-pro" ]; then
-    ln -sf "$BUILD_DIR/bin/qlith-pro" "$PROJECT_ROOT/qlith-pro-run"
+if [ -f "$BUILD_DIR/qlith-pro.app/Contents/MacOS/qlith-pro" ]; then
+    ln -sf "$BUILD_DIR/qlith-pro.app/Contents/MacOS/qlith-pro" "$PROJECT_ROOT/qlith-pro-run"
     chmod +x "$PROJECT_ROOT/qlith-pro-run"
     echo "Created launch script: $PROJECT_ROOT/qlith-pro-run"
 fi

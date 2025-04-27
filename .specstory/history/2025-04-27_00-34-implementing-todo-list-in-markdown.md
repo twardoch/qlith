@@ -18210,6 +18210,2608 @@ _**Assistant**_
 
 ---
 
+<details>
+            <summary>Searched codebase "build_macos.sh" • **2** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build_macos.sh
+
+---
+
+```bash
+cat CMakeFiles/qlith-pro.dir/link.txt
+```
+
+```
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/c++ -O3 -DNDEBUG -isysroot /Applications/Xcode.app/Contents/Developer/Pla
+tforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Wl,-search_paths_first -Wl
+,-headerpad_max_install_names "CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_c
+ompilation.cpp.o" "CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o" "CMakeF
+iles/qlith-pro.dir/src/gui/fontcache.cpp.o" "CMakeFiles/qlith-pro.dir/src/gui/li
+tehtmlwidget.cpp.o" "CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o" "CMakeFiles/ql
+ith-pro.dir/src/gui/mainwindow.cpp.o" -o qlith-pro.app/Contents/MacOS/qlith-pro
+-F/usr/local/opt/qt@5/lib  /usr/local/opt/qt@5/lib/QtWidgets.framework/QtWidgets
+ /usr/local/opt/qt@5/lib/QtNetwork.framework/QtNetwork litehtml/liblitehtml.a li
+tehtml/src/gumbo/libgumbo.a /usr/local/opt/qt@5/lib/QtGui.framework/QtGui /usr/l
+ocal/opt/qt@5/lib/QtCore.framework/QtCore
+
+```
+
+---
+
+```bash
+cd "$PROJECT_ROOT" && ./build_macos.sh
+```
+
+```
+zsh: no such file or directory: ./build_macos.sh
+
+```
+
+---
+
+```bash
+cd .. && ./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/fontcache.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 94%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+[ 96%] Building CXX object CMakeFiles/qlith-pro.dir/qrc_res.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/fontcache.
+cpp:3:10: fatal error: 'fontcache.h' file not found
+    3 | #include "fontcache.h"
+      |          ^~~~~~~~~~~~~
+1 error generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:130: CMakeFiles/qlith-pro.dir
+/src/gui/fontcache.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:2:
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/MXUWEOXILK/moc_litehtmlwidget.cpp:10:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/../../../src/gui/litehtmlwidget.h:15:10: fatal error: 'containe
+r_qt5.h' file not found
+   15 | #include "container_qt5.h"
+      |          ^~~~~~~~~~~~~~~~~
+1 error generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:102: CMakeFiles/qlith-pro.dir
+/qlith-pro_autogen/mocs_compilation.cpp.o] Error 1
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:126:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const liteh
+tml::list_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:345:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  345 | void container_qt5::load_image(const char* src, const char* baseurl, boo
+l redraw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:375:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  375 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:392:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  392 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:421:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  421 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:452:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  452 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:133: warning: unused parameter 'root' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:546:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  546 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:104: warning: unused parameter 'el' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:559:84: warning: unused parameter 'el' [-Wunused-parameter]
+  559 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:66: warning: unused parameter 'el' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:92: warning: unused parameter 'event' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:609:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  609 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:630:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  630 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:689:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  689 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:690:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  690 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:691:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  691 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:21:14: warning: unused function 'positionToRect' [-Wunused-function]
+   21 | static QRect positionToRect(const litehtml::position& pos) {
+      |              ^~~~~~~~~~~~~~
+1 warning generated.
+26 warnings generated.
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+```diff
+  // -*- coding: utf-8 -*-
+  
+- #include "fontcache.h"
++ #include "qlith/fontcache.h"
+  
+  #include <QFontInfo>
+```
+
+---
+
+<details>
+            <summary>Searched codebase "litehtmlwidget.h" • **3** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwidget.h
+
+---
+
+```diff
+  
+  #include "litehtml.h"
+- #include "container_qt5.h"
++ #include "qlith/container_qt5.h"
+  
+  /**
+```
+
+---
+
+```bash
+cd build && cmake --build . -- -j16
+```
+
+```
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+Undefined symbols for architecture x86_64:
+  "container_qt5::titleChanged(QString const&)", referenced from:
+      container_qt5::set_caption(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_caption(char const*) in container_
+qt5.cpp.o
+  "container_qt5::anchorClicked(QString const&)", referenced from:
+      container_qt5::on_anchor_click(char const*, std::__1::shared_ptr<litehtml:
+:element> const&) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::on_anchor_click(char const*, std::__1:
+:shared_ptr<litehtml::element> const&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "container_qt5::cursorChanged(QString const&)", referenced from:
+      container_qt5::set_cursor(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_cursor(char const*) in container_q
+t5.cpp.o
+  "container_qt5::docSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::staticMetaObject", referenced from:
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::documentSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "vtable for MainWindow", referenced from:
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+  "vtable for container_qt5", referenced from:
+      container_qt5::container_qt5(QWidget*) in container_qt5.cpp.o
+      container_qt5::~container_qt5() in container_qt5.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+ld: symbol(s) not found for architecture x86_64
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:225: qlith-pro.app/Contents/M
+acOS/qlith-pro] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+```bash
+cd .. && grep -r "Q_DECLARE_METATYPE" --include="*.h" .
+```
+
+```
+./include/qlith/container_qt5.h:Q_DECLARE_METATYPE(container_qt5*)
+
+```
+
+---
+
+```bash
+grep -r "qRegisterMetaType" --include="*.cpp" .
+```
+
+```
+adam@Hamlet qlith-pro % 
+
+```
+
+---
+
+```diff
+  int main (int argc, char **argv) {
+    QApplication app(argc, argv);
++ 
++   // Register metatype for proper signal/slot connections
++   qRegisterMetaType<container_qt5*>("container_qt5*");
+  
+    FontCache::getInstance()->addFont(":/res/font/Cousine-Regular.ttf", R"raw("Cousine Regular")raw", container_qt5::getDefaultFontSize());
+```
+
+---
+
+```bash
+cd build && rm -rf qlith-pro_autogen && cmake --build . -- -j16
+```
+
+```
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:126:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+1 warning generated.
+[ 93%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+Undefined symbols for architecture x86_64:
+  "container_qt5::titleChanged(QString const&)", referenced from:
+      container_qt5::set_caption(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_caption(char const*) in container_
+qt5.cpp.o
+  "container_qt5::anchorClicked(QString const&)", referenced from:
+      container_qt5::on_anchor_click(char const*, std::__1::shared_ptr<litehtml:
+:element> const&) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::on_anchor_click(char const*, std::__1:
+:shared_ptr<litehtml::element> const&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "container_qt5::cursorChanged(QString const&)", referenced from:
+      container_qt5::set_cursor(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_cursor(char const*) in container_q
+t5.cpp.o
+  "container_qt5::docSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::staticMetaObject", referenced from:
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+      int qRegisterNormalizedMetaType<container_qt5*>(QByteArray const&, contain
+er_qt5**, QtPrivate::MetaTypeDefinedHelper<container_qt5*, QMetaTypeId2<containe
+r_qt5*>::Defined && !QMetaTypeId2<container_qt5*>::IsBuiltIn>::DefinedType) in m
+ain.cpp.o
+      int qRegisterNormalizedMetaType<container_qt5*>(QByteArray const&, contain
+er_qt5**, QtPrivate::MetaTypeDefinedHelper<container_qt5*, QMetaTypeId2<containe
+r_qt5*>::Defined && !QMetaTypeId2<container_qt5*>::IsBuiltIn>::DefinedType) in m
+ain.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::documentSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "vtable for MainWindow", referenced from:
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+  "vtable for container_qt5", referenced from:
+      container_qt5::container_qt5(QWidget*) in container_qt5.cpp.o
+      container_qt5::~container_qt5() in container_qt5.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+ld: symbol(s) not found for architecture x86_64
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:225: qlith-pro.app/Contents/M
+acOS/qlith-pro] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+```bash
+cd .. && rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j16
+```
+
+```
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/To
+olchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Tool
+chains/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Error at /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:14 (message):
+  The imported target "Qt5::Gui" references the file
+
+     "/usr/local/plugins/platforms/libqcocoa.dylib"
+
+  but this file does not exist.  Possible reasons include:
+
+  * The file was deleted, renamed, or moved to another location.
+
+  * An install or uninstall procedure did not complete successfully.
+
+  * The installation package was faulty and contained
+
+     "/usr/local/lib/cmake/Qt5Gui/Qt5Gui_QCocoaIntegrationPlugin.cmake"
+
+  but not all the files it references.
+
+Call Stack (most recent call first):
+  /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:214 (_qt5_Gui_check_file_exists
+)
+  /usr/local/lib/cmake/Qt5Gui/Qt5Gui_QCocoaIntegrationPlugin.cmake:5 (_populate_
+Gui_plugin_properties)
+  /usr/local/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake:223 (include)
+  /usr/local/lib/cmake/Qt5/Qt5Config.cmake:28 (find_package)
+  CMakeLists.txt:27 (find_package)
+
+
+-- Configuring incomplete, errors occurred!
+
+```
+
+---
+
+```bash
+cd .. && rm -rf build && mkdir build && cd build && cmake -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 -DCMAKE_BUILD_TYPE=Debug .. && cmake --build . -- -j16
+```
+
+```
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/To
+olchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Tool
+chains/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- qlith-pro configuration complete
+-- Configuring done (2.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen
+/mocs_compilation.cpp.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  5%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+[  6%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c
+.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.
+o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 12%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+error.c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-
+Wvoid-pointer-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+parser.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from
+ 'void *' [-Wvoid-pointer-to-enum-cast]
+  747 |   return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length -
+ 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+1 warning generated.
+1 warning generated.
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/moc
+s_compilation.cpp.o
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp
+.o
+[ 22%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cp
+p.o
+[ 25%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 26%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_contain
+er.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 30%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.
+cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 33%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 44%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntax
+es.cpp.o
+[ 55%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.
+o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp
+.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp
+.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 66%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.c
+pp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.
+o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.
+o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_con
+text.cpp.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp
+.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_co
+ntext.cpp.o
+[ 77%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp
+.o
+[ 78%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.
+o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp
+.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_conte
+xt.cpp.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 85%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 86%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Generating qrc_res.cpp
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/fontcache.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 94%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 96%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+[ 97%] Building CXX object CMakeFiles/qlith-pro.dir/qrc_res.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:126:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const liteh
+tml::list_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:345:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  345 | void container_qt5::load_image(const char* src, const char* baseurl, boo
+l redraw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:375:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  375 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:392:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  392 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:421:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  421 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:452:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  452 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:133: warning: unused parameter 'root' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:546:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  546 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:104: warning: unused parameter 'el' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:559:84: warning: unused parameter 'el' [-Wunused-parameter]
+  559 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:66: warning: unused parameter 'el' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:92: warning: unused parameter 'event' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:609:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  609 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:630:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  630 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:689:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  689 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:690:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  690 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:691:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  691 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:21:14: warning: unused function 'positionToRect' [-Wunused-function]
+   21 | static QRect positionToRect(const litehtml::position& pos) {
+      |              ^~~~~~~~~~~~~~
+1 warning generated.
+26 warnings generated.
+[ 98%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+Undefined symbols for architecture x86_64:
+  "container_qt5::titleChanged(QString const&)", referenced from:
+      container_qt5::set_caption(char const*) in container_qt5.cpp.o
+  "container_qt5::anchorClicked(QString const&)", referenced from:
+      container_qt5::on_anchor_click(char const*, std::__1::shared_ptr<litehtml:
+:element> const&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "container_qt5::cursorChanged(QString const&)", referenced from:
+      container_qt5::set_cursor(char const*) in container_qt5.cpp.o
+  "container_qt5::docSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::staticMetaObject", referenced from:
+      std::__1::enable_if<QtPrivate::FunctionPointer<litehtmlWidget::litehtmlWid
+get(QWidget*)::$_2>::ArgumentCount == -1, QMetaObject::Connection>::type QObject
+::connect<void (container_qt5::*)(int, int), litehtmlWidget::litehtmlWidget(QWid
+get*)::$_2>(QtPrivate::FunctionPointer<void (container_qt5::*)(int, int)>::Objec
+t const*, void (container_qt5::*)(int, int), QObject const*, litehtmlWidget::lit
+ehtmlWidget(QWidget*)::$_2, Qt::ConnectionType) in litehtmlwidget.cpp.o
+      QMetaObject::Connection QObject::connect<void (container_qt5::*)(QString c
+onst&), void (litehtmlWidget::*)(QString const&)>(QtPrivate::FunctionPointer<voi
+d (container_qt5::*)(QString const&)>::Object const*, void (container_qt5::*)(QS
+tring const&), QtPrivate::FunctionPointer<void (litehtmlWidget::*)(QString const
+&)>::Object const*, void (litehtmlWidget::*)(QString const&), Qt::ConnectionType
+) in litehtmlwidget.cpp.o
+      QtPrivate::MetaObjectForType<container_qt5*, void>::value() in main.cpp.o
+      std::__1::enable_if<QtPrivate::FunctionPointer<MainWindow::MainWindow(QWid
+get*)::$_2>::ArgumentCount == -1, QMetaObject::Connection>::type QObject::connec
+t<void (container_qt5::*)(int, int), MainWindow::MainWindow(QWidget*)::$_2>(QtPr
+ivate::FunctionPointer<void (container_qt5::*)(int, int)>::Object const*, void (
+container_qt5::*)(int, int), QObject const*, MainWindow::MainWindow(QWidget*)::$
+_2, Qt::ConnectionType) in mainwindow.cpp.o
+  "container_qt5::documentSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "vtable for MainWindow", referenced from:
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+  "vtable for container_qt5", referenced from:
+      container_qt5::container_qt5(QWidget*) in container_qt5.cpp.o
+      container_qt5::~container_qt5() in container_qt5.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+ld: symbol(s) not found for architecture x86_64
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:225: qlith-pro.app/Contents/M
+acOS/qlith-pro] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+This is a Qt-specific issue with signals and slots. The problem is that although your code includes the Q_OBJECT macro in the container_qt5 class, the MOC (Meta-Object Compiler) isn't properly generating the metadata for signals defined in the class.
+
+Let's fix this by moving the implementation files to match the header locations in the include directory:
+
+---
+
+```bash
+cd .. && cp build/qlith-pro_autogen/mocs_compilation.cpp build/mocs_compilation.cpp && cat build/mocs_compilation.cpp | head -n20
+```
+
+```
+// This file is autogenerated. Changes will be overwritten.
+#include "MXUWEOXILK/moc_litehtmlwidget.cpp"
+
+```
+
+---
+
+The MOC is not generating output for container_qt5, which is why we're seeing undefined references to the signal metadata. Let's modify the CMakeLists.txt to make sure the Qt MOC system properly processes all our Q_OBJECT classes:
+
+---
+
+```diff
+      # src/litehtml-qt.js_plugin_import.cpp
+  )
++ 
++ # Define header files with Q_OBJECT macro for Qt MOC
++ set(MOC_HEADERS
++     include/qlith/container_qt5.h
++     include/qlith/litehtmlwidget.h
++     include/qlith/mainwindow.h
++ )
+  
+  # Process Qt UI files
+```
+
+```diff
+  set(ALL_SOURCES
+      ${SOURCES}
++     ${MOC_HEADERS}
+  )
+  
+```
+
+---
+
+Now let's check if the litehtmlWidget class is properly implementing the container_qt5 member variable:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+The issue might be with the MOC handling of the container_qt5 class. Let's take a closer look at how the signals are defined. Let's check if we need to rebuild the `ui_mainwindow.h` file:
+
+---
+
+```bash
+cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu) VERBOSE=1
+```
+
+---
+
+<details>
+            <summary>Searched codebase "signals.h" • **0** results</summary>
+        
+No results found
+</details>
+
+---
+
+Let's create a simple fix to ensure the signals are properly defined in the container_qt5 class:
+
+---
+
+```diff
+    Q_OBJECT
+  
+- Q_SIGNALS:
++ signals:
+    void docSizeChanged(int w, int h);
+    void documentSizeChanged(int w, int h);
+```
+
+---
+
+```bash
+cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+```
+
+```
+adam@Hamlet qlith % cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5
+_DIR=/usr/local/opt/cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5
+_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+cd: no such file or directory: build
+adam@Hamlet qlith %
+```
+
+---
+
+I apologize for the confusion. Let's navigate to the correct directory and try again:
+
+---
+
+```bash
+cd qlith-pro && mkdir -p build && cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+```
+
+```
+zsh: sure you want to delete all 9 files in /Users/adam/Developer/vcs/github.twa
+rdoch/pub/qlith/qlith-pro/build [yn]? y
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/To
+olchains/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Tool
+chains/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- qlith-pro configuration complete
+-- Configuring done (1.3s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  4%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen
+/mocs_compilation.cpp.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  5%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+[  6%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c
+.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.
+o
+[ 10%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+error.c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-
+Wvoid-pointer-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/
+parser.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from
+ 'void *' [-Wvoid-pointer-to-enum-cast]
+  747 |   return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length -
+ 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+1 warning generated.
+1 warning generated.
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/moc
+s_compilation.cpp.o
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp
+.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cp
+p.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 25%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_contain
+er.cpp.o
+[ 26%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 30%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.
+cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 33%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 44%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntax
+es.cpp.o
+[ 55%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.
+o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp
+.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp
+.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 66%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.c
+pp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.
+o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.
+o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_con
+text.cpp.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp
+.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_co
+ntext.cpp.o
+[ 77%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp
+.o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.
+o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp
+.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_conte
+xt.cpp.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 85%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 86%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Generating qrc_res.cpp
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/fontcache.cpp.o
+[ 94%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+[ 96%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 97%] Building CXX object CMakeFiles/qlith-pro.dir/qrc_res.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:126:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/MXUWEOXILK/moc_litehtmlwidget.cpp:10:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/../../../src/gui/litehtmlwidget.h:20:7: error: redefinition of
+'litehtmlWidget'
+   20 | class litehtmlWidget : public QWidget
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/../../../include/qlith/litehtmlwidget.h:22:7: note: previous de
+finition is here
+   22 | class litehtmlWidget : public QWidget
+      |       ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:24:8: error: redefinition of 'qt_meta_st
+ringdata_litehtmlWidget_t'
+   24 | struct qt_meta_stringdata_litehtmlWidget_t {
+      |        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:24:8: note: previous definition is here
+   24 | struct qt_meta_stringdata_litehtmlWidget_t {
+      |        ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:33:50: error: redefinition of 'qt_meta_s
+tringdata_litehtmlWidget'
+   33 | static const qt_meta_stringdata_litehtmlWidget_t qt_meta_stringdata_lite
+htmlWidget = {
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:33:50: note: previous definition is here
+   33 | static const qt_meta_stringdata_litehtmlWidget_t qt_meta_stringdata_lite
+htmlWidget = {
+      |                                                  ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:48:19: error: redefinition of 'qt_meta_d
+ata_litehtmlWidget'
+   48 | static const uint qt_meta_data_litehtmlWidget[] = {
+      |                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:53:19: note: previous definition is here
+   53 | static const uint qt_meta_data_litehtmlWidget[] = {
+      |                   ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:72:22: error: redefinition of 'qt_static
+_metacall'
+   72 | void litehtmlWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _
+c, int _id, void **_a)
+      |                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:85:22: note: previous definition is here
+   85 | void litehtmlWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _
+c, int _id, void **_a)
+      |                      ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:101:54: error: redefinition of 'staticMe
+taObject'
+  101 | QT_INIT_METAOBJECT const QMetaObject litehtmlWidget::staticMetaObject = 
+{ {
+      |                                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:116:54: note: previous definition is her
+e
+  116 | QT_INIT_METAOBJECT const QMetaObject litehtmlWidget::staticMetaObject = 
+{ {
+      |                                                      ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:105:5: error: use of undeclared identifi
+er 'qt_static_metacall'
+  105 |     qt_static_metacall,
+      |     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:111:36: error: redefinition of 'metaObje
+ct'
+  111 | const QMetaObject *litehtmlWidget::metaObject() const
+      |                                    ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:126:36: note: previous definition is her
+e
+  126 | const QMetaObject *litehtmlWidget::metaObject() const
+      |                                    ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:116:23: error: redefinition of 'qt_metac
+ast'
+  116 | void *litehtmlWidget::qt_metacast(const char *_clname)
+      |                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:131:23: note: previous definition is her
+e
+  131 | void *litehtmlWidget::qt_metacast(const char *_clname)
+      |                       ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:124:21: error: redefinition of 'qt_metac
+all'
+  124 | int litehtmlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a
+)
+      |                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:139:21: note: previous definition is her
+e
+  139 | int litehtmlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a
+)
+      |                     ^
+In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-
+pro/build/qlith-pro_autogen/mocs_compilation.cpp:5:
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/MXUWEOXILK/moc_litehtmlwidget.cpp:142:22: error: redefinition of 'titleCha
+nged'
+  142 | void litehtmlWidget::titleChanged(const QString & _t1)
+      |                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_au
+togen/BMYM6N7PWQ/moc_litehtmlwidget.cpp:164:22: note: previous definition is her
+e
+  164 | void litehtmlWidget::titleChanged(const QString & _t1)
+      |                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const liteh
+tml::list_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:311:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:345:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  345 | void container_qt5::load_image(const char* src, const char* baseurl, boo
+l redraw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:375:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  375 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:392:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  392 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:421:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  421 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:452:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  452 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:133: warning: unused parameter 'root' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:546:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  546 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:553:104: warning: unused parameter 'el' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:559:84: warning: unused parameter 'el' [-Wunused-parameter]
+  559 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:66: warning: unused parameter 'el' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:566:92: warning: unused parameter 'event' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:609:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  609 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:630:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  630 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:689:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  689 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:690:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  690 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:691:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  691 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+11 errors generated.
+make[2]: *** [CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o]
+ Error 1
+make[2]: *** Waiting for unfinished jobs....
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:21:14: warning: unused function 'positionToRect' [-Wunused-function]
+   21 | static QRect positionToRect(const litehtml::position& pos) {
+      |              ^~~~~~~~~~~~~~
+1 warning generated.
+26 warnings generated.
+make[1]: *** [CMakeFiles/qlith-pro.dir/all] Error 2
+make: *** [all] Error 2
+
+```
+
+---
+
+We need to fix the duplicate class definition issue. It looks like the `litehtmlWidget` class is defined both in `src/gui/litehtmlwidget.h` and `include/qlith/litehtmlwidget.h`. Let's remove the duplicate:
+
+---
+
+<details>
+            <summary>Listed directory qlith-pro/src/gui • **6** results</summary>
+        
+| Name |
+|-------|
+| 📄 `litehtmlwidget.h` |
+| 📄 `main.cpp` |
+| 📄 `fontcache.cpp` |
+| 📄 `container_qt5.cpp` |
+| 📄 `mainwindow.cpp` |
+| 📄 `litehtmlwidget.cpp` |
+
+</details>
+
+---
+
+```bash
+mv src/gui/litehtmlwidget.h src/gui/litehtmlwidget.h.bak
+```
+
+```
+mv: rename src/gui/litehtmlwidget.h to src/gui/litehtmlwidget.h.bak: No such file or d
+irectory
+adam@Hamlet build %
+```
+
+---
+
+
+
+
+
+---
+
+```bash
+cd .. && mv src/gui/litehtmlwidget.h src/gui/litehtmlwidget.h.bak
+```
+
+```
+adam@Hamlet qlith-pro % 
+
+```
+
+---
+
+
+
+---
+
+Now let's rebuild the project with a clean build directory:
+
+---
+
+```bash
+cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+```
+
+```
+zsh: sure you want to delete all 9 files in /Users/adam/Developer/vcs/github.twardoch/
+pub/qlith/qlith-pro/build [yn]? y
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchai
+ns/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains
+/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- qlith-pro configuration complete
+-- Configuring done (1.3s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/pub/qli
+th/qlith-pro/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  4%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen/mocs_
+compilation.cpp.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  5%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  6%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.o
+[ 10%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 12%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/error.
+c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-Wvoid-pointe
+r-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/parser
+.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from 'void *' [-
+Wvoid-pointer-to-enum-cast]
+  747 | 1  warning  generated.
+return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length - 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/mocs_comp
+ilation.cpp.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_container.cpp
+.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 22%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 23%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 31%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 33%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 44%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntaxes.cpp
+.o
+[ 55%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 66%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.cpp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_context.c
+pp.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_context.
+cpp.o
+[ 77%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp.o
+[ 78%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_context.cpp
+.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 85%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 86%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Generating qrc_res.cpp
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compilation
+.cpp.o
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/fontcache.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 96%] Building CXX object CMakeFiles/qlith-pro.dir/qrc_res.cpp.o
+[ 97%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp:1
+26:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-but-set-varia
+ble]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_description
+& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, liteht
+ml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-variable]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::l
+ist_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:311:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
+und_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:311:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
+und_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:345:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  345 | void container_qt5::load_image(const char* src, const char* baseurl, bool redr
+aw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:375:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  375 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::ba
+ckground_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:392:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  392 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtm
+l::background_layer& layer, const litehtml::background_layer::linear_gradient& gradien
+t)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:421:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  421 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtm
+l::background_layer& layer, const litehtml::background_layer::radial_gradient& gradien
+t)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:452:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  452 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml
+::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:480:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borde
+rs& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:480:133: warning: unused parameter 'root' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borde
+rs& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:546:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  546 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:553:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const
+ litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:553:104: warning: unused parameter 'el' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const
+ litehtml::element::ptr& el)
+      |
+
+                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:559:84: warning: unused parameter 'el' [-Wunused-parameter]
+  559 | void container_qt5::on_anchor_click(const char* url, const litehtml::element::
+ptr& el)
+      |
+
+     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:566:66: warning: unused parameter 'el' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml:
+:mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:566:92: warning: unused parameter 'event' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml:
+:mouse_event event)
+      |
+
+             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:609:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  609 | void container_qt5::import_css(litehtml::string& text, const litehtml::string&
+ url, litehtml::string& baseurl)
+      |
+
+                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:630:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  630 | void container_qt5::set_clip(const litehtml::position& pos, const litehtml::bo
+rder_radiuses& bdr_radius)
+      |
+
+               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:689:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  689 | litehtml::element::ptr container_qt5::create_element(const char* tag_name, 
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:690:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  690 |                                                     const litehtml::string_map
+& attributes,
+      |
+
+  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:691:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  691 |                                                     const std::shared_ptr<lite
+html::document>& doc)
+      |
+
+                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:21:14: warning: unused function 'positionToRect' [-Wunused-function]
+   21 | static QRect positionToRect(const litehtml::position& pos) {
+      |              ^~~~~~~~~~~~~~
+1 warning generated.
+26 warnings generated.
+[ 98%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+duplicate symbol 'litehtmlWidget::linkClicked(QString const&)' in:
+    /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/CMakeFiles/qli
+th-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o
+    /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/CMakeFiles/qli
+th-pro.dir/src/gui/litehtmlwidget.cpp.o
+ld: 1 duplicate symbols
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+make[2]: *** [qlith-pro.app/Contents/MacOS/qlith-pro] Error 1
+make[1]: *** [CMakeFiles/qlith-pro.dir/all] Error 2
+make: *** [all] Error 2
+
+```
+
+---
+
+There's still a duplicate symbol issue related to the `litehtmlWidget` class. Let's check what was auto-generated by MOC:
+
+---
+
+```bash
+cd .. && mkdir -p tmp && cp -r build/qlith-pro_autogen tmp/ && cd tmp && find qlith-pro_autogen -type f -name "*.cpp" | xargs wc -l
+```
+
+```
+adam@Hamlet build % cd .. && mkdir -p tmp && cp -r build/qlith-pro_autogen tmp/ && cd 
+tmp && find qlith-prcd .. && mkdir -p tmp && cp -r build/qlith-pro_autogen tmp/ && cd 
+tmp && find qlith-pro_autogen -type f -name "*.cpp" | xargs wc -l
+     170 qlith-pro_autogen/BMYM6N7PWQ/moc_litehtmlwidget.cpp
+      95 qlith-pro_autogen/BMYM6N7PWQ/moc_mainwindow.cpp
+     215 qlith-pro_autogen/BMYM6N7PWQ/moc_container_qt5.cpp
+       4 qlith-pro_autogen/mocs_compilation.cpp
+     484 total
+adam@Hamlet tmp %
+```
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/tmp/qlith-pro_autogen/mocs_compilation.cpp
+
+---
+
+Let's modify the `litehtmlwidget.cpp` file to fix the duplicate symbols issue:
+
+---
+
+
+
+---
+
+Let's try fixing the implementation file:
+
+---
+
+
+
+---
+
+Let's try another approach by updating our CMakeLists.txt to ensure we don't get duplicate symbols:
+
+---
+
+```diff
+      src/gui/main.cpp
+      src/gui/mainwindow.cpp
+-     
+-     # Core sources - Comment out problematic files
+-     # src/affinetransform.cpp
+-     # src/bitmapimage.cpp
+-     # src/color.cpp
+-     # src/common.cpp
+-     # src/contextshadow.cpp
+-     # src/floatpoint.cpp
+-     # src/floatpoint3d.cpp
+-     # src/floatquad.cpp
+-     # src/floatrect.cpp
+-     # src/floatsize.cpp
+-     # src/gradient.cpp
+-     # src/graphicscontext.cpp
+-     # src/image.cpp
+-     # src/imagedecoder.cpp
+-     # src/imagedecoderqt.cpp
+-     # src/imageobserver.cpp
+-     # src/imagesource.cpp
+-     # src/intpoint.cpp
+-     # src/intrect.cpp
+-     # src/intsize.cpp
+-     # src/mimetyperegistry.cpp
+-     # src/mimetyperegistryqt.cpp
+-     # src/pathqt.cpp
+-     # src/pngimagedecoder.cpp
+-     # src/purgeablebuffer.cpp
+-     # src/rgba32bufferqt.cpp
+-     # src/shadowdata.cpp
+-     # src/sharedbuffer.cpp
+-     # src/stillimageqt.cpp
+-     # src/styleimage.cpp
+-     # src/transformationmatrix.cpp
+-     # src/litehtml-qt.js_plugin_import.cpp
+  )
+  
+```
+
+```diff
+      resources/mainwindow.ui
+  )
+- 
+- # Instead of using qt5_wrap_ui directly, we'll rely on AUTOUIC
+- # Make sure the UI files are included in the sources list
+- set(ALL_SOURCES
+-     ${SOURCES}
+-     ${MOC_HEADERS}
+- )
+  
+  # Process Qt resources
+```
+
+```diff
+  # Create executable
+  add_executable(${PROJECT_NAME}
+-     ${ALL_SOURCES}
++     ${SOURCES}
++     ${MOC_HEADERS}
+      ${UI_FILES}
+      ${RESOURCES}
+```
+
+---
+
+Let's try to rebuild with these changes:
+
+---
+
+```bash
+cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+```
+
+```
+adam@Hamlet tmp % cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/us
+r/local/opt/qt@5/lcd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/us
+r/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+cd: no such file or directory: build
+adam@Hamlet tmp %
+```
+
+---
+
+Let's navigate to the correct directory:
+
+---
+
+```bash
+cd .. && cd build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 .. && make -j$(sysctl -n hw.ncpu)
+```
+
+```
+zsh: sure you want to delete all 9 files in /Users/adam/Developer/vcs/github.twardoch/
+pub/qlith/qlith-pro/build [yn]? y
+-- The CXX compiler identification is AppleClang 17.0.0.17000013
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Applications/Xcode.app/Contents/Developer/Toolchai
+ns/XcodeDefault.xctoolchain/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Applications/Xcode.app/Contents/Developer/Toolchains
+/XcodeDefault.xctoolchain/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- qlith-pro configuration complete
+-- Configuring done (1.4s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/pub/qli
+th/qlith-pro/build
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen/mocs_
+compilation.cpp.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/attribute.c.o
+[  4%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/char_ref.c.o
+[  5%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_buffer.c.o
+[  6%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/error.c.o
+[  7%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/parser.c.o
+[  8%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/string_piece.c.o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tag.c.o
+[ 11%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/tokenizer.c.o
+[ 12%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/utf8.c.o
+[ 13%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/util.c.o
+[ 14%] Building C object litehtml/src/gumbo/CMakeFiles/gumbo.dir/vector.c.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/error.
+c:82:20: warning: cast to smaller integer type 'GumboTag' from 'void *' [-Wvoid-pointe
+r-to-enum-cast]
+   82 |     GumboTag tag = (GumboTag) error->tag_stack.data[i];
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/gumbo/parser
+.c:747:10: warning: cast to smaller integer type 'GumboInsertionMode' from 'void *' [-
+Wvoid-pointer-to-enum-cast]
+  747 |   return (GumboInsertionMode)
+      |          ^~~~~~~~~~~~~~~~~~~~
+  748 |       template_insertion_modes->data[(template_insertion_modes->length - 1)];
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+1 warning generated.
+[ 15%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/codepoint.cpp.o
+[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/mocs_comp
+ilation.cpp.o
+[ 21%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_selector.cpp.o
+[ 22%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_length.cpp.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_tokenizer.cpp.o
+[ 24%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_parser.cpp.o
+[ 25%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_base.cpp.o
+[ 27%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/document_container.cpp
+.o
+[ 28%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_anchor.cpp.o
+[ 30%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_before_after.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_body.cpp.o
+[ 32%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_break.cpp.o
+[ 33%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_cdata.cpp.o
+[ 34%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_comment.cpp.o
+[ 35%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_div.cpp.o
+[ 36%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/element.cpp.o
+[ 37%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_font.cpp.o
+[ 38%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_image.cpp.o
+[ 40%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_link.cpp.o
+[ 41%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_para.cpp.o
+[ 42%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_script.cpp.o
+[ 43%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_space.cpp.o
+[ 44%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_style.cpp.o
+[ 45%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_table.cpp.o
+[ 46%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_td.cpp.o
+[ 47%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_text.cpp.o
+[ 48%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_title.cpp.o
+[ 50%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/el_tr.cpp.o
+[ 51%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/encodings.cpp.o
+[ 52%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html.cpp.o
+[ 53%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_tag.cpp.o
+[ 54%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/html_microsyntaxes.cpp
+.o
+[ 55%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/iterators.cpp.o
+[ 56%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/media_query.cpp.o
+[ 57%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/style.cpp.o
+[ 58%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/stylesheet.cpp.o
+[ 60%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/table.cpp.o
+[ 61%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/tstring_view.cpp.o
+[ 62%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url.cpp.o
+[ 63%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/url_path.cpp.o
+[ 64%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/utf8_strings.cpp.o
+[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/web_color.cpp.o
+[ 66%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o
+[ 67%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/strtod.cpp.o
+[ 68%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/string_id.cpp.o
+[ 70%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_properties.cpp.o
+[ 71%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/line_box.cpp.o
+[ 72%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/css_borders.cpp.o
+[ 73%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_item.cpp.o
+[ 74%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block_context.c
+pp.o
+[ 75%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_block.cpp.o
+[ 76%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_inline_context.
+cpp.o
+[ 77%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_table.cpp.o
+[ 78%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_flex.cpp.o
+[ 80%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/render_image.cpp.o
+[ 81%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/formatting_context.cpp
+.o
+[ 82%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_item.cpp.o
+[ 83%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/flex_line.cpp.o
+[ 84%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/background.cpp.o
+[ 85%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/gradient.cpp.o
+[ 86%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 87%] Built target litehtml
+[ 87%] Built target qlith-pro_autogen_timestamp_deps
+[ 88%] Automatic MOC and UIC for target qlith-pro
+[ 88%] Built target qlith-pro_autogen
+[ 90%] Generating qrc_res.cpp
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compilation
+.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/fontcache.cpp.o
+[ 94%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 95%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+[ 96%] Building CXX object CMakeFiles/qlith-pro.dir/qrc_res.cpp.o
+[ 97%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp:1
+26:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-but-set-varia
+ble]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_description
+& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, liteht
+ml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-variable]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::l
+ist_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:311:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
+und_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:311:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  311 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::backgro
+und_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:345:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  345 | void container_qt5::load_image(const char* src, const char* baseurl, bool redr
+aw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:375:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  375 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::ba
+ckground_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:392:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  392 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtm
+l::background_layer& layer, const litehtml::background_layer::linear_gradient& gradien
+t)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:421:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  421 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtm
+l::background_layer& layer, const litehtml::background_layer::radial_gradient& gradien
+t)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:452:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  452 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml
+::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:480:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borde
+rs& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:480:133: warning: unused parameter 'root' [-Wunused-parameter]
+  480 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borde
+rs& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:546:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  546 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:553:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const
+ litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:553:104: warning: unused parameter 'el' [-Wunused-parameter]
+  553 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const
+ litehtml::element::ptr& el)
+      |
+
+                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:559:84: warning: unused parameter 'el' [-Wunused-parameter]
+  559 | void container_qt5::on_anchor_click(const char* url, const litehtml::element::
+ptr& el)
+      |
+
+     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:566:66: warning: unused parameter 'el' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml:
+:mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:566:92: warning: unused parameter 'event' [-Wunused-parameter]
+  566 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml:
+:mouse_event event)
+      |
+
+             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:609:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  609 | void container_qt5::import_css(litehtml::string& text, const litehtml::string&
+ url, litehtml::string& baseurl)
+      |
+
+                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:630:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  630 | void container_qt5::set_clip(const litehtml::position& pos, const litehtml::bo
+rder_radiuses& bdr_radius)
+      |
+
+               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:689:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  689 | litehtml::element::ptr container_qt5::create_element(const char* tag_name, 
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:690:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  690 |                                                     const litehtml::string_map
+& attributes,
+      |
+
+  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:691:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  691 |                                                     const std::shared_ptr<lite
+html::document>& doc)
+      |
+
+                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cp
+p:21:14: warning: unused function 'positionToRect' [-Wunused-function]
+   21 | static QRect positionToRect(const litehtml::position& pos) {
+      |              ^~~~~~~~~~~~~~
+1 warning generated.
+26 warnings generated.
+[ 98%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+duplicate symbol 'litehtmlWidget::linkClicked(QString const&)' in:
+    /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/CMakeFiles/qli
+th-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o
+    /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/CMakeFiles/qli
+th-pro.dir/src/gui/litehtmlwidget.cpp.o
+ld: 1 duplicate symbols
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+make[2]: *** [qlith-pro.app/Contents/MacOS/qlith-pro] Error 1
+make[1]: *** [CMakeFiles/qlith-pro.dir/all] Error 2
+make: *** [all] Error 2
+
+```
+
+---
+
+We're still getting a duplicate symbol error. Let's specifically look at the litehtmlwidget.cpp file to see why we're getting duplicate symbol definitions:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+Now let's check the header file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/litehtmlwidget.h
+
+---
+
+Let's also check the MOC compilation file:
+
+---
+
+<details>
+            <summary>Grep search for "mocs_compilation\.cpp" • **3** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L115 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L116 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L122 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L123 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L2994 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3026 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3028 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3115 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3117 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3241 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3273 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3275 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3362 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3364 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6627 | `[  2%] Building CXX object litehtml/src/gumbo/CMakeFiles/gumbo.dir/gumbo_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6650 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6651 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6658 | `[ 20%] Building CXX object litehtml/CMakeFiles/litehtml.dir/litehtml_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6718 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6719 | `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6724 | `[ 90%] Building CXX object src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6727 | `In file included from /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/build/src/qlith_autogen/mocs_compilation.cpp:2:` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6905 | `gmake[2]: *** [src/CMakeFiles/qlith.dir/build.make:86: src/CMakeFiles/qlith.dir/qlith_autogen/mocs_compilation.cpp.o] Error 1` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L7544 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L7546 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L7553 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L7555 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8509 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8541 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8543 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8630 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8632 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L9060 | `togen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L11994 | `MainWindow::qt_static_metacall(QObject*, QMetaObject::Call, int, void**) in mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6533 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6535 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6542 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6544 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L7633 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L7635 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L7642 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L7644 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L8818 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L8820 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L8827 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L8829 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L11422 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L11424 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L11431 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L11433 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L12647 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L12649 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L12656 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L12658 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L15432 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L15434 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L15441 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L15443 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16482 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16514 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16516 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16603 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16605 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16849 | `find build -name "mocs_compilation.cpp" | xargs -I{} ls -la {}` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16856 | `en/mocs_compilation.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16869 | `cat build/qlith-pro_autogen/mocs_compilation.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L16995 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17027 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17029 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17116 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17118 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17308 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17313 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17318 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17324 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17330 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17335 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17340 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17345 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17355 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17360 | `es/qlith-pro.dir/qlith-pro_autogen/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17473 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17505 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17507 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17594 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L17596 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18326 | `pro/build/qlith-pro_autogen/mocs_compilation.cpp:2:` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18336 | `/qlith-pro_autogen/mocs_compilation.cpp.o] Error 1` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18799 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18831 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18833 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18920 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L18922 | `sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L19159 | `cd .. && cp build/qlith-pro_autogen/mocs_compilation.cpp build/mocs_compilation.cpp && cat build/mocs_compilation.cpp | head -n20` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L19293 | `/mocs_compilation.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L19324 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L19326 | `sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols` |
+
+</details>
+
+---
+
+Let's look at the mocs_compilation file:
+
+---
+
+<details>
+            <summary>Searched codebase "mocs_compilation.cpp" • **1** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+
+</details>
+
+---
+
+Let's check the moc file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build/qlith-pro_autogen/mocs_compilation.cpp
+
+---
+
+Let's check for declarations of `container_qt5` and `MainWindow` classes in the project:
+
+---
+
+<details>
+            <summary>Grep search for "class\s+MainWindow" • **7** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/browser/mainwindow.h` | L22 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L3771 | `class MainWindow;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L3774 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini.txt` | L636 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6192 | `class MainWindow;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L6197 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L4124 | `class MainWindow;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L4127 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L5746 | `class MainWindow;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L5749 | `class MainWindow : public QMainWindow` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/mainwindow.h` | L9 | `class MainWindow;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/mainwindow.h` | L14 | `class MainWindow : public QMainWindow` |
+
+</details>
+
+---
+
+<details>
+            <summary>Grep search for "class\s+container_qt5" • **8** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L150 | `10 | class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L165 | `10 | class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L228 | `10 | class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L1134 | `class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L1634 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L1784 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L2063 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3393 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3427 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3537 | `10 | class container_qt5 : public QObject, public litehtml::document_containe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L1487 | `class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/litehtmlwidget.h` | L12 | `class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/container_qt5.h` | L22 | `class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L200 | `class container_qt5 : public QObject, public litehtml::document_container` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L4815 | `+ class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L5999 | `- class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L9929 | `+ class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L10092 | `+ class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L10518 | `- class container_qt5;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L4627 | `class container_qt5 : public QObject, public litehtml::document_container` |
+
+</details>
+
+---
+
+Now let's check the implementation of the `container_qt5` class:
+
+---
+
+<details>
+            <summary>Searched codebase "container_qt5.cpp" • **2** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Let's check the main implementation file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
 
 
 ---

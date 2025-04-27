@@ -24,7 +24,7 @@ class container_qt5 : public QObject, public litehtml::document_container
 {
   Q_OBJECT
 
-Q_SIGNALS:
+signals:
   void docSizeChanged(int w, int h);
   void documentSizeChanged(int w, int h);
   void titleChanged(const QString& title);

@@ -384,16 +384,6 @@ void litehtmlWidget::onDocSizeChanged(int w, int h)
 }
 
 /**
- * Handler for link clicks
- * @param url The clicked link URL
- */
-void litehtmlWidget::linkClicked(const QString& url)
-{
-    // Handle link click
-    QDesktopServices::openUrl(QUrl(url));
-}
-
-/**
  * Handler for anchor clicks
  * @param url The clicked anchor URL
  */
