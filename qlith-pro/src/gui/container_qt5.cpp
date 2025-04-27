@@ -1,4 +1,4 @@
-#include "container_qt5.h"
+#include "qlith/container_qt5.h"
 #include <QDebug>
 #include <QFont>
 #include <QFontMetrics>
@@ -141,7 +141,7 @@ void container_qt5::repaint(QPainter& painter)
     
     // Draw the document
     try {
-        _doc->draw(0, getScroll().x(), getScroll().y(), &clipPos);
+        _doc->draw(reinterpret_cast<litehtml::uint_ptr>(&painter), getScroll().x(), getScroll().y(), &clipPos);
     }
     catch (std::exception& e) {
         qWarning() << "Exception in container_qt5::repaint:" << e.what();
@@ -156,6 +156,7 @@ void container_qt5::repaint(QPainter& painter)
     // Notify if document size has changed
     if (_doc->width() != m_lastDocWidth || _doc->height() != m_lastDocHeight) {
         emit docSizeChanged(_doc->width(), _doc->height());
+        emit documentSizeChanged(_doc->width(), _doc->height());
         m_lastDocWidth = _doc->width();
         m_lastDocHeight = _doc->height();
     }
@@ -248,7 +249,9 @@ int container_qt5::pt_to_px(int pt) const
     if (QGuiApplication::primaryScreen()) {
         dpr = QGuiApplication::primaryScreen()->devicePixelRatio();
     }
-    return static_cast<int>(pt * dpr * (96.0 / 72.0));
+    
+    // 96 DPI is the standard screen resolution
+    return (pt * 96) / 72;
 }
 
 // Get default font size
@@ -260,9 +263,7 @@ int container_qt5::get_default_font_size() const
 // Get default font name
 const char* container_qt5::get_default_font_name() const
 {
-    static QByteArray fontName;
-    fontName = m_defaultFontName.toUtf8();
-    return fontName.constData();
+    return m_defaultFontName.toUtf8().constData();
 }
 
 // Draw a list marker (bullet or number)
@@ -567,40 +568,39 @@ void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders
     m_painter->restore();
 }
 
-// Set a document caption (title)
+// Set caption (title)
 void container_qt5::set_caption(const char* caption)
 {
     emit titleChanged(QString::fromUtf8(caption));
 }
 
-// Set the base URL for resolving relative paths
+// Set base URL
 void container_qt5::set_base_url(const char* base_url)
 {
-    // Store base URL
-    QString baseUrl = QString::fromUtf8(base_url);
-    // TODO: Update base URL in actual implementation
+    // This is already used in the code but not implemented
+    // Store base URL if needed
 }
 
-// Handle links between documents
+// Link handling
 void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el)
 {
-    // No implementation needed for basic functionality
+    // No implementation needed
 }
 
-// Handle clicks on anchor elements
+// Anchor click handling
 void container_qt5::on_anchor_click(const char* url, const litehtml::element::ptr& el)
 {
     QString linkUrl = QString::fromUtf8(url);
     emit anchorClicked(linkUrl);
 }
 
-// Handle mouse events on elements
+// Mouse event handling
 void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event)
 {
-    // Handle mouse hover events
+    // No implementation needed
 }
 
-// Set the cursor for the current mouse position
+// Set cursor
 void container_qt5::set_cursor(const char* cursor)
 {
     QString cursorName = QString::fromUtf8(cursor);
@@ -740,199 +740,73 @@ void container_qt5::onImageLoaded(const QString& url, const QImage& image)
     }
 }
 
-//
-// litehtmlWidget implementation
-//
-
-litehtmlWidget::litehtmlWidget(QWidget* parent)
-    : QWidget(parent)
-    , m_container(new container_qt5(this))
-    , m_needsLayout(false)
-    , m_scrollPos(0, 0)
-    , m_docSize(0, 0)
-    , m_isLoading(false)
+// Drawing method
+void container_qt5::draw(std::shared_ptr<litehtml::document>& doc, QPainter* painter, int x, int y, const litehtml::position* clip)
 {
-    setMouseTracking(true);
-    setFocusPolicy(Qt::StrongFocus);
+    if (!doc) {
+        qWarning() << "container_qt5::draw called with null document";
+        return;
+    }
+
+    // Set up painter
+    setPainter(painter);
     
-    connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
-    connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::linkClicked);
-    connect(m_container, &container_qt5::cursorChanged, [this](const QString& cursor) {
-        // Set appropriate cursor
-        if (cursor == "pointer") {
-            setCursor(Qt::PointingHandCursor);
-        } else if (cursor == "text") {
-            setCursor(Qt::IBeamCursor);
-        } else {
-            setCursor(Qt::ArrowCursor);
-        }
-    });
-}
-
-litehtmlWidget::~litehtmlWidget()
-{
-    delete m_container;
-}
-
-container_qt5* litehtmlWidget::getContainer() const
-{
-    return m_container;
-}
-
-void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
-{
-    m_isLoading = true;
-    
-    // Create document without using the context class
-    m_container->_doc = litehtml::document::createFromString(html.toUtf8().constData(), m_container);
-    
-    // Set base URL
-    if (!baseUrl.isEmpty()) {
-        m_container->set_base_url(baseUrl.toUtf8().constData());
+    try {
+        // Draw the document at the specified position with clipping
+        doc->draw(reinterpret_cast<litehtml::uint_ptr>(painter), x, y, clip);
+    }
+    catch (std::exception& e) {
+        qWarning() << "Exception in container_qt5::draw:" << e.what();
+    }
+    catch (...) {
+        qWarning() << "Unknown exception in container_qt5::draw";
     }
     
-    // Reset scroll position
-    setScrollPosition(QPoint(0, 0));
+    // Clean up
+    setPainter(nullptr);
+}
+
+// Mouse button down handler
+void container_qt5::on_lbutton_down(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
+{
+    if (!doc) {
+        return;
+    }
     
-    m_needsLayout = true;
-    m_isLoading = false;
-    update();
-}
-
-void litehtmlWidget::setScrollPosition(const QPoint& pos)
-{
-    m_scrollPos = pos;
-    m_container->setScroll(m_scrollPos);
-    update();
-}
-
-QPoint litehtmlWidget::scrollPosition() const
-{
-    return m_scrollPos;
-}
-
-QSize litehtmlWidget::documentSize() const
-{
-    return m_docSize;
-}
-
-void litehtmlWidget::paintEvent(QPaintEvent* event)
-{
-    QPainter painter(this);
+    setLastMouseCoords(x, y, client_x, y);
     
-    // Draw background
-    painter.fillRect(rect(), Qt::white);
-    
-    // Draw content
-    if (m_container->_doc) {
-        m_container->repaint(painter);
+    litehtml::position::vector redraw_boxes;
+    if (doc->on_lbutton_down(x, y, x, y, redraw_boxes)) {
+        // TODO: Implement redraw of specific boxes if needed
     }
 }
 
-void litehtmlWidget::resizeEvent(QResizeEvent* event)
+// Mouse button up handler
+void container_qt5::on_lbutton_up(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
 {
-    QWidget::resizeEvent(event);
-    
-    // Trigger re-layout
-    if (m_container->_doc) {
-        m_needsLayout = true;
-        update();
-    }
-}
-
-void litehtmlWidget::mousePressEvent(QMouseEvent* event)
-{
-    if (m_container->_doc) {
-        // Adjust mouse coordinates for scrolling
-        int x = event->x() + m_scrollPos.x();
-        int y = event->y() + m_scrollPos.y();
-        
-        // Track coordinates
-        m_container->setLastMouseCoords(x, y, event->x(), event->y());
-        
-        // Get the element under the cursor
-        litehtml::element::ptr el = m_container->elementUnderCursor();
-        
-        // Handle click
-        if (el) {
-            litehtml::position::vector redraw_boxes;
-            m_container->_doc->on_lbutton_down(x, y, event->x(), event->y(), redraw_boxes);
-            update();
-        }
-    }
-}
-
-void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
-{
-    if (m_container->_doc) {
-        // Adjust mouse coordinates for scrolling
-        int x = event->x() + m_scrollPos.x();
-        int y = event->y() + m_scrollPos.y();
-        
-        // Track coordinates
-        m_container->setLastMouseCoords(x, y, event->x(), event->y());
-        
-        // Get the element under the cursor
-        litehtml::element::ptr el = m_container->elementUnderCursor();
-        
-        // Handle release
-        if (el) {
-            litehtml::position::vector redraw_boxes;
-            m_container->_doc->on_lbutton_up(x, y, event->x(), event->y(), redraw_boxes);
-            update();
-        }
-    }
-}
-
-void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
-{
-    if (m_container->_doc) {
-        // Adjust mouse coordinates for scrolling
-        int x = event->x() + m_scrollPos.x();
-        int y = event->y() + m_scrollPos.y();
-        
-        // Track coordinates
-        m_container->setLastMouseCoords(x, y, event->x(), event->y());
-        
-        // Get the element under the cursor
-        litehtml::element::ptr el = m_container->elementUnderCursor();
-        
-        // Handle hover
-        if (el) {
-            litehtml::position::vector redraw_boxes;
-            m_container->_doc->on_mouse_over(x, y, event->x(), event->y(), redraw_boxes);
-            update();
-        }
-    }
-}
-
-void litehtmlWidget::wheelEvent(QWheelEvent* event)
-{
-    // Adjust scroll position based on wheel delta
-    QPoint delta = event->angleDelta() / 8;
-    if (!delta.isNull()) {
-        QPoint newPos = m_scrollPos - QPoint(0, delta.y());
-        
-        // Clamp to document bounds
-        newPos.setX(qBound(0, newPos.x(), qMax(0, m_docSize.width() - width())));
-        newPos.setY(qBound(0, newPos.y(), qMax(0, m_docSize.height() - height())));
-        
-        setScrollPosition(newPos);
+    if (!doc) {
+        return;
     }
     
-    event->accept();
+    setLastMouseCoords(x, y, client_x, y);
+    
+    litehtml::position::vector redraw_boxes;
+    if (doc->on_lbutton_up(x, y, x, y, redraw_boxes)) {
+        // TODO: Implement redraw of specific boxes if needed
+    }
 }
 
-void litehtmlWidget::onDocSizeChanged(int w, int h)
+// Mouse move handler
+void container_qt5::on_mouse_over(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
 {
-    m_docSize = QSize(w, h);
+    if (!doc) {
+        return;
+    }
     
-    // Adjust scroll position if out of bounds
-    QPoint newPos = m_scrollPos;
-    newPos.setX(qBound(0, newPos.x(), qMax(0, m_docSize.width() - width())));
-    newPos.setY(qBound(0, newPos.y(), qMax(0, m_docSize.height() - height())));
+    setLastMouseCoords(x, y, client_x, y);
     
-    if (newPos != m_scrollPos) {
-        setScrollPosition(newPos);
+    litehtml::position::vector redraw_boxes;
+    if (doc->on_mouse_over(x, y, x, y, redraw_boxes)) {
+        // TODO: Implement redraw of specific boxes if needed
     }
 }

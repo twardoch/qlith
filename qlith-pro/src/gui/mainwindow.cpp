@@ -1,10 +1,10 @@
 // -*- coding: utf-8 -*-
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "container_qt5.h"
-#include "litehtmlwidget.h"
-#include "qlith/context.h"
+# include "qlith/mainwindow.h"
+# include "ui_mainwindow.h"
+# include "qlith/container_qt5.h"
+# include "qlith/litehtmlwidget.h"
+# include "qlith/context.h"
 
 #include <QDebug>
 #include <QFile>
@@ -102,7 +102,7 @@ jkljkljkljkl
   const char* html = htmlStr.c_str();
   
   // Create document
-  auto doc = litehtml::document::createFromString(html, m_litehtmlWidget->getContainer(), context.get_context_ptr());
+  auto doc = litehtml::document::createFromString(html, m_litehtmlWidget->getContainer(), context.get_master_css());
   m_litehtmlWidget->getContainer()->set_document(doc);
 
   m_litehtmlWidget->show();
@@ -122,20 +122,21 @@ jkljkljkljkl
     m_litehtmlWidget->repaint();
   });
 
-  connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
-    if (!scrollBar) {
-      return;
-    }
+  connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), 
+    [this, scrollBar](int w, int h) {
+      if (!scrollBar) {
+        return;
+      }
 
-    const int singleVisiblePageHeight = m_litehtmlWidget->height();
-
-    // Subtracts already visible area = widget size
-    const int availableScroll = h - singleVisiblePageHeight;
-    scrollBar->setMaximum(availableScroll);
-    // amount that the value changes on cursor keys
-    scrollBar->setSingleStep(singleVisiblePageHeight);
-    // amount that the value changes on Page Up and Page Down keys
-    scrollBar->setPageStep(singleVisiblePageHeight);
+      const int singleVisiblePageHeight = m_litehtmlWidget->height();
+      
+      // Subtracts already visible area = widget size
+      const int availableScroll = h - singleVisiblePageHeight;
+      scrollBar->setMaximum(availableScroll);
+      // amount that the value changes on cursor keys
+      scrollBar->setSingleStep(singleVisiblePageHeight);
+      // amount that the value changes on Page Up and Page Down keys
+      scrollBar->setPageStep(singleVisiblePageHeight);
   });
 
   ui->verticalLayoutBar->addWidget(scrollBar);

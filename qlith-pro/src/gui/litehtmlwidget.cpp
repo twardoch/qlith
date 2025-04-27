@@ -1,10 +1,19 @@
-#include "litehtmlwidget.h"
+#include "qlith/litehtmlwidget.h"
+#include "qlith/container_qt5.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QResizeEvent>
 #include <QWheelEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrl>
+#include <QFileInfo>
+#include <QScrollBar>
+#include <QTimer>
+#include <QDesktopServices>
 
 /**
  * Constructor for litehtmlWidget
@@ -13,28 +22,75 @@
 litehtmlWidget::litehtmlWidget(QWidget* parent)
     : QWidget(parent)
     , m_container(new container_qt5(this))
-    , m_needsLayout(false)
-    , m_scrollPos(0, 0)
-    , m_docSize(0, 0)
-    , m_isLoading(false)
+    , m_htmlDocument(nullptr)
+    , m_vScrollBar(new QScrollBar(Qt::Vertical, this))
+    , m_hScrollBar(new QScrollBar(Qt::Horizontal, this))
+    , m_scrollX(0)
+    , m_scrollY(0)
+    , m_documentSizeSet(false)
+    , m_documentSize(0, 0)
+    , m_needUpdate(false)
 {
-    // Set attributes
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setFocusPolicy(Qt::StrongFocus);
-    setMouseTracking(true);
+    // Setup scrollbars
+    m_vScrollBar->hide();
+    m_hScrollBar->hide();
     
-    // Connect signals
-    connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
-    connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::linkClicked);
-    connect(m_container, &container_qt5::cursorChanged, this, [this](const QString& cursor) {
-        if (cursor == "pointer") {
-            setCursor(Qt::PointingHandCursor);
-        } else if (cursor == "text") {
-            setCursor(Qt::IBeamCursor);
-        } else {
-            setCursor(Qt::ArrowCursor);
+    m_vScrollBar->setRange(0, 0);
+    m_hScrollBar->setRange(0, 0);
+    
+    connect(m_vScrollBar, &QScrollBar::valueChanged, [this](int value) {
+        m_scrollY = value;
+        update();
+    });
+    
+    connect(m_hScrollBar, &QScrollBar::valueChanged, [this](int value) {
+        m_scrollX = value;
+        update();
+    });
+    
+    // Connect container signals
+    connect(m_container, &container_qt5::documentSizeChanged, this, 
+        [this](int width, int height) {
+            m_documentSize = QSize(width, height);
+            m_documentSizeSet = true;
+            
+            // Update scrollbar ranges
+            m_vScrollBar->setRange(0, std::max(0, height - this->height()));
+            m_vScrollBar->setPageStep(this->height());
+            
+            m_hScrollBar->setRange(0, std::max(0, width - this->width()));
+            m_hScrollBar->setPageStep(this->width());
+            
+            // Show scrollbars if needed
+            m_vScrollBar->setVisible(height > this->height());
+            m_hScrollBar->setVisible(width > this->width());
+            
+            // Position scrollbars
+            m_vScrollBar->setGeometry(this->width() - m_vScrollBar->sizeHint().width(), 
+                                     0, 
+                                     m_vScrollBar->sizeHint().width(), 
+                                     this->height() - (m_hScrollBar->isVisible() ? m_hScrollBar->sizeHint().height() : 0));
+            
+            m_hScrollBar->setGeometry(0, 
+                                     this->height() - m_hScrollBar->sizeHint().height(),
+                                     this->width() - (m_vScrollBar->isVisible() ? m_vScrollBar->sizeHint().width() : 0),
+                                     m_hScrollBar->sizeHint().height());
+            
+            update();
+        });
+    
+    connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::anchorClicked);
+    
+    // Setup timer for deferred updates
+    m_updateTimer.setSingleShot(true);
+    connect(&m_updateTimer, &QTimer::timeout, this, [this]() {
+        if (m_needUpdate) {
+            update();
+            m_needUpdate = false;
         }
     });
+    
+    setMouseTracking(true);
 }
 
 /**
@@ -42,12 +98,14 @@ litehtmlWidget::litehtmlWidget(QWidget* parent)
  */
 litehtmlWidget::~litehtmlWidget()
 {
+    delete m_vScrollBar;
+    delete m_hScrollBar;
     delete m_container;
 }
 
 /**
- * Get the container object used for rendering
- * @return The container_qt5 instance
+ * Get the container object
+ * @return Pointer to the container_qt5 instance
  */
 container_qt5* litehtmlWidget::getContainer() const
 {
@@ -61,60 +119,75 @@ container_qt5* litehtmlWidget::getContainer() const
  */
 void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
 {
-    m_isLoading = true;
+    m_container->set_base_url(baseUrl.toStdString().c_str());
+    m_htmlDocument = litehtml::document::createFromString(html.toStdString().c_str(), m_container);
     
-    // Create document context
-    litehtml::context ctx;
-    
-    // Create new document with the HTML content
-    m_container->_doc = litehtml::document::createFromString(
-        html.toUtf8().constData(),
-        m_container,
-        &ctx
-    );
-    
-    // Set base URL if provided
-    if (!baseUrl.isEmpty()) {
-        m_container->set_base_url(baseUrl.toUtf8().constData());
+    if (m_htmlDocument) {
+        // Reset scroll position
+        m_scrollX = 0;
+        m_scrollY = 0;
+        m_vScrollBar->setValue(0);
+        m_hScrollBar->setValue(0);
+        
+        // Force re-layout
+        m_documentSizeSet = false;
+        
+        // Render document
+        if (width() > 0) {
+            m_htmlDocument->render(width());
+        }
+        
+        update();
     }
+}
+
+/**
+ * Load HTML content from a URL
+ * @param url The URL to load the HTML content from
+ */
+void litehtmlWidget::loadUrl(const QString& url)
+{
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+    QNetworkRequest request(url);
     
-    // Reset scroll position
-    setScrollPosition(QPoint(0, 0));
+    QNetworkReply* reply = manager->get(request);
     
-    // Mark for layout
-    m_needsLayout = true;
-    m_isLoading = false;
+    connect(reply, &QNetworkReply::finished, this, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QString content = QString::fromUtf8(reply->readAll());
+            loadHtml(content, url);
+        } else {
+            qWarning() << "Failed to load URL:" << url << "Error:" << reply->errorString();
+        }
+        
+        reply->deleteLater();
+        manager->deleteLater();
+    });
+}
+
+/**
+ * Set the scroll position
+ * @param x New horizontal scroll position
+ * @param y New vertical scroll position
+ */
+void litehtmlWidget::setScrollPos(int x, int y)
+{
+    m_scrollX = x;
+    m_scrollY = y;
+    
+    m_hScrollBar->setValue(x);
+    m_vScrollBar->setValue(y);
+    
     update();
 }
 
 /**
  * Set the scroll position
- * @param pos The new scroll position
+ * @param pos New scroll position
  */
 void litehtmlWidget::setScrollPosition(const QPoint& pos)
 {
-    // Ensure we don't scroll past document boundaries
-    QPoint newPos = pos;
-    
-    // Don't allow negative scrolling
-    if (newPos.x() < 0) newPos.setX(0);
-    if (newPos.y() < 0) newPos.setY(0);
-    
-    // Don't scroll past document edges
-    if (m_container->_doc) {
-        int maxX = qMax(0, m_docSize.width() - width());
-        int maxY = qMax(0, m_docSize.height() - height());
-        
-        if (newPos.x() > maxX) newPos.setX(maxX);
-        if (newPos.y() > maxY) newPos.setY(maxY);
-    }
-    
-    // Update scroll position if changed
-    if (m_scrollPos != newPos) {
-        m_scrollPos = newPos;
-        m_container->setScroll(m_scrollPos);
-        update();
-    }
+    setScrollPos(pos.x(), pos.y());
 }
 
 /**
@@ -123,16 +196,25 @@ void litehtmlWidget::setScrollPosition(const QPoint& pos)
  */
 QPoint litehtmlWidget::scrollPosition() const
 {
-    return m_scrollPos;
+    return QPoint(m_scrollX, m_scrollY);
 }
 
 /**
- * Get the size of the document
+ * Get the current scroll position
+ * @return Current scroll position
+ */
+QPoint litehtmlWidget::scrollPos() const
+{
+    return scrollPosition();
+}
+
+/**
+ * Get the size of the HTML document
  * @return Document size
  */
 QSize litehtmlWidget::documentSize() const
 {
-    return m_docSize;
+    return m_documentSize;
 }
 
 /**
@@ -141,52 +223,63 @@ QSize litehtmlWidget::documentSize() const
  */
 void litehtmlWidget::paintEvent(QPaintEvent* event)
 {
-    QPainter painter(this);
+    Q_UNUSED(event);
     
-    // Fill background
-    painter.fillRect(rect(), Qt::white);
-    
-    // If no document, just return
-    if (!m_container->_doc) {
+    if (!m_htmlDocument) {
         return;
     }
     
-    // Perform layout if needed
-    if (m_needsLayout) {
-        m_container->_doc->render(width());
-        m_needsLayout = false;
-    }
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     
-    // Render the document
-    m_container->repaint(painter);
+    // Set white background
+    painter.fillRect(rect(), Qt::white);
+    
+    // Apply scroll position
+    painter.translate(-m_scrollX, -m_scrollY);
+    
+    // Draw the HTML document
+    litehtml::position clip(0, 0, width() + m_scrollX, height() + m_scrollY);
+    m_container->draw(m_htmlDocument, &painter, 0, 0, &clip);
 }
 
 /**
- * Mouse move event handler
- * @param event Mouse event
+ * Resize event handler
+ * @param event Resize event
  */
-void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
+void litehtmlWidget::resizeEvent(QResizeEvent* event)
 {
-    if (m_container->_doc) {
-        // Update mouse position
-        m_container->setLastMouseCoords(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y()
-        );
+    Q_UNUSED(event);
+    
+    if (m_htmlDocument) {
+        // Re-render the document with the new width
+        m_htmlDocument->render(width());
         
-        // Trigger hover event
-        m_container->_doc->on_mouse_over(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y(),
-            m_container->elementUnderCursor()
-        );
-        
-        // Update the view
-        update();
+        // Update scrollbar positions
+        if (m_documentSizeSet) {
+            m_vScrollBar->setRange(0, std::max(0, m_documentSize.height() - height()));
+            m_vScrollBar->setPageStep(height());
+            
+            m_hScrollBar->setRange(0, std::max(0, m_documentSize.width() - width()));
+            m_hScrollBar->setPageStep(width());
+            
+            // Show scrollbars if needed
+            m_vScrollBar->setVisible(m_documentSize.height() > height());
+            m_hScrollBar->setVisible(m_documentSize.width() > width());
+            
+            // Position scrollbars
+            m_vScrollBar->setGeometry(width() - m_vScrollBar->sizeHint().width(), 
+                                     0, 
+                                     m_vScrollBar->sizeHint().width(), 
+                                     height() - (m_hScrollBar->isVisible() ? m_hScrollBar->sizeHint().height() : 0));
+            
+            m_hScrollBar->setGeometry(0, 
+                                     height() - m_hScrollBar->sizeHint().height(),
+                                     width() - (m_vScrollBar->isVisible() ? m_vScrollBar->sizeHint().width() : 0),
+                                     m_hScrollBar->sizeHint().height());
+        }
     }
 }
 
@@ -196,27 +289,14 @@ void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
  */
 void litehtmlWidget::mousePressEvent(QMouseEvent* event)
 {
-    if (m_container->_doc && event->button() == Qt::LeftButton) {
-        // Update mouse position
-        m_container->setLastMouseCoords(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y()
-        );
+    if (m_htmlDocument) {
+        int x = event->pos().x() + m_scrollX;
+        int y = event->pos().y() + m_scrollY;
         
-        // Trigger click event
-        m_container->_doc->on_lbutton_down(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y(),
-            m_container->elementUnderCursor()
-        );
-        
-        // Update the view
-        update();
+        m_container->on_lbutton_down(m_htmlDocument, x, y, 0);
     }
+    
+    QWidget::mousePressEvent(event);
 }
 
 /**
@@ -225,44 +305,30 @@ void litehtmlWidget::mousePressEvent(QMouseEvent* event)
  */
 void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (m_container->_doc && event->button() == Qt::LeftButton) {
-        // Update mouse position
-        m_container->setLastMouseCoords(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y()
-        );
+    if (m_htmlDocument) {
+        int x = event->pos().x() + m_scrollX;
+        int y = event->pos().y() + m_scrollY;
         
-        // Trigger click event
-        m_container->_doc->on_lbutton_up(
-            event->x() + m_scrollPos.x(),
-            event->y() + m_scrollPos.y(),
-            event->x(),
-            event->y(),
-            m_container->elementUnderCursor()
-        );
-        
-        // Update the view
-        update();
+        m_container->on_lbutton_up(m_htmlDocument, x, y, 0);
     }
+    
+    QWidget::mouseReleaseEvent(event);
 }
 
 /**
- * Resize event handler
- * @param event Resize event
+ * Mouse move event handler
+ * @param event Mouse event
  */
-void litehtmlWidget::resizeEvent(QResizeEvent* event)
+void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    if (m_container->_doc) {
-        // Mark layout as needing update
-        m_needsLayout = true;
+    if (m_htmlDocument) {
+        int x = event->pos().x() + m_scrollX;
+        int y = event->pos().y() + m_scrollY;
         
-        // Adjust scroll position if needed
-        setScrollPosition(m_scrollPos);
-        
-        update();
+        m_container->on_mouse_over(m_htmlDocument, x, y, 0);
     }
+    
+    QWidget::mouseMoveEvent(event);
 }
 
 /**
@@ -271,24 +337,15 @@ void litehtmlWidget::resizeEvent(QResizeEvent* event)
  */
 void litehtmlWidget::wheelEvent(QWheelEvent* event)
 {
-    if (m_container->_doc) {
-        // Calculate scroll delta based on wheel delta
+    if (m_vScrollBar->isVisible()) {
+        // Calculate scroll amount (adjust the divisor for sensitivity)
         int delta = event->angleDelta().y() / 8;
         
-        // Create new scroll position
-        QPoint newPos = m_scrollPos;
-        
-        if (event->modifiers() & Qt::ShiftModifier) {
-            // Horizontal scroll if Shift is pressed
-            newPos.setX(newPos.x() - delta);
-        } else {
-            // Vertical scroll by default
-            newPos.setY(newPos.y() - delta);
-        }
-        
-        // Apply scroll position
-        setScrollPosition(newPos);
+        // Update vertical scrollbar
+        m_vScrollBar->setValue(m_vScrollBar->value() - delta);
     }
+    
+    event->accept();
 }
 
 /**
@@ -298,11 +355,50 @@ void litehtmlWidget::wheelEvent(QWheelEvent* event)
  */
 void litehtmlWidget::onDocSizeChanged(int w, int h)
 {
-    m_docSize = QSize(w, h);
+    m_documentSize = QSize(w, h);
+    m_documentSizeSet = true;
     
-    // Adjust scrollbars if widget is in a scroll area
-    updateGeometry();
+    // Update scrollbar ranges
+    m_vScrollBar->setRange(0, std::max(0, h - this->height()));
+    m_vScrollBar->setPageStep(this->height());
     
-    // Ensure current scroll position is still valid
-    setScrollPosition(m_scrollPos);
+    m_hScrollBar->setRange(0, std::max(0, w - this->width()));
+    m_hScrollBar->setPageStep(this->width());
+    
+    // Show scrollbars if needed
+    m_vScrollBar->setVisible(h > this->height());
+    m_hScrollBar->setVisible(w > this->width());
+    
+    // Position scrollbars
+    m_vScrollBar->setGeometry(this->width() - m_vScrollBar->sizeHint().width(), 
+                             0, 
+                             m_vScrollBar->sizeHint().width(), 
+                             this->height() - (m_hScrollBar->isVisible() ? m_hScrollBar->sizeHint().height() : 0));
+    
+    m_hScrollBar->setGeometry(0, 
+                             this->height() - m_hScrollBar->sizeHint().height(),
+                             this->width() - (m_vScrollBar->isVisible() ? m_vScrollBar->sizeHint().width() : 0),
+                             m_hScrollBar->sizeHint().height());
+    
+    update();
+}
+
+/**
+ * Handler for link clicks
+ * @param url The clicked link URL
+ */
+void litehtmlWidget::linkClicked(const QString& url)
+{
+    // Handle link click
+    QDesktopServices::openUrl(QUrl(url));
+}
+
+/**
+ * Handler for anchor clicks
+ * @param url The clicked anchor URL
+ */
+void litehtmlWidget::anchorClicked(const QString& url)
+{
+    // Emit the linkClicked signal
+    emit linkClicked(url);
 } 

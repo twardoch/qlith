@@ -4,6 +4,7 @@
 #include <litehtml.h>
 #include <litehtml/document.h>
 #include <litehtml/document_container.h>
+#include <QObject>
 #include <QWidget>
 #include <QHash>
 #include <QImage>
@@ -12,6 +13,9 @@
 #include <QPoint>
 #include <QMap>
 #include <QFontMetrics>
+
+// Forward declarations
+class litehtmlWidget;
 
 /**
  * Implementation of the litehtml document_container for Qt5
@@ -22,6 +26,7 @@ class container_qt5 : public QObject, public litehtml::document_container
 
 Q_SIGNALS:
   void docSizeChanged(int w, int h);
+  void documentSizeChanged(int w, int h);
   void titleChanged(const QString& title);
   void anchorClicked(const QString& url);
   void cursorChanged(const QString& cursor);
@@ -73,17 +78,20 @@ public:
 
   void setLastMouseCoords(int x, int y, int xClient, int yClient);
 
-  litehtml::element::ptr elementUnderCursor()
-  {
-    return _doc->root()->find_element_by_point(lastCursorX, lastCursorY, lastCursorClientX, lastCursorClientY);
-  }
-
   std::shared_ptr<litehtml::document> getDocument()
   {
     return _doc;
   }
 
   void set_document(std::shared_ptr<litehtml::document> doc);
+
+  // Additional methods for mouse interaction
+  void on_lbutton_down(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
+  void on_lbutton_up(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
+  void on_mouse_over(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
+
+  // Drawing method
+  void draw(std::shared_ptr<litehtml::document>& doc, QPainter* painter, int x, int y, const litehtml::position* clip);
 
   // litehtml::document_container implementation
   litehtml::uint_ptr create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm) override;
@@ -128,49 +136,6 @@ public:
   void setScrollY(const int &val);
   void setPainter(QPainter* painter);
   void onImageLoaded(const QString& url, const QImage& image);
-};
-
-class litehtmlWidget : public QWidget
-{
-  Q_OBJECT
-
-public:
-  /**
-   * Default constructor
-   */
-  explicit litehtmlWidget(QWidget* parent = nullptr);
-
-  /**
-   * Destructor
-   */
-  ~litehtmlWidget();
-
-  container_qt5* getContainer() const;
-  void loadHtml(const QString& html, const QString& baseUrl = QString());
-  void setScrollPosition(const QPoint& pos);
-  QPoint scrollPosition() const;
-  QSize documentSize() const;
-
-signals:
-  void linkClicked(const QString& url);
-
-protected:
-  virtual void paintEvent(QPaintEvent *event) override;
-  virtual void mouseMoveEvent(QMouseEvent *event) override;
-  virtual void mousePressEvent(QMouseEvent *event) override;
-  virtual void mouseReleaseEvent(QMouseEvent *event) override;
-  virtual void resizeEvent(QResizeEvent *event) override;
-  virtual void wheelEvent(QWheelEvent* event) override;
-
-private:
-  container_qt5* m_container;
-  bool m_needsLayout;
-  QPoint m_scrollPos;
-  QSize m_docSize;
-  bool m_isLoading;
-
-private slots:
-  void onDocSizeChanged(int w, int h);
 };
 
 //Q_DECLARE_METATYPE(container_qt5);

@@ -1,17 +1,21 @@
 // this_file: qlith-pro/src/gui/litehtmlwidget.h
 #pragma once
 
-#include "container_qt5.h"
 #include <QWidget>
 #include <QPoint>
 #include <QSize>
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QResizeEvent>
+#include <QWheelEvent>
+#include <QScrollBar>
+#include <QTimer>
+
+#include "litehtml.h"
+#include "container_qt5.h"
 
 /**
- * @brief Widget for rendering HTML content using litehtml
- * 
- * The litehtmlWidget provides a QWidget-based component for rendering HTML 
- * using the litehtml library. It handles all necessary events and provides
- * methods for loading HTML content and controlling the view.
+ * @brief Widget for displaying HTML content using litehtml
  */
 class litehtmlWidget : public QWidget
 {
@@ -19,53 +23,60 @@ class litehtmlWidget : public QWidget
 
 public:
     /**
-     * @brief Construct a new litehtmlWidget
-     * @param parent The parent widget
+     * @brief Constructor
+     * @param parent Parent widget
      */
     explicit litehtmlWidget(QWidget* parent = nullptr);
     
     /**
-     * @brief Destroy the litehtmlWidget
+     * @brief Destructor
      */
-    virtual ~litehtmlWidget();
+    ~litehtmlWidget();
     
     /**
-     * @brief Get the litehtml container object
-     * @return Pointer to the container_qt5 instance
-     */
-    container_qt5* getContainer() const;
-    
-    /**
-     * @brief Load HTML content into the widget
-     * @param html The HTML content to load
-     * @param baseUrl The base URL for resolving relative links
+     * @brief Load HTML content
+     * @param html HTML content
+     * @param baseUrl Base URL for resolving relative paths
      */
     void loadHtml(const QString& html, const QString& baseUrl = QString());
     
     /**
-     * @brief Set the scroll position of the view
-     * @param pos The new scroll position
+     * @brief Load URL content
+     * @param url URL of the content
      */
-    void setScrollPosition(const QPoint& pos);
+    void loadUrl(const QString& url);
     
     /**
-     * @brief Get the current scroll position
+     * @brief Set the scroll position
+     * @param x X position
+     * @param y Y position
+     */
+    void setScrollPos(int x, int y);
+    
+    /**
+     * @brief Get current scroll position
      * @return Current scroll position
      */
-    QPoint scrollPosition() const;
+    QPoint scrollPos() const;
     
     /**
-     * @brief Get the size of the document
+     * @brief Get document size
      * @return Size of the document
      */
     QSize documentSize() const;
 
 signals:
     /**
-     * @brief Signal emitted when a link is clicked
-     * @param url The URL of the clicked link
+     * @brief Signal emitted when the title changes
+     * @param title New title
      */
-    void linkClicked(const QString& url);
+    void titleChanged(const QString& title);
+    
+    /**
+     * @brief Signal emitted when an anchor is clicked
+     * @param url URL of the clicked anchor
+     */
+    void anchorClicked(const QString& url);
 
 protected:
     /**
@@ -104,18 +115,15 @@ protected:
      */
     void wheelEvent(QWheelEvent* event) override;
 
-private slots:
-    /**
-     * @brief Handle document size changes
-     * @param width The new document width
-     * @param height The new document height
-     */
-    void onDocSizeChanged(int width, int height);
-
 private:
-    container_qt5* m_container;    ///< HTML container implementation
-    bool m_needsLayout;            ///< Flag indicating if layout is needed
-    QPoint m_scrollPos;            ///< Current scroll position
-    QSize m_docSize;               ///< Size of the document
-    bool m_isLoading;              ///< Flag indicating if content is loading
+    container_qt5 m_container;    ///< HTML container implementation
+    litehtml::document::ptr m_htmlDocument;
+    QScrollBar* m_vScrollBar;       ///< Vertical scroll bar
+    QScrollBar* m_hScrollBar;       ///< Horizontal scroll bar
+    int m_scrollX;                  ///< X scroll position
+    int m_scrollY;                  ///< Y scroll position
+    bool m_documentSizeSet;          ///< Flag indicating if document size is set
+    QSize m_documentSize;           ///< Size of the document
+    QTimer m_updateTimer;           ///< Timer for updating the widget
+    bool m_needUpdate;              ///< Flag indicating if an update is needed
 }; 

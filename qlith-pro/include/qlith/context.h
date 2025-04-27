@@ -4,7 +4,7 @@
 #include <string>
 
 /**
- * @brief Wrapper class for litehtml context
+ * @brief Wrapper class for litehtml document creation
  */
 class litehtml_context
 {
@@ -20,27 +20,18 @@ public:
      */
     void load_master_stylesheet(const char* css)
     {
-        m_context.load_master_stylesheet(css);
+        master_css = css;
     }
     
     /**
-     * @brief Get the litehtml context object
-     * @return Reference to the internal litehtml context
+     * @brief Get the master CSS
+     * @return The master stylesheet content
      */
-    litehtml::context& get_context()
+    const std::string& get_master_css() const
     {
-        return m_context;
-    }
-    
-    /**
-     * @brief Get a pointer to the litehtml context
-     * @return Pointer to the internal litehtml context
-     */
-    litehtml::context* get_context_ptr()
-    {
-        return &m_context;
+        return master_css;
     }
     
 private:
-    litehtml::context m_context;
+    std::string master_css;
 }; 
