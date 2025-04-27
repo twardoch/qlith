@@ -11298,39 +11298,41 @@ Now let's look at the litehtmlwidget implementation:
 
 ---
 
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwidget.cpp
 
+---
+
+Let's also check the litehtmlwidget.h file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/litehtmlwidget.h
+
+---
+
+Now, let's check the container_qt5.h file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/container_qt5.h
+
+---
+
+Let's also check the container_qt5.cpp file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
 
 ---
 
 
 
----
-
-
+Now, let's examine the background.h file to understand the gradient API:
 
 ---
 
-
-
----
-
-
-
----
-
-
-
----
-
-
-
----
-
-
-
----
-
-
+Cancelled
 
 ---
 
@@ -11341,6 +11343,3773 @@ _**User**_
 ---
 
 _**Assistant**_
+
+
+
+---
+
+Let me check if the build script exists in the project:
+
+---
+
+<details>
+            <summary>Searched codebase "build_macos.sh" • **2** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Let's see what's in the build script for qlith-pro:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build_macos.sh
+
+---
+
+Now let's run the build script:
+
+---
+
+```bash
+./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 86%] Built target litehtml
+[ 86%] Built target qlith-pro_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith-pro
+[ 87%] Built target qlith-pro_autogen
+[ 89%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 90%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 92%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:167:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  167 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:218:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  218 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:355:65: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  355 | void container_qt5::get_image_size(const char* src, const char* baseurl,
+ litehtml::size& sz)
+      |                                                                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:371:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  371 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:371:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  371 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:412:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  412 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:424:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  424 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:453:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  453 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:36:46: error: no member named 'linkClicked' in 'litehtmlWidget'
+   36 |   connect(m_litehtmlWidget, &litehtmlWidget::linkClicked, this, [](const
+ QString& url) {
+      |                              ~~~~~~~~~~~~~~~~^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:105:75: error: no member named 'getContainer' in 'litehtmlWidget'
+  105 |   auto doc = litehtml::document::createFromString(html, m_litehtmlWidget
+->getContainer(), context.get_master_css());
+      |                                                         ~~~~~~~~~~~~~~~~
+  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:507:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  507 | void container_qt5::draw_borders(litehtml::uin/Users/adam/Developer/vcs/
+github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cppt:_106p:t21r:  hdcerro
+r: , no member named 'getContainer' in 'litehtmlWidget'co
+nst litehtml:  :106b | o r dme_rlsi&t ebhtomrldWeirdsg,e t-c>ognesttCo nltiatien
+hetrm(l):-:>psoesti_tdioocunm&e ndtr(adwo_cp)o;s,
+       | bo  ~~~~~~~~~~~~~~~~  ^o
+l root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:507:133: warning: unused parameter 'root' [-Wunused-parameter]
+  507 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:121:23: error: no member named 'getContainer' in 'litehtmlWidget'
+  121 |     m_litehtmlWidget->getContainer()->setScrollY(-val);
+      |     ~~~~~~~~~~~~~~~~  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:133: warning: unused parameter 'w' [-Wunused-parameter]
+  125 |   connect(m_/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pr
+o/src/gui/container_qt5.cpp:585:69:l itewarning: htmunused parameter 'doc' [-Wun
+used-parameter]lW
+idget->getContainer(), &co  n585t | aivnoeird_q tc5o:n:tdaoicnSeirz_eqCth5a:n:gl
+eidn,k (m_clointsetht msltWdi:d:gsehta-r>egde_tpCtorn<tlaiitneehrt(m)l,: :[doctu
+hmiesnt,> &s cdroocl,l Bacro]n(stin tli twe,h tmiln:t:e lhe)m{en
+t      :| :p
+
+                                                                ^t
+r& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:585:104: warning: unused parameter 'el' [-Wunused-parameter]
+  585 | vo/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/
+mainwindow.cppi:d125: 29c:o ntaerror: ineno member named 'getContainer' in 'lite
+htmlWidget'r_
+qt5::link(co  n125s | t   csotndn:e:csth(amr_eldi_tpethrt<mlliWtiedhgtemtl-:>:gd
+eotcCuomnetnati>n&e rd(o)c,,  &ccoonntsatin elri_tqeth5t:m:ld:o:ceSliezmeeCnhta:
+n:gpetdr,&  me_ll)it
+e      h| tm
+
+                                   ^l
+Widget->getContainer(), [this, scrollBar](int w, int h){
+      |           ~~~~~~~~~~~~~~~~  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:95: error: no member named 'getContainer' in 'litehtmlWidget'
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getCont/Users/adam/Developer/vcs/github.twardoch/pub/qlith
+/qlith-pro/src/gui/container_qt5.cpp:a591i:n84e:r (),warning:  [unused parameter
+ 'el' [-Wunused-parameter]
+this, scrollBa  r591] | (vionitd  wc,o ntianitne rh_)q{t5
+:      :| on
+
+        ~~~~~~~~~~~~~~~~  ^_
+anchor_click(const char* url, const litehtml::element::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:134:27: error: variable 'availableScroll' cannot be implicitly captured in
+a lambda with no capture-default specified
+  134 |     scrollBar->setMaximum(availableScroll);
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:142: note: while substituting into a lambda expression here
+  125 |   connect(m_litehtmlWidget->getContainer/Users/adam/Developer/vcs/github
+.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp(:)598,: 66&:c ontwarning
+: ainunused parameter 'el' [-Wunused-parameter]er
+_qt5::docSizeCha  n598g | edv,o imd_l ictoenhttamilnWeird_gqett5-:>:goent_Cmoonu
+tsaei_neevre(n)t,( [cotnhsits ,l istcerhotlmllB:a:re]l(emienntt: :wp,t r&i netl,
+  hl)i{te
+h      t| ml
+
+                                                                         ^:
+:mouse_even/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui
+/mainwindow.cppt: 133e:v15e:n t)note:
+      'availableScroll' declared here| 
+                                                                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:598:92:   133 |  warning:    unused parameter 'event' [-Wunused-paramete
+r]c
+onst int   a598v | aivloaibdle Sccornotlali n=e rh_ q-t 5s:i:nognl_emVoiussieb_l
+eevPeangte(Heciognhstt;
+l      i| te              ^h
+tml::/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainw
+indow.cppe:l125e:m111e:n t::note: ptlambda expression begins herer&
+ el, litehtml::  m125o | u s ec_oenvneenctt (emv_elnitt)eh
+t      m| lW
+
+                       ^
+idget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getCont
+ainer(), [this, scrollBar](int w, int h){
+      |
+
+                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'availableScroll' by value
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , availableScroll
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'availableScroll' by reference
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , &availableScroll
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:136:30: error: variable 'singleVisiblePageHeight' cannot be implicitly capt
+ured in a lambda with no capture-default specified
+  136 |     scrollBar->setSingleStep(singleVisiblePageHeight);
+      |                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:130:15: note: 'singleVisiblePageHeight' declared here
+  130 |     const int singleVisiblePageHeight = m_litehtmlWidget->height();
+      |               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:111: note: lambda expression begins here
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'singleVisiblePageHeight' by value
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , singleVisiblePageHeight
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'singleVisiblePageHeight' by reference
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , &singleVisiblePageHeight
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:637:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  637 | /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/ma
+inwindow.cpp:v138o:i28d:  coerror: ntavariable 'singleVisiblePageHeight' cannot
+be implicitly captured in a lambda with no capture-default specifiedin
+er_qt5::i  m138p | o r t _ csscsr(olliltBeahrt-m>ls:e:tsPtargienSgt&e pt(esxitn,
+g lecVoinssitbl elPiatgeehHtemilg:h:ts)t;ri
+n      g| &                            ^u
+rl, /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwi
+ndow.cppl:i130t:e15h:t ml:note: :s'singleVisiblePageHeight' declared heretr
+ing&   b130a | s e u r l)c
+      |
+
+                              ^onst
+ int singleVisiblePageHeight = m_litehtmlWidget->height();
+      |               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:111: note: lambda expression begins here
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                      ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'singleVisiblePageHeight' by value
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , singleVisiblePageHeight
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:127: note: capture 'singleVisiblePageHeight' by reference
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                      ^
+      |
+
+                                                      , &singleVisiblePageHeight
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:133: warning: unused parameter 'w' [-Wunused-parameter]
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:140: warning: unused parameter 'h' [-Wunused-parameter]
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:125:112: warning: lambda capture 'this' is not used [-Wunused-lambda-captur
+e]
+  125 |   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChang
+ed, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
+      |
+
+                                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:649:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  649 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:24:7: error: member initializer 'm_htmlDocument' does not name a non-st
+atic data member or base class
+   24 |     , m_htmlDocument(nullptr)
+      |       ^~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:25:7: error: member initializer 'm_vScrollBar' does not name a non-stat
+ic data member or base class
+   25 |     , m_vScrollBar(new QScrollBar(Qt::Vertical, this))
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:26:7: error: member initializer 'm_hScrollBar' does not name a non-stat
+ic data member or base class
+   26 |     , m_hScrollBar(new QScrollBar(Qt::Horizontal, this))
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:725:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  725 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:726:81: warning: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qli
+th-pro/src/gui/litehtmlwidget.cpp:27unused parameter 'attributes' [-Wunused-para
+meter]:7
+: error: initializer 'm_scrollX' does not name a non-static data member or base 
+class; did you mean the member 'm_scrollPos'?
+  726 |           27  |          ,   m _ s c r o l l X (  0  )  
+        |         ^~~~~~~~~ 
+         |         m_scrollPos 
+          /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/
+qlith/litehtmlwidget.h:87:12: note: 'm_scrollPos' declared here
+   87 |     QPoint m_scro llPocso;ns
+t      |  l           ^i
+tehtml::string_map& attributes,
+      /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/lite
+htmlwidget.cpp| :27
+                   ^:
+7: error: no matching constructor for initialization of 'QPoint'/Users/adam/Deve
+loper/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
+:727:96:    27 |   warning:   ,unused parameter 'doc' [-Wunused-parameter] m
+_scrollX(0)
+      |       ^         ~
+  727 |          /usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h : 52 
+: 21 :     note:   candidate constructor (the implicit copy constructor) not via
+ble: no known conversion from 'int' to 'const QPoint' for 1st argument
+         52  |   c l a s s    Q _ C O R E _ E X P O R T   QPcooinnstt
+       s| td                    ^~~~~~:
+:share/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.hd:_52p:t21r:< lit
+note: ehcandidate constructor (the implicit move constructor) not viable: no kno
+wn conversion from 'int' to 'QPoint' for 1st argumenttm
+l::d   o52c | umcelnats>s&  Qd_oCcO)RE
+_      E| XP
+
+                           ^O
+RT QPoint
+      |                     ^~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:122:33: note: candidat
+e constructor not viable: requires 0 arguments, but 1 was provided
+  122 | Q_DECL_CONSTEXPR inline QPoint::QPoint() : xp(0), yp(0) {}
+      |                                 ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:124:33: note: candidat
+e constructor not viable: requires 2 arguments, but 1 was provided
+  124 | Q_DECL_CONSTEXPR inline QPoint::QPoint(int xpos, int ypos) : xp(xpos), y
+p(ypos) {}
+      |                                 ^      ~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:747:1: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  747 | litehtmlWidget::litehtmlWidget(QWidget* parent)
+      | ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/ql
+ith/container_qt5.h::2817::77::  error: note: forward declaration of 'litehtmlWi
+dget'initializer 'm_scrollY' does not name a non-static data member or base clas
+s; did you mean the member 'm_scrollPos'?
+
+   17 | cl   a28s | s    l i,t emh_tsmclrWoildlgYe(t;0
+)      | 
+            ^| 
+      ^~~~~~~~~
+      |       m_scrollPos
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qli
+th/litehtmlwidget.h::74787::112::  error: note: 'm_scrollPos' declared hereincom
+plete type 'litehtmlWidget' named in nested name specifier
+
+   87 |    747  |  l iQtPeohitnmtl Wmi_dsgcerto:l:llPiotse;ht
+m      l| Wi           ^d
+get(QWidget* parent)/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pr
+o/src/gui/litehtmlwidget.cpp:
+28      :| 7:^~~~~~~~~~~~~~~~ 
+error: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qli
+th/container_qt5.h:no matching constructor for initialization of 'QPoint'17:
+7: note: forward declaration of 'litehtmlWidget'   
+28 |        17, |  mc_lsacsrsol llYi(te0ht)ml
+W      i| dg      ^         ~e
+t;
+      |       ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:52:21: note: candidate
+ constructor (the implicit copy constructor) not viable: no known conversion fro
+m 'int' to 'const QPoint' for 1st argument
+   52 | cl/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/
+container_qt5.cppa:s772s:1 :Q _COerror: RE_incomplete type 'litehtmlWidget' name
+d in nested name specifierEX
+PORT QPoint
+      |                     ^~~~~~
+  772 | l/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.hi:t52e:h21t:m 
+lWinote: dgcandidate constructor (the implicit move constructor) not viable: no
+known conversion from 'int' to 'QPoint' for 1st argumentet
+::~lit   e52h | tmcllWaisdsge tQ(_)CO
+R      E| _E^~~~~~~~~~~~~~~~X
+PORT /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith
+/container_qt5.hQ:P17o:i7n:t
+      note: | forward declaration of 'litehtmlWidget'                    ^~~~~~
+
+   17 | class l/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.hi:t122e:
+h33t:m lWinote: dgcandidate constructor not viable: requires 0 arguments, but 1
+was providedet
+;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:777:16:   122error:  | incomplete type 'litehtmlWidget' named in nested
+name specifier
+Q_DECL_CONSTEXPR   777i | ncloinnteai nQePro_iqntt5:*: QlPiotienhtt(m)l W:i dxgp
+e(t:0:g)e,t Cyopn(ta0in)e r{(})
+      c| on                                ^s
+t
+      |                ^~~~~~~~~~~~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:124:/Users/adam/Develo
+per/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/container_qt5.h33::17
+:7:note:  candidate constructor not viable: requires 2 arguments, but 1 was prov
+idednote:
+forward declaration of 'litehtmlWidget'
+   17 | class litehtml  W124i | dQg_eDtE;CL
+_      C| ON      ^S
+TEXPR inl/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/c
+ontainer_qt5.cppi:n782e:6 :Q Poierror: nt:incomplete type 'litehtmlWidget' named
+ in nested name specifier:Q
+Point(int xpos, int  782  | ypvoosi)d :  lxipt(exhptomsl)W,i dygpe(ty:p:olso)a d
+{H}tm
+l      (| c                                ^      ~~~~~~~~~~~~~~~~~~o
+nst QString& html, const QString& baseUrl)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:802:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  802 | void litehtmlWidget:/Users/adam/Developer/vcs/github.twardoch/pub/qlith/
+qlith-pro/src/gui/litehtmlwidget.cpp::s29e:t7S:c rolerror: lPomember initializer
+ 'm_documentSizeSet' does not name a non-static data member or base classsi
+tion(con   s29t |    Q P o,i nmt_&d opcousm)en
+t      S| iz     ^~~~~~~~~~~~~~~~e
+Set(/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/
+container_qt5.h:f17a:l7s:e )note:
+      forward declaration of 'litehtmlWidget'| 
+      ^~~~~~~~~~~~~~~~~~~~~~~~
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:809:8: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  809 | QPoint litehtmlWidget::scrollPosition() const
+      |        ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/li
+tehtmlwidget.cppc:l30a:s7s:  lierror: tehmember initializer 'm_documentSize' doe
+s not name a non-static data member or base classtm
+lWidget;   
+30       | |         ^ 
+ , m_docume/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui
+/container_qt5.cppn:t814S:i7z:e (0error: , incomplete type 'litehtmlWidget' name
+d in nested name specifier0
+)
+      |       ^~~~~~~~~~~~~~~~~~~~
+  814 | QSize litehtmlWidget::documentSize() const
+      |       ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:819:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:31:7: error: member initializer 'm_needUpdate' does not name a non-stat
+ic data member or base class
+  819 | voi   d31 |   l i t e,h tmm_lnWeieddgUeptd:a:tpea(inftaElvseent)(Q
+P      a| in      ^~~~~~~~~~~~~~~~~~~t
+Event* event)/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/g
+ui/litehtmlwidget.cpp
+:      28| :7     ^~~~~~~~~~~~~~~~:
+ error: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/ql
+ith/container_qt5.h:multiple initializations given for non-static member 'm_scro
+llPos'
+17:7: note:    forward declaration of 'litehtmlWidget'28 | 
+    , m   _17s | crcollaslsY( 0)
+l      | it      ^~~~~~~~~~~~e
+htmlWi/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/lite
+htmlwidget.cppd:g27e:t7;:
+      note: | previous initialization is here      ^
+
+   27 |     , m_scrollX(0)/Users/adam/Developer/vcs/github.twardoch/pub/qlith/ql
+ith-pro/src/gui/container_qt5.cpp:832:6
+:       | error:       ^~~~~~~~~~~~
+incomplete type 'litehtmlWidget' named in nested name specifier
+  832 | void litehtmlWidget::resizeEvent(QResizeEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:843:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  843 | void litehtmlWidget::mousePressEvent(QMouseEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:860:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  860 | void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:877:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  877 | void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:894:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  894 | void litehtmlWidget::wheelEvent(QWheelEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:911:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  911 | void litehtmlWidget::onDocSizeChanged(int w, int h)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:34:5: error: use of undeclared identifier 'm_vScrollBar'
+   34 |     m_vScrollBar->hide();
+      |     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:35:5: error: use of undeclared identifier 'm_hScrollBar'
+   35 |     m_hScrollBar->hide();
+      |     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:37:5: error: use of undeclared identifier 'm_vScrollBar'
+   37 |     m_vScrollBar->setRange(0, 0);
+      |     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:38:5: error: use of undeclared identifier 'm_hScrollBar'
+   38 |     m_hScrollBar->setRange(0, 0);
+      |     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:41:9: error: use of undeclared identifier 'm_scrollY'; did you mean 'm_
+scrollPos'?
+   41 |         m_scrollY = value;
+      |         ^~~~~~~~~
+      |         m_scrollPos
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/lite
+htmlwidget.h:87:12: note: 'm_scrollPos' declared here
+   87 |     QPoint m_scrollPos;
+      |            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:41:19: error: no viable overloaded '='
+   41 |         m_scrollY = value;
+      |         ~~~~~~~~~ ^ ~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:52:21: note: candidate
+ function (the implicit copy assignment operator) not viable: no known conversio
+n from 'int' to 'const QPoint' for 1st argument
+   52 | class Q_CORE_EXPORT QPoint
+      |                     ^~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qpoint.h:52:21: note: candidate
+ function (the implicit move assignment operator) not viable: no known conversio
+n from 'int' to 'QPoint' for 1st argument
+   52 | class Q_CORE_EXPORT QPoint
+      |                     ^~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:40:13: error: use of undeclared identifier 'm_vScrollBar'
+   40 |     connect(m_vScrollBar, &QScrollBar::valueChanged, [this](int value) {
+      |             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:46:9: error: use of undeclared identifier 'm_scrollX'; did you mean 'm_
+scrollPos'?
+   46 |         m_scrollX = value;
+      |         ^~~~~~~~~
+      |         m_scrollPos
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/lite
+htmlwidget.h:87:12: note: 'm_scrollPos' declared here
+   87 |     QPoint m_scrollPos;
+      |            ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:148: CMakeFiles/qlith-pro.dir
+/src/gui/litehtmlwidget.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+4 warnings and 9 errors generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:176: CMakeFiles/qlith-pro.dir
+/src/gui/mainwindow.cpp.o] Error 1
+22 warnings and 15 errors generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:120: CMakeFiles/qlith-pro.dir
+/src/gui/container_qt5.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+There are several issues with the code that are causing the build to fail. Let me analyze the main problems:
+
+1. **File Path Mismatch**: There's a mismatch between the header file locations and implementation. The implementation is looking for the header in "qlith/litehtmlwidget.h" but the actual file is located at different paths.
+
+2. **Header Inconsistency**: There are two different litehtmlwidget.h files:
+   - `qlith-pro/include/qlith/litehtmlwidget.h`
+   - `qlith-pro/src/gui/litehtmlwidget.h`
+
+   These have different member variables and function definitions.
+
+3. **Class Member Mismatch**: The litehtmlwidget.cpp file is trying to initialize members like `m_htmlDocument`, `m_vScrollBar`, etc., but these are not declared in the header.
+
+4. **API Discrepancy**: The mainwindow.cpp code is trying to use methods like `linkClicked` and `getContainer()` which don't match the interface defined in the header.
+
+Let's fix these issues:
+
+1. First, let's check the mainwindow.h/cpp to understand what's expected from litehtmlwidget:
+
+---
+
+Could not find file '/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.h' in the workspace.
+
+---
+
+Let's search for the mainwindow.h file:
+
+---
+
+<details>
+            <summary>Searched codebase "mainwindow.h" • **6** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/mainwindow.h
+
+---
+
+Let's check the mainwindow.cpp:
+
+---
+
+<details>
+            <summary>Searched codebase "mainwindow.cpp" • **6** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+| `undefined` |
+
+</details>
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp
+
+---
+
+Based on the build errors and the code files I've examined, I need to fix the mismatch between the litehtmlwidget class implementation in different files. Let's create a consolidated litehtmlwidget class that works properly.
+
+First, let's create a new header file that combines both implementations:
+
+---
+
+```diff
+  #include <QPoint>
+  #include <QSize>
++ #include <QScrollBar>
++ #include <QTimer>
+  #include <memory>
+  
+```
+
+```diff
+  namespace litehtml {
+      class document;
++     typedef std::shared_ptr<document> document_ptr;
+  }
+  
+```
+
+```diff
+       */
+      void loadHtml(const QString& html, const QString& baseUrl = QString());
++ 
++     /**
++      * Load HTML content from a URL
++      * @param url The URL to load the HTML content from
++      */
++     void loadUrl(const QString& url);
++ 
++     /**
++      * Set the scroll position
++      * @param x New horizontal scroll position
++      * @param y New vertical scroll position
++      */
++     void setScrollPos(int x, int y);
+  
+      /**
+```
+
+```diff
+       */
+      QPoint scrollPosition() const;
++ 
++     /**
++      * Get the current scroll position
++      * @return Current scroll position
++      */
++     QPoint scrollPos() const;
+  
+      /**
+```
+
+```diff
+      void linkClicked(const QString& url);
+  
++     /**
++      * Emitted when the title changes
++      * @param title New title
++      */
++     void titleChanged(const QString& title);
++ 
+  protected:
+      void paintEvent(QPaintEvent* event) override;
+```
+
+```diff
+  private slots:
+      void onDocSizeChanged(int w, int h);
++     void anchorClicked(const QString& url);
+  
+  private:
+      container_qt5* m_container;
+-     bool m_needsLayout;
+-     QPoint m_scrollPos;
+-     QSize m_docSize;
+-     bool m_isLoading;
++     litehtml::document_ptr m_htmlDocument;
++     QScrollBar* m_vScrollBar;
++     QScrollBar* m_hScrollBar;
++     int m_scrollX;
++     int m_scrollY;
++     bool m_documentSizeSet;
++     QSize m_documentSize;
++     QTimer m_updateTimer;
++     bool m_needUpdate;
+  }; 
+```
+
+---
+
+Now let's update the container_qt5.h file to make sure it works with the rest of the code:
+
+---
+
+```diff
+  #include <litehtml/document.h>
+  #include <litehtml/document_container.h>
+- #include <QWidget>
++ #include <QObject>
+  #include <QHash>
+  #include <QImage>
+```
+
+```diff
+  Q_SIGNALS:
+    void docSizeChanged(int w, int h);
++   void documentSizeChanged(int w, int h);
+    void titleChanged(const QString& title);
+    void anchorClicked(const QString& url);
+```
+
+```diff
+  
+    void set_document(std::shared_ptr<litehtml::document> doc);
++ 
++   // Additional methods for mouse interaction
++   void on_lbutton_down(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
++   void on_lbutton_up(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
++   void on_mouse_over(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x);
++ 
++   // Drawing method
++   void draw(std::shared_ptr<litehtml::document>& doc, QPainter* painter, int x, int y, const litehtml::position* clip);
+  
+    // litehtml::document_container implementation
+```
+
+---
+
+Now, let's update the litehtmlwidget.cpp implementation to match our header:
+
+---
+
+```diff
+  #include <QScrollBar>
+  #include <QTimer>
++ #include <QDesktopServices>
+  
+  /**
+```
+
+```diff
+  litehtmlWidget::litehtmlWidget(QWidget* parent)
+      : QWidget(parent)
+-     , m_container()
++     , m_container(new container_qt5(this))
+      , m_htmlDocument(nullptr)
+      , m_vScrollBar(new QScrollBar(Qt::Vertical, this))
+```
+
+```diff
+      
+      // Connect container signals
+-     connect(&m_container, &container_qt5::documentSizeChanged, this, 
++     connect(m_container, &container_qt5::documentSizeChanged, this, 
+          [this](int width, int height) {
+              m_documentSize = QSize(width, height);
+```
+
+```diff
+          });
+      
+-     connect(&m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::anchorClicked);
++     connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::anchorClicked);
+      
+      // Setup timer for deferred updates
+```
+
+```diff
+      delete m_vScrollBar;
+      delete m_hScrollBar;
++     delete m_container;
++ }
++ 
++ /**
++  * Get the container object
++  * @return Pointer to the container_qt5 instance
++  */
++ container_qt5* litehtmlWidget::getContainer() const
++ {
++     return m_container;
+  }
+  
+```
+
+```diff
+  void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
+  {
+-     m_container.set_base_url(baseUrl.toStdString());
+-     m_htmlDocument = litehtml::document::createFromString(html.toStdString().c_str(), &m_container);
++     m_container->set_base_url(baseUrl.toStdString());
++     m_htmlDocument = litehtml::document::createFromString(html.toStdString().c_str(), m_container);
+      
+      if (m_htmlDocument) {
+```
+
+```diff
+      update();
+  }
++ 
++ /**
++  * Set the scroll position
++  * @param pos New scroll position
++  */
++ void litehtmlWidget::setScrollPosition(const QPoint& pos)
++ {
++     setScrollPos(pos.x(), pos.y());
++ }
++ 
++ /**
++  * Get the current scroll position
++  * @return Current scroll position
++  */
++ QPoint litehtmlWidget::scrollPosition() const
++ {
++     return QPoint(m_scrollX, m_scrollY);
++ }
+  
+  /**
+```
+
+```diff
+  QPoint litehtmlWidget::scrollPos() const
+  {
+-     return QPoint(m_scrollX, m_scrollY);
++     return scrollPosition();
++ }
++ 
++ /**
++  * Get the size of the HTML document
++  * @return Document size
++  */
++ QSize litehtmlWidget::documentSize() const
++ {
++     return m_documentSize;
+  }
+  
+```
+
+```diff
+      // Draw the HTML document
+      litehtml::position clip(0, 0, width() + m_scrollX, height() + m_scrollY);
+-     m_container.draw(m_htmlDocument, &painter, 0, 0, &clip);
++     m_container->draw(m_htmlDocument, &painter, 0, 0, &clip);
+  }
+  
+```
+
+```diff
+          int y = event->pos().y() + m_scrollY;
+          
+-         m_container.on_lbutton_down(m_htmlDocument, x, y, 0);
++         m_container->on_lbutton_down(m_htmlDocument, x, y, 0);
+      }
+      
+```
+
+```diff
+          int y = event->pos().y() + m_scrollY;
+          
+-         m_container.on_lbutton_up(m_htmlDocument, x, y, 0);
++         m_container->on_lbutton_up(m_htmlDocument, x, y, 0);
+      }
+      
+```
+
+```diff
+          int y = event->pos().y() + m_scrollY;
+          
+-         m_container.on_mouse_over(m_htmlDocument, x, y, 0);
++         m_container->on_mouse_over(m_htmlDocument, x, y, 0);
+      }
+      
+```
+
+```diff
+  void litehtmlWidget::anchorClicked(const QString& url)
+  {
+-     // Handle anchor click
+-     linkClicked(url);
++     // Emit the linkClicked signal
++     emit linkClicked(url);
+  } 
+```
+
+---
+
+Now let's implement the container_qt5.cpp missing functions:
+
+---
+
+```diff
+      }
+  }
++ 
++ // Drawing method
++ void container_qt5::draw(std::shared_ptr<litehtml::document>& doc, QPainter* painter, int x, int y, const litehtml::position* clip)
++ {
++     if (!doc) {
++         qWarning() << "container_qt5::draw called with null document";
++         return;
++     }
++ 
++     // Set up painter
++     setPainter(painter);
++     
++     try {
++         // Draw the document at the specified position with clipping
++         doc->draw(x, y, clip);
++     }
++     catch (std::exception& e) {
++         qWarning() << "Exception in container_qt5::draw:" << e.what();
++     }
++     catch (...) {
++         qWarning() << "Unknown exception in container_qt5::draw";
++     }
++     
++     // Clean up
++     setPainter(nullptr);
++ }
++ 
++ // Mouse button down handler
++ void container_qt5::on_lbutton_down(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
++ {
++     if (!doc) {
++         return;
++     }
++     
++     setLastMouseCoords(x, y, client_x, y);
++     
++     litehtml::position::vector redraw_boxes;
++     if (doc->on_lbutton_down(x, y, x, y, redraw_boxes)) {
++         // TODO: Implement redraw of specific boxes if needed
++     }
++ }
++ 
++ // Mouse button up handler
++ void container_qt5::on_lbutton_up(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
++ {
++     if (!doc) {
++         return;
++     }
++     
++     setLastMouseCoords(x, y, client_x, y);
++     
++     litehtml::position::vector redraw_boxes;
++     if (doc->on_lbutton_up(x, y, x, y, redraw_boxes)) {
++         // TODO: Implement redraw of specific boxes if needed
++     }
++ }
++ 
++ // Mouse move handler
++ void container_qt5::on_mouse_over(std::shared_ptr<litehtml::document>& doc, int x, int y, int client_x)
++ {
++     if (!doc) {
++         return;
++     }
++     
++     setLastMouseCoords(x, y, client_x, y);
++     
++     litehtml::position::vector redraw_boxes;
++     if (doc->on_mouse_over(x, y, x, y, redraw_boxes)) {
++         // TODO: Implement redraw of specific boxes if needed
++     }
++ }
+  
+  //
+```
+
+---
+
+Let's fix the include paths to resolve the errors:
+
+---
+
+```diff
+- #include "container_qt5.h"
++ #include "qlith/container_qt5.h"
+  #include <QDebug>
+  #include <QFont>
+```
+
+---
+
+Let's also fix mainwindow.cpp:
+
+---
+
+```diff
+  // -*- coding: utf-8 -*-
+  
+- #include "mainwindow.h"
+- #include "ui_mainwindow.h"
+- #include "container_qt5.h"
+- #include "litehtmlwidget.h"
+- #include "qlith/context.h"
++ # include "qlith/mainwindow.h"
++ # include "ui_mainwindow.h"
++ # include "qlith/container_qt5.h"
++ # include "qlith/litehtmlwidget.h"
++ # include "qlith/context.h"
+  
+  #include <QDebug>
+```
+
+---
+
+Let's also fix the lambda capture in mainwindow.cpp:
+
+---
+
+```diff
+    });
+  
+-   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), [this, scrollBar](int w, int h){
++   connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), 
++     [this, scrollBar, singleVisiblePageHeight, availableScroll](int w, int h) {
+        if (!scrollBar) {
+          return;
+        }
+- 
+-     const int singleVisiblePageHeight = m_litehtmlWidget->height();
+  
+        // Subtracts already visible area = widget size
+-     const int availableScroll = h - singleVisiblePageHeight;
+        scrollBar->setMaximum(availableScroll);
+        // amount that the value changes on cursor keys
+```
+
+---
+
+Let's fix the lambda by moving the variable declarations inside it:
+
+---
+
+```diff
+  
+    connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), 
+-     [this, scrollBar, singleVisiblePageHeight, availableScroll](int w, int h) {
++     [this, scrollBar](int w, int h) {
+        if (!scrollBar) {
+          return;
+        }
++ 
++       const int singleVisiblePageHeight = m_litehtmlWidget->height();
+        
+        // Subtracts already visible area = widget size
++       const int availableScroll = h - singleVisiblePageHeight;
+        scrollBar->setMaximum(availableScroll);
+        // amount that the value changes on cursor keys
+```
+
+---
+
+Now let's try building again:
+
+---
+
+```bash
+./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Automatic MOC and UIC for target gumbo
+[  1%] Built target gumbo_autogen
+[  2%] Linking CXX static library libgumbo.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: libgumbo.a(mocs_compilation.cpp.o) has no symbols
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Automatic MOC and UIC for target litehtml
+[ 17%] Built target litehtml_autogen
+[ 18%] Linking CXX static library liblitehtml.a
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/u
+sr/bin/ranlib: file: liblitehtml.a(mocs_compilation.cpp.o) has no symbols
+[ 86%] Built target litehtml
+[ 86%] Built target qlith-pro_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith-pro
+[ 87%] Built target qlith-pro_autogen
+[ 89%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 90%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:38:7: error: no matching constructor for initialization of 'QObject'
+   38 |     : QObject(parent)
+      |       ^       ~~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qobject.h:135:26: note: candida
+te constructor not viable: cannot convert argument of incomplete type 'QWidget *
+' to 'QObject *' for 1st argument
+  135 |     Q_INVOKABLE explicit QObject(QObject *parent=nullptr);
+      |                          ^       ~~~~~~~~~~~~~~~~~~~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qobject.h:447:5: note: candidat
+e constructor not viable: cannot convert argument of incomplete type 'QWidget *'
+ to 'QObjectPrivate &' for 1st argument
+  447 |     QObject(QObjectPrivate &dd, QObject *parent = nullptr);
+      |     ^       ~~~~~~~~~~~~~~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qobject.h:467:20: note: candida
+te constructor not viable: cannot convert argument of incomplete type 'QWidget *
+' to 'const QObject' for 1st argument
+  467 |     Q_DISABLE_COPY(QObject)
+      |     ~~~~~~~~~~~~~~~^~~~~~~~
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qglobal.h:445:5: note: expanded
+ from macro 'Q_DISABLE_COPY'
+  445 |     Class(const Class &) = delete;\
+      |     ^     ~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:130:23: error: member access into incomplete type 'QWidget'
+  130 |     QRect rc = m_owner->rect();
+      |                       ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qmetatype.h:1486:7: note: forwa
+rd declaration of 'QWidget'
+ 1486 | class QWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:167:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  167 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:218:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  218 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:344:24: error: member access into incomplete type 'QWidget'
+  344 |                 m_owner->update();
+      |                        ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qmetatype.h:1486:7: note: forwa
+rd declaration of 'QWidget'
+ 1486 | class QWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:355:65: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  355 | void container_qt5::get_image_size(const char* src, const char* baseurl,
+ litehtml::size& sz)
+      |                                                                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:371:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  371 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:371:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  371 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:412:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  412 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:424:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  424 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:453:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  453 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:480:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  480 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:507:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  507 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:507:133: warning: unused parameter 'root' [-Wunused-parameter]
+  507 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:585:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  585 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:585:104: warning: unused parameter 'el' [-Wunused-parameter]
+  585 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:591:84: warning: unused parameter 'el' [-Wunused-parameter]
+  591 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:598:66: warning: unused parameter 'el' [-Wunused-parameter]
+  598 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:598:92: warning: unused parameter 'event' [-Wunused-parameter]
+  598 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:637:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  637 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:649:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  649 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:688:23: error: member access into incomplete type 'QWidget'
+  688 |     QRect rc = m_owner->rect();
+      |                       ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qmetatype.h:1486:7: note: forwa
+rd declaration of 'QWidget'
+ 1486 | class QWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:698:23: error: member access into incomplete type 'QWidget'
+  698 |     QRect rc = m_owner->rect();
+      |                       ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qmetatype.h:1486:7: note: forwa
+rd declaration of 'QWidget'
+ 1486 | class QWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:725:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  725 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:726:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  726 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:727:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  727 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:739:16: error: member access into incomplete type 'QWidget'
+  739 |         m_owner->update();
+      |                ^
+/usr/local/opt/qt@5/lib/QtCore.framework/Headers/qmetatype.h:1486:7: note: forwa
+rd declaration of 'QWidget'
+ 1486 | class QWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:756:29: error: too few arguments to function call, expected 4, have 3
+  756 |         doc->draw(x, y, clip);
+      |         ~~~~~~~~~           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../external/liteht
+ml/include/litehtml/document.h:81:14: note: 'draw' declared here
+   81 |                 void
+
+draw(uint_ptr hdc, int x, int y, const position* clip);
+      |
+
+^    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:818:1: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  818 | litehtmlWidget::litehtmlWidget(QWidget* parent)
+      | ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:818:1: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  818 | litehtmlWidget::litehtmlWidget(QWidget* parent)
+      | ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:843:1: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  843 | litehtmlWidget::~litehtmlWidget()
+      | ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:848:16: error: incomplete type 'litehtmlWidget' named in nested name spe
+cifier
+  848 | container_qt5* litehtmlWidget::getContainer() const
+      |                ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:853:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  853 | void litehtmlWidget::loadHtml(const QString& html, const QString& baseUr
+l)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:873:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  873 | void litehtmlWidget::setScrollPosition(const QPoint& pos)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:880:8: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  880 | QPoint litehtmlWidget::scrollPosition() const
+      |        ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:885:7: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  885 | QSize litehtmlWidget::documentSize() const
+      |       ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:890:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  890 | void litehtmlWidget::paintEvent(QPaintEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:903:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  903 | void litehtmlWidget::resizeEvent(QResizeEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:914:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  914 | void litehtmlWidget::mousePressEvent(QMouseEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:931:6: error: incomplete type 'litehtmlWidget' named in nested name spec
+ifier
+  931 | void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
+      |      ^~~~~~~~~~~~~~~~
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:17:7: note: forward declaration of 'litehtmlWidget'
+   17 | class litehtmlWidget;
+      |       ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+21 warnings and 20 errors generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:120: CMakeFiles/qlith-pro.dir
+/src/gui/container_qt5.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/litehtmlwi
+dget.cpp:122:31: error: no viable conversion from 'std::string' (aka 'basic_stri
+ng<char>') to 'const char *'
+  122 |     m_container->set_base_url(baseUrl.toStdString());
+      |                               ^~~~~~~~~~~~~~~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/S
+DKs/MacOSX15.4.sdk/usr/include/c++/v1/string:1216:55: note: candidate function
+ 1216 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 operator __self_vi
+ew() const _NOEXCEPT {
+      |                                                       ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/cont
+ainer_qt5.h:113:33: note: passing argument to parameter 'base_url' here
+  113 |   void set_base_url(const char* base_url) override;
+      |                                 ^
+1 error generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:148: CMakeFiles/qlith-pro.dir
+/src/gui/litehtmlwidget.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+There's a significant issue with our approach. The litehtmlWidget.cpp implementation is merged into the container_qt5.cpp file, which is causing conflicts. Let's fix this by:
+
+1. Including QWidget in container_qt5.h
+2. Fixing the draw method to pass the hdc parameter
+3. Removing the litehtmlWidget implementation from container_qt5.cpp
+
+---
+
+```diff
+  #include <litehtml/document_container.h>
+  #include <QObject>
++ #include <QWidget>
+  #include <QHash>
+  #include <QImage>
+```
+
+---
+
+Now let's fix the container_qt5.cpp file:
+
+---
+
+```diff
+      // Draw the document
+      try {
+-         _doc->draw(0, getScroll().x(), getScroll().y(), &clipPos);
++         _doc->draw(reinterpret_cast<litehtml::uint_ptr>(&painter), getScroll().x(), getScroll().y(), &clipPos);
+      }
+      catch (std::exception& e) {
+```
+
+```diff
+      if (_doc->width() != m_lastDocWidth || _doc->height() != m_lastDocHeight) {
+          emit docSizeChanged(_doc->width(), _doc->height());
++         emit documentSizeChanged(_doc->width(), _doc->height());
+          m_lastDocWidth = _doc->width();
+          m_lastDocHeight = _doc->height();
+```
+
+```diff
+          dpr = QGuiApplication::primaryScreen()->devicePixelRatio();
+      }
+-     return static_cast<int>(pt * dpr * (96.0 / 72.0));
++     
++     // 96 DPI is the standard screen resolution
++     return (pt * 96) / 72;
+  }
+  
+```
+
+```diff
+  const char* container_qt5::get_default_font_name() const
+  {
+-     static QByteArray fontName;
+-     fontName = m_defaultFontName.toUtf8();
+-     return fontName.constData();
++     return m_defaultFontName.toUtf8().constData();
+  }
+  
+```
+
+```diff
+      try {
+          // Draw the document at the specified position with clipping
+-         doc->draw(x, y, clip);
++         doc->draw(reinterpret_cast<litehtml::uint_ptr>(painter), x, y, clip);
+      }
+      catch (std::exception& e) {
+```
+
+```diff
+      }
+  }
+- 
+- //
+- // litehtmlWidget implementation
+- //
+- 
+- litehtmlWidget::litehtmlWidget(QWidget* parent)
+-     : QWidget(parent)
+-     , m_container(new container_qt5(this))
+-     , m_needsLayout(false)
+-     , m_scrollPos(0, 0)
+-     , m_docSize(0, 0)
+-     , m_isLoading(false)
+- {
+-     setMouseTracking(true);
+-     setFocusPolicy(Qt::StrongFocus);
+-     
+-     connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
+-     connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::linkClicked);
+-     connect(m_container, &container_qt5::cursorChanged, [this](const QString& cursor) {
+-         // Set appropriate cursor
+-         if (cursor == "pointer") {
+-             setCursor(Qt::PointingHandCursor);
+-         } else if (cursor == "text") {
+-             setCursor(Qt::IBeamCursor);
+-         } else {
+-             setCursor(Qt::ArrowCursor);
+-         }
+-     });
+- }
+- 
+- litehtmlWidget::~litehtmlWidget()
+- {
+-     delete m_container;
+- }
+- 
+- container_qt5* litehtmlWidget::getContainer() const
+- {
+-     return m_container;
+- }
+- 
+- void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
+- {
+-     m_isLoading = true;
+-     
+-     // Create document without using the context class
+-     m_container->_doc = litehtml::document::createFromString(html.toUtf8().constData(), m_container);
+-     
+-     // Set base URL
+-     if (!baseUrl.isEmpty()) {
+-         m_container->set_base_url(baseUrl.toUtf8().constData());
+-     }
+-     
+-     // Reset scroll position
+-     setScrollPosition(QPoint(0, 0));
+-     
+-     m_needsLayout = true;
+-     m_isLoading = false;
+-     update();
+- }
+- 
+- void litehtmlWidget::setScrollPosition(const QPoint& pos)
+- {
+-     m_scrollPos = pos;
+-     m_container->setScroll(m_scrollPos);
+-     update();
+- }
+- 
+- QPoint litehtmlWidget::scrollPosition() const
+- {
+-     return m_scrollPos;
+- }
+- 
+- QSize litehtmlWidget::documentSize() const
+- {
+-     return m_docSize;
+- }
+- 
+- void litehtmlWidget::paintEvent(QPaintEvent* event)
+- {
+-     QPainter painter(this);
+-     
+-     // Draw background
+-     painter.fillRect(rect(), Qt::white);
+-     
+-     // Draw content
+-     if (m_container->_doc) {
+-         m_container->repaint(painter);
+-     }
+- }
+- 
+- void litehtmlWidget::resizeEvent(QResizeEvent* event)
+- {
+-     QWidget::resizeEvent(event);
+-     
+-     // Trigger re-layout
+-     if (m_container->_doc) {
+-         m_needsLayout = true;
+-         update();
+-     }
+- }
+- 
+- void litehtmlWidget::mousePressEvent(QMouseEvent* event)
+- {
+-     if (m_container->_doc) {
+-         // Adjust mouse coordinates for scrolling
+-         int x = event->x() + m_scrollPos.x();
+-         int y = event->y() + m_scrollPos.y();
+-         
+-         // Track coordinates
+-         m_container->setLastMouseCoords(x, y, event->x(), event->y());
+-         
+-         // Handle clicks directly with the document
+-         litehtml::position::vector redraw_boxes;
+-         m_container->_doc->on_lbutton_down(x, y, event->x(), event->y(), redraw_boxes);
+-         update();
+-     }
+- }
+- 
+- void litehtmlWidget::mouseReleaseEvent(QMouseEvent* event)
+- {
+-     if (m_container->_doc) {
+-         // Adjust mouse coordinates for scrolling
+-         int x = event->x() + m_scrollPos.x();
+-         int y = event->y() + m_scrollPos.y();
+-         
+-         // Track coordinates
+-         m_container->setLastMouseCoords(x, y, event->x(), event->y());
+-         
+-         // Handle release directly with the document
+-         litehtml::position::vector redraw_boxes;
+-         m_container->_doc->on_lbutton_up(x, y, event->x(), event->y(), redraw_boxes);
+-         update();
+-     }
+- }
+- 
+- void litehtmlWidget::mouseMoveEvent(QMouseEvent* event)
+- {
+-     if (m_container->_doc) {
+-         // Adjust mouse coordinates for scrolling
+-         int x = event->x() + m_scrollPos.x();
+-         int y = event->y() + m_scrollPos.y();
+-         
+-         // Track coordinates
+-         m_container->setLastMouseCoords(x, y, event->x(), event->y());
+-         
+-         // Handle hover directly with the document
+-         litehtml::position::vector redraw_boxes;
+-         m_container->_doc->on_mouse_over(x, y, event->x(), event->y(), redraw_boxes);
+-         update();
+-     }
+- }
+- 
+- void litehtmlWidget::wheelEvent(QWheelEvent* event)
+- {
+-     // Adjust scroll position based on wheel delta
+-     QPoint delta = event->angleDelta() / 8;
+-     if (!delta.isNull()) {
+-         QPoint newPos = m_scrollPos - QPoint(0, delta.y());
+-         
+-         // Clamp to document bounds
+-         newPos.setX(qBound(0, newPos.x(), qMax(0, m_docSize.width() - width())));
+-         newPos.setY(qBound(0, newPos.y(), qMax(0, m_docSize.height() - height())));
+-         
+-         setScrollPosition(newPos);
+-     }
+-     
+-     event->accept();
+- }
+- 
+- void litehtmlWidget::onDocSizeChanged(int w, int h)
+- {
+-     m_docSize = QSize(w, h);
+-     
+-     // Adjust scroll position if out of bounds
+-     QPoint newPos = m_scrollPos;
+-     newPos.setX(qBound(0, newPos.x(), qMax(0, m_docSize.width() - width())));
+-     newPos.setY(qBound(0, newPos.y(), qMax(0, m_docSize.height() - height())));
+-     
+-     if (newPos != m_scrollPos) {
+-         setScrollPosition(newPos);
+-     }
+- }
+  
+```
+
+---
+
+Now let's update the litehtmlwidget.cpp file:
+
+---
+
+```diff
+  void litehtmlWidget::loadHtml(const QString& html, const QString& baseUrl)
+  {
+-     m_container->set_base_url(baseUrl.toStdString());
++     m_container->set_base_url(baseUrl.toStdString().c_str());
+      m_htmlDocument = litehtml::document::createFromString(html.toStdString().c_str(), m_container);
+      
+```
+
+---
+
+Now let's try building again:
+
+---
+
+```bash
+./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 86%] Built target litehtml
+[ 86%] Built target qlith-pro_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith-pro
+[ 87%] Built target qlith-pro_autogen
+[ 89%] Building CXX object CMakeFiles/qlith-pro.dir/qlith-pro_autogen/mocs_compi
+lation.cpp.o
+[ 90%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+[ 91%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/litehtmlwidget.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/main.cpp.o
+[ 93%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/mainwindow.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow
+.cpp:126:27: warning: unused parameter 'w' [-Wunused-parameter]
+  126 |     [this, scrollBar](int w, int h) {
+      |                           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:356:65: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  356 | void container_qt5::get_image_size(const char* src, const char* baseurl,
+ litehtml::size& sz)
+      |                                                                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:372:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  372 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:372:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  372 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:413:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  413 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:425:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  425 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:454:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  454 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:481:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  481 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:508:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  508 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:508:133: warning: unused parameter 'root' [-Wunused-parameter]
+  508 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:586:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  586 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:586:104: warning: unused parameter 'el' [-Wunused-parameter]
+  586 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:592:84: warning: unused parameter 'el' [-Wunused-parameter]
+  592 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:599:66: warning: unused parameter 'el' [-Wunused-parameter]
+  599 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:599:92: warning: unused parameter 'event' [-Wunused-parameter]
+  599 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:638:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  638 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:650:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  650 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:726:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  726 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:727:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  727 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:728:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  728 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+1 warning generated.
+23 warnings generated.
+[ 94%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+Undefined symbols for architecture x86_64:
+  "container_qt5::titleChanged(QString const&)", referenced from:
+      container_qt5::set_caption(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_caption(char const*) in container_
+qt5.cpp.o
+  "container_qt5::anchorClicked(QString const&)", referenced from:
+      container_qt5::on_anchor_click(char const*, std::__1::shared_ptr<litehtml:
+:element> const&) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::on_anchor_click(char const*, std::__1:
+:shared_ptr<litehtml::element> const&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "container_qt5::cursorChanged(QString const&)", referenced from:
+      container_qt5::set_cursor(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_cursor(char const*) in container_q
+t5.cpp.o
+  "container_qt5::docSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::staticMetaObject", referenced from:
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::documentSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "vtable for MainWindow", referenced from:
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+  "vtable for container_qt5", referenced from:
+      container_qt5::container_qt5(QWidget*) in container_qt5.cpp.o
+      container_qt5::~container_qt5() in container_qt5.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+ld: symbol(s) not found for architecture x86_64
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:229: qlith-pro.app/Contents/M
+acOS/qlith-pro] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+We're getting closer! Now we're facing linker errors because some methods needed for the vtable are not implemented. Let's add the missing implementations to container_qt5.cpp:
+
+---
+
+```diff
+  }
+  
+- // Set a document caption (title)
++ // Set caption (title)
+  void container_qt5::set_caption(const char* caption)
+  {
+      emit titleChanged(QString::fromUtf8(caption));
+  }
+  
+- // Set the base URL for resolving relative paths
++ // Set base URL
+  void container_qt5::set_base_url(const char* base_url)
+  {
+-     // Store base URL
+-     QString baseUrl = QString::fromUtf8(base_url);
+-     // TODO: Update base URL in actual implementation
++     // This is already used in the code but not implemented
++     // Store base URL if needed
+  }
+  
+- // Handle links between documents
++ // Link handling
+  void container_qt5::link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el)
+  {
+-     // No implementation needed for basic functionality
++     // No implementation needed
+  }
+  
+- // Handle clicks on anchor elements
++ // Anchor click handling
+  void container_qt5::on_anchor_click(const char* url, const litehtml::element::ptr& el)
+  {
+```
+
+```diff
+  }
+  
+- // Handle mouse events on elements
++ // Mouse event handling
+  void container_qt5::on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event)
+  {
+-     // Handle mouse hover events
++     // No implementation needed
+  }
+  
+- // Set the cursor for the current mouse position
++ // Set cursor
+  void container_qt5::set_cursor(const char* cursor)
+  {
+```
+
+---
+
+Now let's build once more:
+
+---
+
+```bash
+./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 86%] Built target litehtml
+[ 86%] Built target qlith-pro_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith-pro
+[ 87%] Built target qlith-pro_autogen
+[ 89%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:356:65: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  356 | void container_qt5::get_image_size(const char* src, const char* baseurl,
+ litehtml::size& sz)
+      |                                                                 ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:372:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  372 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:372:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  372 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:413:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  413 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:425:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  425 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:454:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  454 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:481:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  481 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:508:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  508 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:508:133: warning: unused parameter 'root' [-Wunused-parameter]
+  508 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:578:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  578 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:585:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  585 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:585:104: warning: unused parameter 'el' [-Wunused-parameter]
+  585 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:591:84: warning: unused parameter 'el' [-Wunused-parameter]
+  591 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:598:66: warning: unused parameter 'el' [-Wunused-parameter]
+  598 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:598:92: warning: unused parameter 'event' [-Wunused-parameter]
+  598 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:637:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  637 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:649:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  649 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:725:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  725 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:726:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  726 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:727:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  727 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+24 warnings generated.
+[ 90%] Linking CXX executable qlith-pro.app/Contents/MacOS/qlith-pro
+Undefined symbols for architecture x86_64:
+  "container_qt5::titleChanged(QString const&)", referenced from:
+      container_qt5::set_caption(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_caption(char const*) in container_
+qt5.cpp.o
+  "container_qt5::anchorClicked(QString const&)", referenced from:
+      container_qt5::on_anchor_click(char const*, std::__1::shared_ptr<litehtml:
+:element> const&) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::on_anchor_click(char const*, std::__1:
+:shared_ptr<litehtml::element> const&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "container_qt5::cursorChanged(QString const&)", referenced from:
+      container_qt5::set_cursor(char const*) in container_qt5.cpp.o
+      non-virtual thunk to container_qt5::set_cursor(char const*) in container_q
+t5.cpp.o
+  "container_qt5::docSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::staticMetaObject", referenced from:
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+  "container_qt5::documentSizeChanged(int, int)", referenced from:
+      container_qt5::repaint(QPainter&) in container_qt5.cpp.o
+      litehtmlWidget::litehtmlWidget(QWidget*) in litehtmlwidget.cpp.o
+  "vtable for MainWindow", referenced from:
+      MainWindow::MainWindow(QWidget*) in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+      MainWindow::~MainWindow() in mainwindow.cpp.o
+      non-virtual thunk to MainWindow::~MainWindow() in mainwindow.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+  "vtable for container_qt5", referenced from:
+      container_qt5::container_qt5(QWidget*) in container_qt5.cpp.o
+      container_qt5::~container_qt5() in container_qt5.cpp.o
+   NOTE: a missing vtable usually means the first non-inline virtual member func
+tion has no definition.
+ld: symbol(s) not found for architecture x86_64
+c++: error: linker command failed with exit code 1 (use -v to see invocation)
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:229: qlith-pro.app/Contents/M
+acOS/qlith-pro] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+We need to make sure all the virtual functions from the document_container are implemented. Let's check the mainwindow.cpp file for more issues:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp
+
+---
+
+Let's check the context.h file that is causing problems:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/context.h
+
+---
+
+Let's implement all the missing functions from the document_container interface in container_qt5.cpp:
+
+---
+
+```diff
+  }
+  
+- // Transform text based on CSS text-transform property
++ // Transform text based on the specified transformation
+  void container_qt5::transform_text(litehtml::string& text, litehtml::text_transform tt)
+  {
+-     if (text.empty()) {
++     if (text.empty() || tt == litehtml::text_transform_none) {
+          return;
+      }
+  
+-     QString qText = QString::fromUtf8(text.c_str());
++     std::string& str = text;
+      
+      switch (tt) {
+          case litehtml::text_transform_capitalize:
+-             qText = qText.at(0).toUpper() + qText.mid(1);
++             if (!str.empty()) {
++                 str[0] = std::toupper(str[0]);
++             }
+              break;
+          case litehtml::text_transform_uppercase:
+-             qText = qText.toUpper();
++             for (auto& c : str) {
++                 c = std::toupper(c);
++             }
+              break;
+          case litehtml::text_transform_lowercase:
+-             qText = qText.toLower();
++             for (auto& c : str) {
++                 c = std::tolower(c);
++             }
+              break;
+          default:
+              break;
+      }
+- 
+-     text = qText.toStdString();
+  }
+  
+- // Import CSS for the document
++ // Import CSS from external resources
+  void container_qt5::import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl)
+  {
+-     // TODO: Implement CSS loading from external files
++     // Try to load the CSS file from resources first
+      QString cssUrl = QString::fromStdString(url);
++     
++     // Convert to resource path if needed
++     if (cssUrl.startsWith("://")) {
+          QFile file(cssUrl);
+-     if (file.open(QFile::ReadOnly)) {
+-         QByteArray data = file.readAll();
+-         text = std::string(data.constData(), data.size());
++         if (file.open(QIODevice::ReadOnly)) {
++             QByteArray cssData = file.readAll();
++             text = cssData.constData();
++             file.close();
++             return;
+          }
++     }
++     
++     // For external CSS, we would need to implement a network request
++     // For simplicity in this example, we're just handling resource files
+  }
+  
+- // Set clipping region
++ // Set clipping rectangle
+  void container_qt5::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius)
+  {
+-     if (!m_painter) {
+-         qWarning() << "set_clip: Painter is null";
+-         return;
+-     }
+-     
+-     // Store the clip
+-     g_clips.push_back(pos);
+-     
+-     // Apply the clip to the painter
+-     m_painter->setClipRect(QRect(pos.x, pos.y, pos.width, pos.height), Qt::IntersectClip);
++     if (m_painter) {
++         m_painter->save();
++         m_painter->setClipRect(QRect(pos.x, pos.y, pos.width, pos.height));
++     }
+  }
+  
+- // Remove the current clipping region
++ // Remove clipping
+  void container_qt5::del_clip()
+  {
+-     if (!m_painter) {
+-         qWarning() << "del_clip: Painter is null";
+-         return;
+-     }
+-     
+-     // Remove the last clip
+-     if (!g_clips.empty()) {
+-         g_clips.pop_back();
+-     }
+-     
+-     // Reset the clip path
+-     m_painter->setClipping(false);
+-     
+-     // Reapply remaining clips
+-     for (const auto& clip : g_clips) {
+-         m_painter->setClipRect(QRect(clip.x, clip.y, clip.width, clip.height), Qt::IntersectClip);
++     if (m_painter) {
++         m_painter->restore();
+      }
+  }
+  
+- // Get the current viewport dimensions
++ // Get viewport position and dimensions
+  void container_qt5::get_viewport(litehtml::position& viewport) const
+  {
++     if (m_owner) {
+          QRect rc = m_owner->rect();
+-     viewport.x = rc.left();
+-     viewport.y = rc.top();
++         viewport.x = rc.x();
++         viewport.y = rc.y();
+          viewport.width = rc.width();
+          viewport.height = rc.height();
++     } else {
++         viewport.x = 0;
++         viewport.y = 0;
++         viewport.width = 1024;
++         viewport.height = 768;
++     }
+  }
+  
+- // Get media features for CSS media queries
++ // Get media features for responsive design
+  void container_qt5::get_media_features(litehtml::media_features& media) const
+  {
++     if (m_owner) {
+          QRect rc = m_owner->rect();
+          
+-     // Set up media features
++         media.type = litehtml::media_type_screen;
+          media.width = rc.width();
+          media.height = rc.height();
+-     media.device_width = rc.width();
+-     media.device_height = rc.height();
+-     media.color = 8; // 8 bits per color component
++         media.device_width = QGuiApplication::primaryScreen()->size().width();
++         media.device_height = QGuiApplication::primaryScreen()->size().height();
++         media.color = 8;
+          media.monochrome = 0;
+-     media.resolution = 96; // 96 dpi is standard
+-     
+-     // Device pixel ratio for high DPI screens
+-     qreal dpr = 1.0;
+-     if (QGuiApplication::primaryScreen()) {
+-         dpr = QGuiApplication::primaryScreen()->devicePixelRatio();
+-         media.resolution = static_cast<int>(96.0 * dpr);
++         media.color_index = 256;
++         media.resolution = 96;
+      }
+  }
+  
+- // Get language and culture for the document
++ // Get language information for the document
+  void container_qt5::get_language(litehtml::string& language, litehtml::string& culture) const
+  {
+      language = "en";
+-     culture = "";
++     culture = "US";
+  }
+  
+- // Create a custom element
++ // Create custom elements (not used in basic implementation)
+  litehtml::element::ptr container_qt5::create_element(const char* tag_name, 
+                                                      const litehtml::string_map& attributes,
+                                                      const std::shared_ptr<litehtml::document>& doc)
+  {
+-     // Let litehtml create default element
+      return nullptr;
+  }
+  
+- // Handle image loading callback
+- void container_qt5::onImageLoaded(const QString& url, const QImage& image)
+- {
+-     m_images[url] = image;
+-     
+-     if (_doc) {
+-         m_owner->update();
+-     }
++ // Resolve color names to actual colors
++ litehtml::string container_qt5::resolve_color(const litehtml::string& color) const
++ {
++     return color;
+  }
+  
+```
+
+---
+
+Let's add the missing implementation for draw_list_marker and onImageLoaded methods:
+
+---
+
+```diff
+  }
+  
+- // Draw a list marker (bullet or number)
++ // Draw a list marker (bullet, number, etc.)
+  void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_list_marker: Painter is null";
+          return;
+      }
+      
+      m_painter->save();
+      
+-     // Handle image markers
+-     if (!marker.image.empty()) {
+-         QString imageUrl = QString::fromUtf8(marker.image.c_str());
+-         auto it = m_images.find(imageUrl);
+-         if (it != m_images.end()) {
+-             m_painter->drawImage(QRect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height), it.value());
+-         }
+-     } else {
+-         // Handle text markers (bullets, numbers)
+-         switch (marker.marker_type) {
++     QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
++     
++     m_painter->setPen(webColorToQColor(marker.color));
++     
++     switch (marker.type) {
+          case litehtml::list_style_type_circle:
+-                 m_painter->setPen(webColorToQColor(marker.color));
+              m_painter->setBrush(Qt::NoBrush);
+-                 m_painter->drawEllipse(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
++             m_painter->drawEllipse(rect);
+              break;
+-                 
+          case litehtml::list_style_type_disc:
+-                 m_painter->setPen(Qt::NoPen);
+              m_painter->setBrush(webColorToQColor(marker.color));
+-                 m_painter->drawEllipse(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
++             m_painter->drawEllipse(rect);
+              break;
+-                 
+          case litehtml::list_style_type_square:
+-                 m_painter->setPen(Qt::NoPen);
+              m_painter->setBrush(webColorToQColor(marker.color));
+-                 m_painter->drawRect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
++             m_painter->drawRect(rect);
+              break;
+-                 
+          default:
+-                 // For decimal, etc., we draw the text
+-                 if (marker.font != 0) {
+-                     QString text = QString::number(marker.index) + ".";
+-                     draw_text(hdc, text.toUtf8().constData(), marker.font, marker.color, marker.pos);
++             // For other types (like numbers or letters), we draw the text
++             if (!marker.text.empty()) {
++                 m_painter->setFont(m_fonts[1].font);  // Use default font
++                 m_painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString::fromUtf8(marker.text.c_str()));
+              }
+              break;
+-         }
+      }
+      
+```
+
+```diff
+      }
+  }
++ 
++ // Handle image loading callback
++ void container_qt5::onImageLoaded(const QString& url, const QImage& image)
++ {
++     m_images[url] = image;
++     
++     if (_doc && m_owner) {
++         m_owner->update();
++     }
++ }
+  
+```
+
+---
+
+
+
+Let's make one last fix to implement all missing color-related functions and try to build again:
+
+---
+
+```diff
+  }
+  
+- // Draw a solid color background
++ // Draw solid color background
+  void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_solid_fill: Painter is null";
+          return;
+      }
+      
+-     QRect rc = positionToRect(layer.clip_box);
+-     m_painter->fillRect(rc, webColorToQColor(color));
++     QColor qcolor = webColorToQColor(color);
++     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
++     
++     m_painter->save();
++     m_painter->setPen(Qt::NoPen);
++     m_painter->setBrush(qcolor);
++     m_painter->drawRect(rect);
++     m_painter->restore();
+  }
+  
+- // Draw a linear gradient
++ // Draw linear gradient
+  void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_linear_gradient: Painter is null";
+          return;
+      }
+      
+-     m_painter->save();
+-     
+-     QRect rc = positionToRect(layer.clip_box);
+-     m_painter->setClipRect(rc);
++     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
+      
+-     // Create a linear gradient using the start and end points directly from the gradient object
+-     QLinearGradient qGradient;
+-     qGradient.setStart(gradient.start.x, gradient.start.y);
+-     qGradient.setFinalStop(gradient.end.x, gradient.end.y);
++     // Calculate the start and end points
++     QPointF startPoint(rect.x() + gradient.start_x * rect.width(), rect.y() + gradient.start_y * rect.height());
++     QPointF endPoint(rect.x() + gradient.end_x * rect.width(), rect.y() + gradient.end_y * rect.height());
++     
++     // Create the gradient
++     QLinearGradient linearGradient(startPoint, endPoint);
+      
+      // Add color stops
+-     for (const auto& stop : gradient.color_points) {
+-         qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
++     for (const auto& stop : gradient.color_stops) {
++         linearGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+      }
+      
+      // Draw the gradient
+-     m_painter->fillRect(rc, qGradient);
+-     
++     m_painter->save();
++     m_painter->setPen(Qt::NoPen);
++     m_painter->setBrush(linearGradient);
++     m_painter->drawRect(rect);
+      m_painter->restore();
+  }
+  
+- // Draw a radial gradient
++ // Draw radial gradient
+  void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_radial_gradient: Painter is null";
+          return;
+      }
+      
+-     m_painter->save();
++     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
+      
+-     QRect rc = positionToRect(layer.clip_box);
+-     m_painter->setClipRect(rc);
++     // Calculate the center point and radius
++     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
++     qreal radius = gradient.radius_x * std::min(rect.width(), rect.height());
+      
+-     // Create a radial gradient using the position and radius directly from the gradient object
+-     QRadialGradient qGradient(gradient.position.x, gradient.position.y, gradient.radius.x);
++     // Create the gradient
++     QRadialGradient radialGradient(centerPoint, radius);
+      
+      // Add color stops
+-     for (const auto& stop : gradient.color_points) {
+-         qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
++     for (const auto& stop : gradient.color_stops) {
++         radialGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+      }
+      
+      // Draw the gradient
+-     m_painter->fillRect(rc, qGradient);
+-     
++     m_painter->save();
++     m_painter->setPen(Qt::NoPen);
++     m_painter->setBrush(radialGradient);
++     m_painter->drawRect(rect);
+      m_painter->restore();
+  }
+  
+- // Draw a conic gradient
++ // Draw conic gradient
+  void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_conic_gradient: Painter is null";
+          return;
+      }
+      
+-     m_painter->save();
++     QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
+      
+-     QRect rc = positionToRect(layer.clip_box);
+-     m_painter->setClipRect(rc);
++     // Calculate the center point
++     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
+      
+-     // Qt uses QConicalGradient for conic gradients
+-     QConicalGradient qGradient(gradient.position.x, gradient.position.y, gradient.angle);
++     // Qt doesn't have a direct conic gradient, so we'll use a QConicalGradient
++     QConicalGradient conicGradient(centerPoint, gradient.angle);
+      
+      // Add color stops
+-     for (const auto& stop : gradient.color_points) {
+-         qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
++     for (const auto& stop : gradient.color_stops) {
++         conicGradient.setColorAt(stop.first, webColorToQColor(stop.second));
+      }
+      
+      // Draw the gradient
+-     m_painter->fillRect(rc, qGradient);
+-     
++     m_painter->save();
++     m_painter->setPen(Qt::NoPen);
++     m_painter->setBrush(conicGradient);
++     m_painter->drawRect(rect);
+      m_painter->restore();
+  }
+  
+- // Draw borders around an element
++ // Draw borders
+  void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root)
+  {
+      if (!m_painter) {
+-         qWarning() << "draw_borders: Painter is null";
+          return;
+      }
+      
+      m_painter->save();
+      
+-     // Draw the borders
+-     QRect borderRect = positionToRect(draw_pos);
+-     
+-     // Top border
++     // Draw top border
+      if (borders.top.width > 0) {
+          m_painter->setPen(Qt::NoPen);
+          m_painter->setBrush(webColorToQColor(borders.top.color));
+          m_painter->drawRect(
+-             borderRect.left(),
+-             borderRect.top(),
+-             borderRect.width(),
++             draw_pos.x,
++             draw_pos.y,
++             draw_pos.width,
+              borders.top.width
+          );
+      }
+      
+-     // Right border
++     // Draw right border
+      if (borders.right.width > 0) {
+          m_painter->setPen(Qt::NoPen);
+          m_painter->setBrush(webColorToQColor(borders.right.color));
+          m_painter->drawRect(
+-             borderRect.right() - borders.right.width,
+-             borderRect.top() + borders.top.width,
++             draw_pos.x + draw_pos.width - borders.right.width,
++             draw_pos.y,
+              borders.right.width,
+-             borderRect.height() - borders.top.width - borders.bottom.width
++             draw_pos.height
+          );
+      }
+      
+-     // Bottom border
++     // Draw bottom border
+      if (borders.bottom.width > 0) {
+          m_painter->setPen(Qt::NoPen);
+          m_painter->setBrush(webColorToQColor(borders.bottom.color));
+          m_painter->drawRect(
+-             borderRect.left(),
+-             borderRect.bottom() - borders.bottom.width,
+-             borderRect.width(),
++             draw_pos.x,
++             draw_pos.y + draw_pos.height - borders.bottom.width,
++             draw_pos.width,
+              borders.bottom.width
+          );
+      }
+      
+-     // Left border
++     // Draw left border
+      if (borders.left.width > 0) {
+          m_painter->setPen(Qt::NoPen);
+          m_painter->setBrush(webColorToQColor(borders.left.color));
+          m_painter->drawRect(
+-             borderRect.left(),
+-             borderRect.top() + borders.top.width,
++             draw_pos.x,
++             draw_pos.y,
+              borders.left.width,
+-             borderRect.height() - borders.top.width - borders.bottom.width
++             draw_pos.height
+          );
+      }
+```
+
+---
+
+The fixes look good. Let's add the rest of the functions that were cut off:
+
+---
+
+```diff
+  }
+  
+- // Load an image
+- void container_qt5::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
+- {
+-     QString sourceUrl = QString::fromUtf8(src);
+-     QString baseUrl = QString::fromUtf8(baseurl);
+-     
+-     // Check if we already have this image
+-     if (m_images.contains(sourceUrl)) {
++ // Draw an image
++ void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
++ {
++     if (!m_painter) {
+          return;
+      }
+      
+-     // Resolve URL
+-     QUrl url;
+-     if (QUrl(sourceUrl).isRelative()) {
+-         url = QUrl(baseUrl).resolved(QUrl(sourceUrl));
+-     } else {
+-         url = QUrl(sourceUrl);
+-     }
+-     
+-     if (url.isLocalFile()) {
+-         // Load local image
+-         QImage image(url.toLocalFile());
+-         if (!image.isNull()) {
+-             m_images[sourceUrl] = image;
+-             if (redraw_on_ready && _doc) {
+-                 m_owner->update();
+-             }
+-         }
+-     } else {
+-         // For network images, we would need to use QNetworkAccessManager
+-         // (Not implemented here for simplicity)
+-         qDebug() << "Network image loading not implemented:" << url.toString();
++     QString imageUrl = QString::fromStdString(url);
++     
++     if (m_images.contains(imageUrl)) {
++         QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
++         m_painter->drawImage(rect, m_images[imageUrl]);
+      }
+  }
+```
+
+```diff
+  void container_qt5::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
+  {
+-     QString sourceUrl = QString::fromUtf8(src);
++     QString imageUrl = QString::fromUtf8(src);
+      
+-     auto it = m_images.find(sourceUrl);
+-     if (it != m_images.end()) {
+-         sz.width = it.value().width();
+-         sz.height = it.value().height();
++     if (m_images.contains(imageUrl)) {
++         QImage& img = m_images[imageUrl];
++         sz.width = img.width();
++         sz.height = img.height();
+      } else {
+-         // Default size for missing images
++         // Load the image if it's not loaded yet
++         load_image(src, baseurl, false);
++         
++         // Set default size
+          sz.width = 0;
+          sz.height = 0;
+      }
+  }
+  
+- // Draw an image as a background
+- void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
++ // Load an image from a URL
++ void container_qt5::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
+  {
+-     if (!m_painter) {
+-         qWarning() << "draw_image: Painter is null";
++     if (!src || !*src) {
+          return;
+      }
+      
+-     QString sourceUrl = QString::fromStdString(url);
+-     auto it = m_images.find(sourceUrl);
+-     if (it != m_images.end()) {
+-         QRect rc = positionToRect(layer.clip_box);
+-         
+-         switch (layer.repeat) {
+-             case litehtml::background_repeat_no_repeat:
+-                 // Draw single image at specified position
+-                 m_painter->drawImage(rc, it.value());
+-                 break;
+-                 
+-             case litehtml::background_repeat_repeat_x:
+-                 // Repeat horizontally
+-                 for (int x = rc.left(); x < rc.right(); x += it.value().width()) {
+-                     m_painter->drawImage(QRect(x, rc.top(), it.value().width(), rc.height()), it.value());
+-                 }
+-                 break;
+-                 
+-             case litehtml::background_repeat_repeat_y:
+-                 // Repeat vertically
+-                 for (int y = rc.top(); y < rc.bottom(); y += it.value().height()) {
+-                     m_painter->drawImage(QRect(rc.left(), y, rc.width(), it.value().height()), it.value());
+-                 }
+-                 break;
+-                 
+-             case litehtml::background_repeat_repeat:
+-                 // Repeat in both directions
+-                 m_painter->drawTiledPixmap(rc, QPixmap::fromImage(it.value()));
+-                 break;
+-         }
+-     }
++     QString imageUrl = QString::fromUtf8(src);
++     
++     // Check if the image is already loaded
++     if (m_images.contains(imageUrl)) {
++         return;
++     }
++     
++     // Check if it's a resource path
++     if (imageUrl.startsWith("://")) {
++         QImage img(imageUrl);
++         if (!img.isNull()) {
++             m_images[imageUrl] = img;
++             
++             if (redraw_on_ready && _doc && m_owner) {
++                 m_owner->update();
++             }
++         }
++     }
++     
++     // For external images, we would need to implement a network request
++     // For simplicity in this example, we're just handling resource files
+  }
+  
+```
+
+---
+
+Now let's try building again:
+
+---
+
+```bash
+./build_macos.sh
+```
+
+```
++ BUILD_TYPE=Release
++++ dirname ./build_macos.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ PROJECT_ROOT=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro
++ BUILD_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ EXTERNAL_DIR=/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../
+external
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/litehtml ']'
++ '[' '!' -d /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/../ex
+ternal/gumbo-parser ']'
+++ brew --prefix qt@5
++ QT_PATH=/usr/local/opt/qt@5
++ '[' -z /usr/local/opt/qt@5 ']'
++ echo 'Using Qt5 from: /usr/local/opt/qt@5'
+Using Qt5 from: /usr/local/opt/qt@5
++ mkdir -p /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ cd /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/build
++ echo 'Configuring project...'
+Configuring project...
++ cmake /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro -DCMAKE_BU
+ILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5 -DCMAKE_EXPORT_COMPILE_
+COMMANDS=ON
+-- qlith-pro configuration complete
+-- Configuring done (0.8s)
+-- Generating done (0.2s)
+-- Build files have been written to: /Users/adam/Developer/vcs/github.twardoch/p
+ub/qlith/qlith-pro/build
++ echo 'Building project...'
+Building project...
+++ sysctl -n hw.ncpu
++ cmake --build . -- -j16
+[  0%] Built target gumbo_autogen_timestamp_deps
+[  1%] Built target gumbo_autogen
+[ 16%] Built target gumbo
+[ 16%] Built target litehtml_autogen_timestamp_deps
+[ 17%] Built target litehtml_autogen
+[ 86%] Built target litehtml
+[ 86%] Built target qlith-pro_autogen_timestamp_deps
+[ 87%] Automatic MOC and UIC for target qlith-pro
+[ 87%] Built target qlith-pro_autogen
+[ 89%] Building CXX object CMakeFiles/qlith-pro.dir/src/gui/container_qt5.cpp.o
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:48:11: warning: variable 'devicePixelRatio' set but not used [-Wunused-b
+ut-set-variable]
+   48 |     qreal devicePixelRatio = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:168:114: warning: unused parameter 'doc' [-Wunused-parameter]
+  168 | litehtml::uint_ptr container_qt5::create_font(const litehtml::font_descr
+iption& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+      |
+
+                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:219:50: warning: unused parameter 'hdc' [-Wunused-parameter]
+  219 | void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, 
+litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& p
+os)
+      |                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:248:11: warning: variable 'dpr' set but not used [-Wunused-but-set-varia
+ble]
+  248 |     qreal dpr = 1.0;
+      |           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:282:20: error: no member named 'type' in 'litehtml::list_marker'
+  282 |     switch (marker.type) {
+      |             ~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:297:25: error: no member named 'text' in 'litehtml::list_marker'
+  297 |             if (!marker.text.empty()) {
+      |                  ~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:299:102: error: no member named 'text' in 'litehtml::list_marker'
+  299 |                 m_painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCent
+er, QString::fromUtf8(marker.text.c_str()));
+      |
+
+                      ~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:270:57: warning: unused parameter 'hdc' [-Wunused-parameter]
+  270 | void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const liteh
+tml::list_marker& marker)
+      |                                                         ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:308:51: warning: unused parameter 'hdc' [-Wunused-parameter]
+  308 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:308:140: warning: unused parameter 'base_url' [-Wunused-parameter]
+  308 | void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::b
+ackground_layer& layer, const std::string& url, const std::string& base_url)
+      |
+
+                                                                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:342:61: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  342 | void container_qt5::load_image(const char* src, const char* baseurl, boo
+l redraw_on_ready)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:372:56: warning: unused parameter 'hdc' [-Wunused-parameter]
+  372 | void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const liteht
+ml::background_layer& layer, const litehtml::web_color& color)
+      |                                                        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:398:44: error: no member named 'start_x' in 'litehtml::background_layer:
+:linear_gradient'
+  398 |     QPointF startPoint(rect.x() + gradient.start_x * rect.width(), rect.
+y() + gradient.start_y * rect.height());
+      |                                   ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:398:88: error: no member named 'start_y' in 'litehtml::background_layer:
+:linear_gradient'
+  398 |     QPointF startPoint(rect.x() + gradient.start_x * rect.width(), rect.
+y() + gradient.start_y * rect.height());
+      |
+
+      ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:399:42: error: no member named 'end_x' in 'litehtml::background_layer::l
+inear_gradient'
+  399 |     QPointF endPoint(rect.x() + gradient.end_x * rect.width(), rect.y() 
++ gradient.end_y * rect.height());
+      |                                 ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:399:84: error: no member named 'end_y' in 'litehtml::background_layer::l
+inear_gradient'
+  399 |     QPointF endPoint(rect.x() + gradient.end_x * rect.width(), rect.y() 
++ gradient.end_y * rect.height());
+      |
+
+  ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:405:38: error: no member named 'color_stops' in 'litehtml::background_la
+yer::linear_gradient'
+  405 |     for (const auto& stop : gradient.color_stops) {
+      |                             ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:389:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  389 | void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::linear_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:427:45: error: no member named 'center_x' in 'litehtml::background_layer
+::radial_gradient'
+  427 |     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rec
+t.y() + gradient.center_y * rect.height());
+      |                                    ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:427:90: error: no member named 'center_y' in 'litehtml::background_layer
+::radial_gradient'
+  427 |     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rec
+t.y() + gradient.center_y * rect.height());
+      |
+
+        ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:428:29: error: no member named 'radius_x' in 'litehtml::background_layer
+::radial_gradient'
+  428 |     qreal radius = gradient.radius_x * std::min(rect.width(), rect.heigh
+t());
+      |                    ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:434:38: error: no member named 'color_stops' in 'litehtml::background_la
+yer::radial_gradient'
+  434 |     for (const auto& stop : gradient.color_stops) {
+      |                             ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:418:61: warning: unused parameter 'hdc' [-Wunused-parameter]
+  418 | void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const l
+itehtml::background_layer& layer, const litehtml::background_layer::radial_gradi
+ent& gradient)
+      |                                                             ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:456:45: error: no member named 'center_x' in 'litehtml::background_layer
+::conic_gradient'
+  456 |     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rec
+t.y() + gradient.center_y * rect.height());
+      |                                    ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:456:90: error: no member named 'center_y' in 'litehtml::background_layer
+::conic_gradient'
+  456 |     QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rec
+t.y() + gradient.center_y * rect.height());
+      |
+
+        ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:462:38: error: no member named 'color_stops' in 'litehtml::background_la
+yer::conic_gradient'
+  462 |     for (const auto& stop : gradient.color_stops) {
+      |                             ~~~~~~~~ ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:447:60: warning: unused parameter 'hdc' [-Wunused-parameter]
+  447 | void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const li
+tehtml::background_layer& layer, const litehtml::background_layer::conic_gradien
+t& gradient)
+      |                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:475:53: warning: unused parameter 'hdc' [-Wunused-parameter]
+  475 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:475:133: warning: unused parameter 'root' [-Wunused-parameter]
+  475 | void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml:
+:borders& borders, const litehtml::position& draw_pos, bool root)
+      |
+
+                                                            ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:541:46: warning: unused parameter 'base_url' [-Wunused-parameter]
+  541 | void container_qt5::set_base_url(const char* base_url)
+      |                                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:548:69: warning: unused parameter 'doc' [-Wunused-parameter]
+  548 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |                                                                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:548:104: warning: unused parameter 'el' [-Wunused-parameter]
+  548 | void container_qt5::link(const std::shared_ptr<litehtml::document>& doc,
+ const litehtml::element::ptr& el)
+      |
+
+                               ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:554:84: warning: unused parameter 'el' [-Wunused-parameter]
+  554 | void container_qt5::on_anchor_click(const char* url, const litehtml::ele
+ment::ptr& el)
+      |
+
+           ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:561:66: warning: unused parameter 'el' [-Wunused-parameter]
+  561 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:561:92: warning: unused parameter 'event' [-Wunused-parameter]
+  561 | void container_qt5::on_mouse_event(const litehtml::element::ptr& el, lit
+ehtml::mouse_event event)
+      |
+
+                   ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:604:103: warning: unused parameter 'baseurl' [-Wunused-parameter]
+  604 | void container_qt5::import_css(litehtml::string& text, const litehtml::s
+tring& url, litehtml::string& baseurl)
+      |
+
+                              ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:625:94: warning: unused parameter 'bdr_radius' [-Wunused-parameter]
+  625 | void container_qt5::set_clip(const litehtml::position& pos, const liteht
+ml::border_radiuses& bdr_radius)
+      |
+
+                     ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:684:66: warning: unused parameter 'tag_name' [-Wunused-parameter]
+  684 | litehtml::element::ptr container_qt5::create_element(const char* tag_nam
+e,
+      |                                                                  ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:685:81: warning: unused parameter 'attributes' [-Wunused-parameter]
+  685 |                                                     const litehtml::stri
+ng_map& attributes,
+      |
+
+        ^
+/Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_
+qt5.cpp:686:96: warning: unused parameter 'doc' [-Wunused-parameter]
+  686 |                                                     const std::shared_pt
+r<litehtml::document>& doc)
+      |
+
+                       ^
+25 warnings and 15 errors generated.
+gmake[2]: *** [CMakeFiles/qlith-pro.dir/build.make:120: CMakeFiles/qlith-pro.dir
+/src/gui/container_qt5.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:140: CMakeFiles/qlith-pro.dir/all] Error 2
+gmake: *** [Makefile:136: all] Error 2
+
+```
+
+---
+
+We need to check the structure of the `list_marker` class and the gradient-related classes in litehtml to match their actual API:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/types.h
+
+---
+
+Let's check the list_marker.h file to understand its structure:
+
+---
+
+Could not find file '/Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/list_marker.h' in the workspace.
+
+---
+
+Let's check where the list_marker class might be defined:
+
+---
+
+<details>
+            <summary>Grep search for "class list_marker" • **0** files</summary>
+        
+No results found
+</details>
+
+---
+
+Let's search for list_marker in general:
+
+---
+
+<details>
+            <summary>Grep search for "list_marker" • **24** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L567 | `*   Implement `draw_background` (for image backgrounds) and `draw_list_marker` (for image markers) using `painter->drawImage()` or `painter->drawTiledPixmap()` with the cached `QImage`.` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini.txt` | L1103 | `void ContainerQPainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini.txt` | L1724 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_21-51-implementing-todo-list-in-markdown.md` | L2465 | `+ void container_qpainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.h` | L101 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-mini/src/container_qpainter.cpp` | L215 | `void ContainerQPainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L4682 | `+ void ContainerQPainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6992 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L1721 | `virtual void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L8773 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp` | L269 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L152 | `⟪ 100 characters skipped ⟫| L306 | `void container_qpainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L458 | `-     virtual void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L533 | `+   void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L1376 | `+ void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L1379 | `+         qWarning() << "draw_list_marker: Painter is null";` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L3959 | `- void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L1368 | `virtual void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L8420 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L4311 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L4861 | `virtual void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/container_qt5.h` | L103 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/haiku/container_haiku.cpp` | L304 | `LiteHtmlView::draw_list_marker( litehtml::uint_ptr hdc,` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/haiku/container_haiku.cpp` | L305 | `const litehtml::list_marker& marker )` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/haiku/container_haiku.cpp` | L307 | `std::cout << "draw_list_marker" << std::endl;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/windows/win32/win32_container.h` | L36 | `void		draw_list_marker(uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/windows/win32/win32_container.cpp` | L186 | `void win32_container::draw_list_marker(uint_ptr hdc, const list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L316 | `draw_list_marker(hdc, pos);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1049 | `void litehtml::html_tag::draw_list_marker( uint_ptr hdc, const position& pos )` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1051 | `list_marker lm;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1122 | `auto marker_text = get_list_marker_text(lm.index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1126 | `get_document()->container()->draw_list_marker(hdc, lm);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1143 | `get_document()->container()->draw_list_marker(hdc, lm);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1147 | `litehtml::string litehtml::html_tag::get_list_marker_text(int index)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h` | L14 | `struct list_marker` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h` | L42 | `virtual void				draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) = 0;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/html_tag.h` | L107 | `void				draw_list_marker( uint_ptr hdc, const position &pos );` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/html_tag.h` | L108 | `string				get_list_marker_text(int index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/test/test_container.cpp` | L173 | `void test_container::draw_list_marker(uint_ptr hdc, const list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/haiku/container_haiku.h` | L48 | `virtual void 						draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/test/test_container.h` | L33 | `void 			draw_list_marker(uint_ptr hdc, const list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/cairo/container_cairo.cpp` | L21 | `void container_cairo::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker )` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/containers/cairo/container_cairo.h` | L50 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp` | L269 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+
+</details>
+
+---
+
+Let's check the document_container.h file where the list_marker struct is defined:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/document_container.h
+
+---
+
+Now let's examine a container implementation to understand how the list marker is being drawn:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+Let me check the HTML tag implementation to see how the `list_marker` is created:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp
+
+---
+
+Now let me check how the `num_cvt` class is defined to better understand how list markers are formatted:
+
+---
+
+<details>
+            <summary>Grep search for "class num_cvt" • **0** files</summary>
+        
+No results found
+</details>
+
+---
+
+Let me find the `num_cvt` implementation:
+
+---
+
+<details>
+            <summary>Grep search for "num_cvt" • **10** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external.txt` | L203 | `│   │   ├── num_cvt.h` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external.txt` | L311 | `│   ├── num_cvt.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L214 | `│   │   ├── num_cvt.h` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L322 | `│   ├── num_cvt.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3085 | `[ 49%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L3332 | `[ 49%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L6699 | `[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8024 | `Dependencies file "litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o.d" is newe` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_23-01-create-cmakelists-txt-file.md` | L8600 | `[ 65%] Building CXX object litehtml/CMakeFiles/litehtml.dir/src/num_cvt.cpp.o` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L213 | `│   │   ├── num_cvt.h` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L321 | `│   ├── num_cvt.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/litehtml.vcxproj` | L281 | `<ClCompile Include="src\num_cvt.cpp" />` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/litehtml.vcxproj` | L339 | `<ClInclude Include="include\litehtml\num_cvt.h" />` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | Lundefined | `#include "num_cvt.h"` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | L40 | `litehtml::string litehtml::num_cvt::to_latin_lower(int val)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | L45 | `litehtml::string litehtml::num_cvt::to_latin_upper(int val)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | L50 | `litehtml::string litehtml::num_cvt::to_greek_lower(int val)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | L55 | `litehtml::string litehtml::num_cvt::to_roman_lower(int value)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp` | L82 | `litehtml::string litehtml::num_cvt::to_roman_upper(int value)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L9 | `#include "num_cvt.h"` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1164 | `return num_cvt::to_latin_lower(index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1166 | `return num_cvt::to_greek_lower(index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1169 | `return num_cvt::to_latin_upper(index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1171 | `return num_cvt::to_roman_lower(index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/html_tag.cpp` | L1173 | `return num_cvt::to_roman_upper(index);` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/litehtml.vcxproj.filters` | L157 | `<ClCompile Include="src\num_cvt.cpp">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/litehtml.vcxproj.filters` | L420 | `<ClInclude Include="include\litehtml\num_cvt.h">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/CMakeLists.txt` | L62 | `src/num_cvt.cpp` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/CMakeLists.txt` | L133 | `include/litehtml/num_cvt.h` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/num_cvt.h` | Lundefined | `#ifndef NUM_CVT_H` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/num_cvt.h` | L1 | `#define NUM_CVT_H` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/num_cvt.h` | L7 | `namespace num_cvt` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/num_cvt.h` | L17 | `#endif	// NUM_CVT_H` |
+
+</details>
+
+---
+
+I'll look at the `num_cvt.h` file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/include/litehtml/num_cvt.h
+
+---
+
+Now I'll check the implementation in `num_cvt.cpp`:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/external/litehtml/src/num_cvt.cpp
+
+---
+
+Now let's check the original issue you mentioned with list markers by looking at how they're used in the container_qt5 implementation:
+
+---
+
+<details>
+            <summary>Grep search for "draw_list_marker" • **3** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp` | L269 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/include/qlith/container_qt5.h` | L103 | `void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp` | L269 | `void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)` |
+
+</details>
+
+---
+
+Let's see the implementation of this function in the container_qt5.cpp file:
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+Now let's check what the list marker structure looks like in litehtml:
+
+---
+
+<details>
+            <summary>Grep search for "list_marker" • **0** files</summary>
+        
+No results found
+</details>
+
+---
+
+Let's look for the definition in the source files:
+
+---
+
+<details>
+            <summary>Grep search for "struct list_marker" • **0** files</summary>
+        
+No results found
+</details>
+
+---
+
+Let's try to find where list markers are defined in litehtml:
+
+---
+
+<details>
+            <summary>Grep search for "list-style|marker" • **0** files</summary>
+        
+No results found
+</details>
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
+
+
+
+---
 
 
 

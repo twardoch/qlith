@@ -266,302 +266,265 @@ const char* container_qt5::get_default_font_name() const
     return m_defaultFontName.toUtf8().constData();
 }
 
-// Draw a list marker (bullet or number)
+// Draw a list marker (bullet, number, etc.)
 void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)
 {
     if (!m_painter) {
-        qWarning() << "draw_list_marker: Painter is null";
         return;
     }
     
     m_painter->save();
     
-    // Handle image markers
-    if (!marker.image.empty()) {
-        QString imageUrl = QString::fromUtf8(marker.image.c_str());
-        auto it = m_images.find(imageUrl);
-        if (it != m_images.end()) {
-            m_painter->drawImage(QRect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height), it.value());
-        }
-    } else {
-        // Handle text markers (bullets, numbers)
-        switch (marker.marker_type) {
-            case litehtml::list_style_type_circle:
-                m_painter->setPen(webColorToQColor(marker.color));
-                m_painter->setBrush(Qt::NoBrush);
-                m_painter->drawEllipse(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
-                break;
-                
-            case litehtml::list_style_type_disc:
-                m_painter->setPen(Qt::NoPen);
-                m_painter->setBrush(webColorToQColor(marker.color));
-                m_painter->drawEllipse(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
-                break;
-                
-            case litehtml::list_style_type_square:
-                m_painter->setPen(Qt::NoPen);
-                m_painter->setBrush(webColorToQColor(marker.color));
-                m_painter->drawRect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
-                break;
-                
-            default:
-                // For decimal, etc., we draw the text
-                if (marker.font != 0) {
-                    QString text = QString::number(marker.index) + ".";
-                    draw_text(hdc, text.toUtf8().constData(), marker.font, marker.color, marker.pos);
-                }
-                break;
-        }
+    QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
+    
+    m_painter->setPen(webColorToQColor(marker.color));
+    
+    switch (marker.type) {
+        case litehtml::list_style_type_circle:
+            m_painter->setBrush(Qt::NoBrush);
+            m_painter->drawEllipse(rect);
+            break;
+        case litehtml::list_style_type_disc:
+            m_painter->setBrush(webColorToQColor(marker.color));
+            m_painter->drawEllipse(rect);
+            break;
+        case litehtml::list_style_type_square:
+            m_painter->setBrush(webColorToQColor(marker.color));
+            m_painter->drawRect(rect);
+            break;
+        default:
+            // For other types (like numbers or letters), we draw the text
+            if (!marker.text.empty()) {
+                m_painter->setFont(m_fonts[1].font);  // Use default font
+                m_painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString::fromUtf8(marker.text.c_str()));
+            }
+            break;
     }
     
     m_painter->restore();
 }
 
-// Load an image
-void container_qt5::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
+// Draw an image
+void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
 {
-    QString sourceUrl = QString::fromUtf8(src);
-    QString baseUrl = QString::fromUtf8(baseurl);
-    
-    // Check if we already have this image
-    if (m_images.contains(sourceUrl)) {
+    if (!m_painter) {
         return;
     }
     
-    // Resolve URL
-    QUrl url;
-    if (QUrl(sourceUrl).isRelative()) {
-        url = QUrl(baseUrl).resolved(QUrl(sourceUrl));
-    } else {
-        url = QUrl(sourceUrl);
-    }
+    QString imageUrl = QString::fromStdString(url);
     
-    if (url.isLocalFile()) {
-        // Load local image
-        QImage image(url.toLocalFile());
-        if (!image.isNull()) {
-            m_images[sourceUrl] = image;
-            if (redraw_on_ready && _doc) {
-                m_owner->update();
-            }
-        }
-    } else {
-        // For network images, we would need to use QNetworkAccessManager
-        // (Not implemented here for simplicity)
-        qDebug() << "Network image loading not implemented:" << url.toString();
+    if (m_images.contains(imageUrl)) {
+        QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
+        m_painter->drawImage(rect, m_images[imageUrl]);
     }
 }
 
 // Get image dimensions
 void container_qt5::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
 {
-    QString sourceUrl = QString::fromUtf8(src);
+    QString imageUrl = QString::fromUtf8(src);
     
-    auto it = m_images.find(sourceUrl);
-    if (it != m_images.end()) {
-        sz.width = it.value().width();
-        sz.height = it.value().height();
+    if (m_images.contains(imageUrl)) {
+        QImage& img = m_images[imageUrl];
+        sz.width = img.width();
+        sz.height = img.height();
     } else {
-        // Default size for missing images
+        // Load the image if it's not loaded yet
+        load_image(src, baseurl, false);
+        
+        // Set default size
         sz.width = 0;
         sz.height = 0;
     }
 }
 
-// Draw an image as a background
-void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
+// Load an image from a URL
+void container_qt5::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
 {
-    if (!m_painter) {
-        qWarning() << "draw_image: Painter is null";
+    if (!src || !*src) {
         return;
     }
     
-    QString sourceUrl = QString::fromStdString(url);
-    auto it = m_images.find(sourceUrl);
-    if (it != m_images.end()) {
-        QRect rc = positionToRect(layer.clip_box);
-        
-        switch (layer.repeat) {
-            case litehtml::background_repeat_no_repeat:
-                // Draw single image at specified position
-                m_painter->drawImage(rc, it.value());
-                break;
-                
-            case litehtml::background_repeat_repeat_x:
-                // Repeat horizontally
-                for (int x = rc.left(); x < rc.right(); x += it.value().width()) {
-                    m_painter->drawImage(QRect(x, rc.top(), it.value().width(), rc.height()), it.value());
-                }
-                break;
-                
-            case litehtml::background_repeat_repeat_y:
-                // Repeat vertically
-                for (int y = rc.top(); y < rc.bottom(); y += it.value().height()) {
-                    m_painter->drawImage(QRect(rc.left(), y, rc.width(), it.value().height()), it.value());
-                }
-                break;
-                
-            case litehtml::background_repeat_repeat:
-                // Repeat in both directions
-                m_painter->drawTiledPixmap(rc, QPixmap::fromImage(it.value()));
-                break;
+    QString imageUrl = QString::fromUtf8(src);
+    
+    // Check if the image is already loaded
+    if (m_images.contains(imageUrl)) {
+        return;
+    }
+    
+    // Check if it's a resource path
+    if (imageUrl.startsWith("://")) {
+        QImage img(imageUrl);
+        if (!img.isNull()) {
+            m_images[imageUrl] = img;
+            
+            if (redraw_on_ready && _doc && m_owner) {
+                m_owner->update();
+            }
         }
     }
+    
+    // For external images, we would need to implement a network request
+    // For simplicity in this example, we're just handling resource files
 }
 
-// Draw a solid color background
+// Draw solid color background
 void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color)
 {
     if (!m_painter) {
-        qWarning() << "draw_solid_fill: Painter is null";
         return;
     }
     
-    QRect rc = positionToRect(layer.clip_box);
-    m_painter->fillRect(rc, webColorToQColor(color));
+    QColor qcolor = webColorToQColor(color);
+    QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
+    
+    m_painter->save();
+    m_painter->setPen(Qt::NoPen);
+    m_painter->setBrush(qcolor);
+    m_painter->drawRect(rect);
+    m_painter->restore();
 }
 
-// Draw a linear gradient
+// Draw linear gradient
 void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient)
 {
     if (!m_painter) {
-        qWarning() << "draw_linear_gradient: Painter is null";
         return;
     }
     
-    m_painter->save();
+    QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
-    QRect rc = positionToRect(layer.clip_box);
-    m_painter->setClipRect(rc);
+    // Calculate the start and end points
+    QPointF startPoint(rect.x() + gradient.start_x * rect.width(), rect.y() + gradient.start_y * rect.height());
+    QPointF endPoint(rect.x() + gradient.end_x * rect.width(), rect.y() + gradient.end_y * rect.height());
     
-    // Create a linear gradient using the start and end points directly from the gradient object
-    QLinearGradient qGradient;
-    qGradient.setStart(gradient.start.x, gradient.start.y);
-    qGradient.setFinalStop(gradient.end.x, gradient.end.y);
+    // Create the gradient
+    QLinearGradient linearGradient(startPoint, endPoint);
     
     // Add color stops
-    for (const auto& stop : gradient.color_points) {
-        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
+    for (const auto& stop : gradient.color_stops) {
+        linearGradient.setColorAt(stop.first, webColorToQColor(stop.second));
     }
     
     // Draw the gradient
-    m_painter->fillRect(rc, qGradient);
-    
+    m_painter->save();
+    m_painter->setPen(Qt::NoPen);
+    m_painter->setBrush(linearGradient);
+    m_painter->drawRect(rect);
     m_painter->restore();
 }
 
-// Draw a radial gradient
+// Draw radial gradient
 void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient)
 {
     if (!m_painter) {
-        qWarning() << "draw_radial_gradient: Painter is null";
         return;
     }
     
-    m_painter->save();
+    QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
-    QRect rc = positionToRect(layer.clip_box);
-    m_painter->setClipRect(rc);
+    // Calculate the center point and radius
+    QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
+    qreal radius = gradient.radius_x * std::min(rect.width(), rect.height());
     
-    // Create a radial gradient using the position and radius directly from the gradient object
-    QRadialGradient qGradient(gradient.position.x, gradient.position.y, gradient.radius.x);
+    // Create the gradient
+    QRadialGradient radialGradient(centerPoint, radius);
     
     // Add color stops
-    for (const auto& stop : gradient.color_points) {
-        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
+    for (const auto& stop : gradient.color_stops) {
+        radialGradient.setColorAt(stop.first, webColorToQColor(stop.second));
     }
     
     // Draw the gradient
-    m_painter->fillRect(rc, qGradient);
-    
+    m_painter->save();
+    m_painter->setPen(Qt::NoPen);
+    m_painter->setBrush(radialGradient);
+    m_painter->drawRect(rect);
     m_painter->restore();
 }
 
-// Draw a conic gradient
+// Draw conic gradient
 void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
 {
     if (!m_painter) {
-        qWarning() << "draw_conic_gradient: Painter is null";
         return;
     }
     
-    m_painter->save();
+    QRect rect(layer.origin_box.x, layer.origin_box.y, layer.origin_box.width, layer.origin_box.height);
     
-    QRect rc = positionToRect(layer.clip_box);
-    m_painter->setClipRect(rc);
+    // Calculate the center point
+    QPointF centerPoint(rect.x() + gradient.center_x * rect.width(), rect.y() + gradient.center_y * rect.height());
     
-    // Qt uses QConicalGradient for conic gradients
-    QConicalGradient qGradient(gradient.position.x, gradient.position.y, gradient.angle);
+    // Qt doesn't have a direct conic gradient, so we'll use a QConicalGradient
+    QConicalGradient conicGradient(centerPoint, gradient.angle);
     
     // Add color stops
-    for (const auto& stop : gradient.color_points) {
-        qGradient.setColorAt(stop.offset, webColorToQColor(stop.color));
+    for (const auto& stop : gradient.color_stops) {
+        conicGradient.setColorAt(stop.first, webColorToQColor(stop.second));
     }
     
     // Draw the gradient
-    m_painter->fillRect(rc, qGradient);
-    
+    m_painter->save();
+    m_painter->setPen(Qt::NoPen);
+    m_painter->setBrush(conicGradient);
+    m_painter->drawRect(rect);
     m_painter->restore();
 }
 
-// Draw borders around an element
+// Draw borders
 void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root)
 {
     if (!m_painter) {
-        qWarning() << "draw_borders: Painter is null";
         return;
     }
     
     m_painter->save();
     
-    // Draw the borders
-    QRect borderRect = positionToRect(draw_pos);
-    
-    // Top border
+    // Draw top border
     if (borders.top.width > 0) {
         m_painter->setPen(Qt::NoPen);
         m_painter->setBrush(webColorToQColor(borders.top.color));
         m_painter->drawRect(
-            borderRect.left(),
-            borderRect.top(),
-            borderRect.width(),
+            draw_pos.x,
+            draw_pos.y,
+            draw_pos.width,
             borders.top.width
         );
     }
     
-    // Right border
+    // Draw right border
     if (borders.right.width > 0) {
         m_painter->setPen(Qt::NoPen);
         m_painter->setBrush(webColorToQColor(borders.right.color));
         m_painter->drawRect(
-            borderRect.right() - borders.right.width,
-            borderRect.top() + borders.top.width,
+            draw_pos.x + draw_pos.width - borders.right.width,
+            draw_pos.y,
             borders.right.width,
-            borderRect.height() - borders.top.width - borders.bottom.width
+            draw_pos.height
         );
     }
     
-    // Bottom border
+    // Draw bottom border
     if (borders.bottom.width > 0) {
         m_painter->setPen(Qt::NoPen);
         m_painter->setBrush(webColorToQColor(borders.bottom.color));
         m_painter->drawRect(
-            borderRect.left(),
-            borderRect.bottom() - borders.bottom.width,
-            borderRect.width(),
+            draw_pos.x,
+            draw_pos.y + draw_pos.height - borders.bottom.width,
+            draw_pos.width,
             borders.bottom.width
         );
     }
     
-    // Left border
+    // Draw left border
     if (borders.left.width > 0) {
         m_painter->setPen(Qt::NoPen);
         m_painter->setBrush(webColorToQColor(borders.left.color));
         m_painter->drawRect(
-            borderRect.left(),
-            borderRect.top() + borders.top.width,
+            draw_pos.x,
+            draw_pos.y,
             borders.left.width,
-            borderRect.height() - borders.top.width - borders.bottom.width
+            draw_pos.height
         );
     }
     
@@ -607,137 +570,128 @@ void container_qt5::set_cursor(const char* cursor)
     emit cursorChanged(cursorName);
 }
 
-// Transform text based on CSS text-transform property
+// Transform text based on the specified transformation
 void container_qt5::transform_text(litehtml::string& text, litehtml::text_transform tt)
 {
-    if (text.empty()) {
+    if (text.empty() || tt == litehtml::text_transform_none) {
         return;
     }
 
-    QString qText = QString::fromUtf8(text.c_str());
-
+    std::string& str = text;
+    
     switch (tt) {
         case litehtml::text_transform_capitalize:
-            qText = qText.at(0).toUpper() + qText.mid(1);
+            if (!str.empty()) {
+                str[0] = std::toupper(str[0]);
+            }
             break;
         case litehtml::text_transform_uppercase:
-            qText = qText.toUpper();
+            for (auto& c : str) {
+                c = std::toupper(c);
+            }
             break;
         case litehtml::text_transform_lowercase:
-            qText = qText.toLower();
+            for (auto& c : str) {
+                c = std::tolower(c);
+            }
             break;
         default:
             break;
     }
-
-    text = qText.toStdString();
 }
 
-// Import CSS for the document
+// Import CSS from external resources
 void container_qt5::import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl)
 {
-    // TODO: Implement CSS loading from external files
+    // Try to load the CSS file from resources first
     QString cssUrl = QString::fromStdString(url);
-    QFile file(cssUrl);
-    if (file.open(QFile::ReadOnly)) {
-        QByteArray data = file.readAll();
-        text = std::string(data.constData(), data.size());
+    
+    // Convert to resource path if needed
+    if (cssUrl.startsWith("://")) {
+        QFile file(cssUrl);
+        if (file.open(QIODevice::ReadOnly)) {
+            QByteArray cssData = file.readAll();
+            text = cssData.constData();
+            file.close();
+            return;
+        }
     }
+    
+    // For external CSS, we would need to implement a network request
+    // For simplicity in this example, we're just handling resource files
 }
 
-// Set clipping region
+// Set clipping rectangle
 void container_qt5::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius)
 {
-    if (!m_painter) {
-        qWarning() << "set_clip: Painter is null";
-        return;
+    if (m_painter) {
+        m_painter->save();
+        m_painter->setClipRect(QRect(pos.x, pos.y, pos.width, pos.height));
     }
-    
-    // Store the clip
-    g_clips.push_back(pos);
-    
-    // Apply the clip to the painter
-    m_painter->setClipRect(QRect(pos.x, pos.y, pos.width, pos.height), Qt::IntersectClip);
 }
 
-// Remove the current clipping region
+// Remove clipping
 void container_qt5::del_clip()
 {
-    if (!m_painter) {
-        qWarning() << "del_clip: Painter is null";
-        return;
-    }
-    
-    // Remove the last clip
-    if (!g_clips.empty()) {
-        g_clips.pop_back();
-    }
-    
-    // Reset the clip path
-    m_painter->setClipping(false);
-    
-    // Reapply remaining clips
-    for (const auto& clip : g_clips) {
-        m_painter->setClipRect(QRect(clip.x, clip.y, clip.width, clip.height), Qt::IntersectClip);
+    if (m_painter) {
+        m_painter->restore();
     }
 }
 
-// Get the current viewport dimensions
+// Get viewport position and dimensions
 void container_qt5::get_viewport(litehtml::position& viewport) const
 {
-    QRect rc = m_owner->rect();
-    viewport.x = rc.left();
-    viewport.y = rc.top();
-    viewport.width = rc.width();
-    viewport.height = rc.height();
-}
-
-// Get media features for CSS media queries
-void container_qt5::get_media_features(litehtml::media_features& media) const
-{
-    QRect rc = m_owner->rect();
-    
-    // Set up media features
-    media.width = rc.width();
-    media.height = rc.height();
-    media.device_width = rc.width();
-    media.device_height = rc.height();
-    media.color = 8; // 8 bits per color component
-    media.monochrome = 0;
-    media.resolution = 96; // 96 dpi is standard
-    
-    // Device pixel ratio for high DPI screens
-    qreal dpr = 1.0;
-    if (QGuiApplication::primaryScreen()) {
-        dpr = QGuiApplication::primaryScreen()->devicePixelRatio();
-        media.resolution = static_cast<int>(96.0 * dpr);
+    if (m_owner) {
+        QRect rc = m_owner->rect();
+        viewport.x = rc.x();
+        viewport.y = rc.y();
+        viewport.width = rc.width();
+        viewport.height = rc.height();
+    } else {
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = 1024;
+        viewport.height = 768;
     }
 }
 
-// Get language and culture for the document
+// Get media features for responsive design
+void container_qt5::get_media_features(litehtml::media_features& media) const
+{
+    if (m_owner) {
+        QRect rc = m_owner->rect();
+        
+        media.type = litehtml::media_type_screen;
+        media.width = rc.width();
+        media.height = rc.height();
+        media.device_width = QGuiApplication::primaryScreen()->size().width();
+        media.device_height = QGuiApplication::primaryScreen()->size().height();
+        media.color = 8;
+        media.monochrome = 0;
+        media.color_index = 256;
+        media.resolution = 96;
+    }
+}
+
+// Get language information for the document
 void container_qt5::get_language(litehtml::string& language, litehtml::string& culture) const
 {
     language = "en";
-    culture = "";
+    culture = "US";
 }
 
-// Create a custom element
+// Create custom elements (not used in basic implementation)
 litehtml::element::ptr container_qt5::create_element(const char* tag_name, 
                                                     const litehtml::string_map& attributes,
                                                     const std::shared_ptr<litehtml::document>& doc)
 {
-    // Let litehtml create default element
     return nullptr;
 }
 
-// Handle image loading callback
-void container_qt5::onImageLoaded(const QString& url, const QImage& image)
+// Resolve color names to actual colors
+litehtml::string container_qt5::resolve_color(const litehtml::string& color) const
 {
-    m_images[url] = image;
-    
-    if (_doc) {
-        m_owner->update();
-    }
+    return color;
 }
 
 // Drawing method
@@ -808,5 +762,15 @@ void container_qt5::on_mouse_over(std::shared_ptr<litehtml::document>& doc, int 
     litehtml::position::vector redraw_boxes;
     if (doc->on_mouse_over(x, y, x, y, redraw_boxes)) {
         // TODO: Implement redraw of specific boxes if needed
+    }
+}
+
+// Handle image loading callback
+void container_qt5::onImageLoaded(const QString& url, const QImage& image)
+{
+    m_images[url] = image;
+    
+    if (_doc && m_owner) {
+        m_owner->update();
     }
 }
