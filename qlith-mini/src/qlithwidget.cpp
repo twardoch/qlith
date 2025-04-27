@@ -117,8 +117,7 @@ public:
             // Create litehtml document
             document = litehtml::document::createFromString(
                 htmlData.constData(), 
-                container, 
-                cssData.constData()
+                container
             );
             
             if (document) {
