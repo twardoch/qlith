@@ -1,0 +1,2738 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+================================================================
+File Summary
+================================================================
+
+Purpose:
+--------
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+
+File Format:
+------------
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Multiple file entries, each consisting of:
+  a. A separator line (================)
+  b. The file path (File: path/to/file)
+  c. Another separator line
+  d. The full contents of the file
+  e. A blank line
+
+Usage Guidelines:
+-----------------
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+
+Notes:
+------
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+
+Additional Info:
+----------------
+
+================================================================
+Directory Structure
+================================================================
+browser/
+  CMakeLists.txt
+  main.cpp
+  mainwindow.cpp
+  mainwindow.h
+cmake/
+  MacOSXBundleInfo.plist.in
+  qlithConfig.cmake.in
+src/
+  CMakeLists.txt
+  container_qpainter_p.h
+  container_qpainter.cpp
+  container_qpainter.h
+  qlith_global.h
+  qlithwidget.cpp
+  qlithwidget.h
+build_macos.sh
+CMakeLists.txt
+README.md
+
+================================================================
+Files
+================================================================
+
+================
+File: browser/CMakeLists.txt
+================
+set(BROWSER_SRCS
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+)
+
+# Define browser executable
+add_executable(qlith_browser
+    MACOSX_BUNDLE
+    ${BROWSER_SRCS}
+)
+
+# Include directories
+target_include_directories(qlith_browser PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+# Link with required libraries
+target_link_libraries(qlith_browser
+    PRIVATE
+    Qt5::Widgets
+    Qt5::Network
+    Qt5::Svg
+    qlith
+)
+
+# Set application properties
+set_target_properties(qlith_browser PROPERTIES
+    OUTPUT_NAME "qlith"
+    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in"
+)
+
+# Installation
+install(TARGETS qlith_browser
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION bin
+)
+
+================
+File: browser/main.cpp
+================
+// this_file: qlith/browser/main.cpp
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QUrl>
+#include <QSurfaceFormat>
+#include <QDir>
+#include <QStandardPaths>
+
+#include "mainwindow.h"
+
+int main(int argc, char *argv[])
+{
+    // Set application information
+    QCoreApplication::setApplicationName("Qlith Browser");
+    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setOrganizationName("Qlith");
+    QCoreApplication::setOrganizationDomain("qlith.org");
+    
+    // Create application
+    QApplication app(argc, argv);
+
+    // Set up high DPI scaling
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    
+    // Set up OpenGL settings for better rendering performance
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setSamples(4);
+    QSurfaceFormat::setDefaultFormat(format);
+    
+    // Parse command line arguments
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Qlith - A lightweight HTML browser");
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("url", "The URL to open, optional.", "[url]");
+    
+    parser.process(app);
+    
+    // Create debug directory if in debug mode
+#ifdef QLITH_DEBUG_DIR
+    QDir dir(QLITH_DEBUG_DIR);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+#endif
+    
+    // Create main window
+    MainWindow mainWindow;
+    mainWindow.show();
+    
+    // Load URL if specified
+    const QStringList args = parser.positionalArguments();
+    if (!args.isEmpty()) {
+        QUrl url = QUrl::fromUserInput(args.first());
+        mainWindow.load(url);
+    } else {
+        // Load default homepage
+        QString homePage = "https://example.com";
+        mainWindow.load(QUrl(homePage));
+    }
+    
+    return app.exec();
+}
+
+================
+File: browser/mainwindow.cpp
+================
+#include "mainwindow.h"
+#include "../src/qlithwidget.h"
+
+#include <QApplication>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QLineEdit>
+#include <QLabel>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <QCloseEvent>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QMenuBar>
+#include <QMenu>
+#include <QPalette>
+#include <QPainter>
+#include <QSvgGenerator>
+#include <QDebug>
+#include <QStandardPaths>
+#include <QDir>
+#include <QDateTime>
+#include <QTextStream>
+#include <QFile>
+#include <QProgressBar>
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , m_htmlWidget(new QlithWidget(this))
+    , m_urlEdit(nullptr)
+    , m_progressBar(nullptr)
+    , m_navigationToolBar(nullptr)
+    , m_statusBar(nullptr)
+    , m_historyIndex(-1)
+    , m_zoomFactor(1.0f)
+{
+    setCentralWidget(m_htmlWidget);
+    setMinimumSize(800, 600);
+
+    setupUi();
+    setupActions();
+    setupMenus();
+    setupToolbar();
+    setupStatusBar();
+    setupConnections();
+    
+    loadSettings();
+    
+    // Load default page
+    load(QUrl("about:blank"));
+}
+
+void MainWindow::onLoadFinished(bool ok)
+{
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Ready"));
+    }
+    
+    // Update window title
+    updateTitle(QString());
+    
+    // Additional debug functionality can be re-implemented if needed
+    
+    // No need to emit loadFinished as we're responding to it
+}
+
+MainWindow::~MainWindow()
+{
+}
+
+void MainWindow::loadUrl()
+{
+    if (!m_urlEdit)
+        return;
+        
+    QString text = m_urlEdit->text().trimmed();
+    if (text.isEmpty())
+        return;
+        
+    QUrl url = QUrl::fromUserInput(text);
+    load(url);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    saveSettings();
+    event->accept();
+}
+
+void MainWindow::updateUrlBar(const QUrl& url)
+{
+    if (m_urlEdit) {
+        m_urlEdit->setText(url.toString());
+    }
+}
+
+void MainWindow::reload()
+{
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        QUrl currentUrl = m_history.at(m_historyIndex);
+        m_htmlWidget->load(currentUrl);
+    }
+}
+
+void MainWindow::goBack()
+{
+    if (m_historyIndex > 0) {
+        m_historyIndex--;
+        QUrl url = m_history.at(m_historyIndex);
+        
+        if (m_urlEdit) {
+            m_urlEdit->setText(url.toString());
+        }
+        
+        m_htmlWidget->load(url);
+        
+        // Update UI
+        if (m_backAction && m_forwardAction) {
+            m_backAction->setEnabled(m_historyIndex > 0);
+            m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+        }
+        
+        updateTitle(QString());
+    }
+}
+
+void MainWindow::goForward()
+{
+    if (m_historyIndex < m_history.size() - 1) {
+        m_historyIndex++;
+        QUrl url = m_history.at(m_historyIndex);
+        
+        if (m_urlEdit) {
+            m_urlEdit->setText(url.toString());
+        }
+        
+        m_htmlWidget->load(url);
+        
+        // Update UI
+        if (m_backAction && m_forwardAction) {
+            m_backAction->setEnabled(m_historyIndex > 0);
+            m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+        }
+        
+        updateTitle(QString());
+    }
+}
+
+void MainWindow::zoomIn()
+{
+    // Implement zoom functionality
+}
+
+void MainWindow::zoomOut()
+{
+    // Implement zoom functionality
+}
+
+void MainWindow::resetZoom()
+{
+    // Implement zoom functionality
+}
+
+void MainWindow::about()
+{
+    QMessageBox::about(this, tr("About Qlith Browser"),
+                       tr("A simple HTML browser demo using the Qlith library."));
+}
+
+void MainWindow::handleLinkClick(const QUrl &url)
+{
+    // Handle clicked links - navigate to them
+    load(url);
+}
+
+void MainWindow::updateTitle(const QString &title)
+{
+    QString windowTitle;
+    
+    if (!title.isEmpty()) {
+        windowTitle = title;
+    } else if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        windowTitle = m_history.at(m_historyIndex).toString();
+    } else {
+        windowTitle = tr("Qlith Browser");
+    }
+    
+    // Add browser name if not already there
+    if (!windowTitle.contains("Qlith Browser")) {
+        windowTitle = tr("%1 - Qlith Browser").arg(windowTitle);
+    }
+    
+    setWindowTitle(windowTitle);
+}
+
+void MainWindow::onLoadStarted()
+{
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Loading..."));
+    }
+}
+
+void MainWindow::setupConnections()
+{
+    // Connect QlithWidget signals
+    connect(m_htmlWidget, &QlithWidget::loadStarted, this, &MainWindow::onLoadStarted);
+    connect(m_htmlWidget, &QlithWidget::loadFinished, this, &MainWindow::onLoadFinished);
+    connect(m_htmlWidget, &QlithWidget::titleChanged, this, &MainWindow::updateTitle);
+    connect(m_htmlWidget, &QlithWidget::linkClicked, this, &MainWindow::handleLinkClick);
+    
+    // Connect URL bar
+    if (m_urlEdit) {
+        connect(m_urlEdit, &QLineEdit::returnPressed, this, &MainWindow::loadUrl);
+    }
+    
+    // Connect actions
+    if (m_backAction) {
+        connect(m_backAction, &QAction::triggered, this, &MainWindow::goBack);
+    }
+    
+    if (m_forwardAction) {
+        connect(m_forwardAction, &QAction::triggered, this, &MainWindow::goForward);
+    }
+    
+    if (m_reloadAction) {
+        connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reload);
+    }
+    
+    if (m_stopAction) {
+        connect(m_stopAction, &QAction::triggered, this, &MainWindow::stop);
+    }
+}
+
+void MainWindow::load(const QUrl& url)
+{
+    if (!url.isValid())
+        return;
+        
+    if (m_urlEdit) {
+        m_urlEdit->setText(url.toString());
+    }
+    
+    m_htmlWidget->load(url);
+    
+    // Add to history
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size() - 1) {
+        // Remove forward history if we navigate from a point in history
+        m_history.erase(m_history.begin() + m_historyIndex + 1, m_history.end());
+    }
+    
+    m_history.append(url);
+    // Limit history size
+    while (m_history.size() > 100) {
+        m_history.removeFirst();
+    }
+    m_historyIndex = m_history.size() - 1;
+    
+    // Update UI
+    if (m_backAction && m_forwardAction) {
+        m_backAction->setEnabled(m_historyIndex > 0);
+        m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+    }
+}
+
+void MainWindow::stop()
+{
+    if (m_htmlWidget) {
+        m_htmlWidget->stop();
+    }
+    
+    // Update status bar
+    if (m_statusBar) {
+        m_statusBar->showMessage(tr("Stopped"));
+    }
+}
+
+void MainWindow::setupUi()
+{
+    // Main widget is already set in constructor
+    // Additional UI setup if needed
+}
+
+void MainWindow::setupActions()
+{
+    m_backAction = new QAction(tr("Back"), this);
+    m_backAction->setIcon(QIcon::fromTheme("go-previous"));
+    m_backAction->setShortcut(QKeySequence::Back);
+    m_backAction->setToolTip(tr("Go back to previous page"));
+    
+    m_forwardAction = new QAction(tr("Forward"), this);
+    m_forwardAction->setIcon(QIcon::fromTheme("go-next"));
+    m_forwardAction->setShortcut(QKeySequence::Forward);
+    m_forwardAction->setToolTip(tr("Go forward to next page"));
+    
+    m_reloadAction = new QAction(tr("Reload"), this);
+    m_reloadAction->setIcon(QIcon::fromTheme("view-refresh"));
+    m_reloadAction->setShortcut(QKeySequence::Refresh);
+    m_reloadAction->setToolTip(tr("Reload current page"));
+    
+    m_stopAction = new QAction(tr("Stop"), this);
+    m_stopAction->setIcon(QIcon::fromTheme("process-stop"));
+    m_stopAction->setShortcut(Qt::Key_Escape);
+    m_stopAction->setToolTip(tr("Stop loading page"));
+    
+    m_viewSourceAction = new QAction(tr("View Source"), this);
+    m_viewSourceAction->setToolTip(tr("View page source"));
+    
+    m_zoomInAction = new QAction(tr("Zoom In"), this);
+    m_zoomInAction->setIcon(QIcon::fromTheme("zoom-in"));
+    m_zoomInAction->setShortcut(QKeySequence::ZoomIn);
+    
+    m_zoomOutAction = new QAction(tr("Zoom Out"), this);
+    m_zoomOutAction->setIcon(QIcon::fromTheme("zoom-out"));
+    m_zoomOutAction->setShortcut(QKeySequence::ZoomOut);
+    
+    m_resetZoomAction = new QAction(tr("Reset Zoom"), this);
+    m_resetZoomAction->setIcon(QIcon::fromTheme("zoom-original"));
+    m_resetZoomAction->setShortcut(QKeySequence(tr("Ctrl+0")));
+    
+    m_exitAction = new QAction(tr("Exit"), this);
+    m_exitAction->setShortcut(QKeySequence::Quit);
+    connect(m_exitAction, &QAction::triggered, this, &QWidget::close);
+    
+    m_aboutAction = new QAction(tr("About"), this);
+    connect(m_aboutAction, &QAction::triggered, this, &MainWindow::about);
+    
+    // Update initial state
+    m_backAction->setEnabled(false);
+    m_forwardAction->setEnabled(false);
+}
+
+void MainWindow::setupMenus()
+{
+    m_fileMenu = menuBar()->addMenu(tr("&File"));
+    m_fileMenu->addAction(m_exitAction);
+    
+    m_viewMenu = menuBar()->addMenu(tr("&View"));
+    m_viewMenu->addAction(m_backAction);
+    m_viewMenu->addAction(m_forwardAction);
+    m_viewMenu->addAction(m_reloadAction);
+    m_viewMenu->addAction(m_stopAction);
+    m_viewMenu->addSeparator();
+    m_viewMenu->addAction(m_zoomInAction);
+    m_viewMenu->addAction(m_zoomOutAction);
+    m_viewMenu->addAction(m_resetZoomAction);
+    m_viewMenu->addSeparator();
+    m_viewMenu->addAction(m_viewSourceAction);
+    
+    m_helpMenu = menuBar()->addMenu(tr("&Help"));
+    m_helpMenu->addAction(m_aboutAction);
+}
+
+void MainWindow::setupToolbar()
+{
+    m_navigationToolBar = addToolBar(tr("Navigation"));
+    m_navigationToolBar->addAction(m_backAction);
+    m_navigationToolBar->addAction(m_forwardAction);
+    m_navigationToolBar->addAction(m_reloadAction);
+    m_navigationToolBar->addAction(m_stopAction);
+    
+    // Add URL bar
+    m_urlEdit = new QLineEdit(this);
+    m_urlEdit->setClearButtonEnabled(true);
+    m_urlEdit->setPlaceholderText(tr("Enter URL..."));
+    m_navigationToolBar->addWidget(m_urlEdit);
+}
+
+void MainWindow::setupStatusBar()
+{
+    m_statusBar = statusBar();
+    m_statusBar->showMessage(tr("Ready"));
+    
+    // Add progress bar
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->setMaximumWidth(150);
+    m_progressBar->setMaximumHeight(16);
+    m_progressBar->setVisible(false);
+    m_statusBar->addPermanentWidget(m_progressBar);
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+    
+    // Window geometry
+    const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    }
+    
+    // Start URL
+    m_startUrl = settings.value("startUrl", QUrl("about:blank")).toUrl();
+    if (m_startUrl.isValid()) {
+        load(m_startUrl);
+    }
+}
+
+void MainWindow::saveSettings()
+{
+    QSettings settings;
+    
+    // Window geometry
+    settings.setValue("geometry", saveGeometry());
+    
+    // Current URL
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        settings.setValue("startUrl", m_history.at(m_historyIndex));
+    }
+}
+
+void MainWindow::viewSource()
+{
+    // Simple implementation to view the HTML source
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        // Get the HTML from the current page
+        // This would require access to the raw HTML content
+        QMessageBox::information(this, tr("View Source"), 
+                              tr("View source not implemented yet."));
+    }
+}
+
+================
+File: browser/mainwindow.h
+================
+// this_file: qlith/browser/mainwindow.h
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QUrl>
+
+class QLineEdit;
+class QProgressBar;
+class QlithWidget;
+class QAction;
+class QToolBar;
+class QStatusBar;
+class QMenu;
+
+/**
+ * @brief The MainWindow class provides the main browser window for the qlith browser.
+ * 
+ * This class represents the main window of the browser application, containing
+ * a QlithWidget for rendering HTML content, navigation controls, and other browser
+ * functionality.
+ */
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief Constructs a MainWindow.
+     * @param parent The parent widget.
+     */
+    explicit MainWindow(QWidget* parent = nullptr);
+    
+    /**
+     * @brief Destroys the MainWindow.
+     */
+    ~MainWindow() override;
+    
+    /**
+     * @brief Load content from a URL.
+     * @param url The URL to load.
+     */
+    void load(const QUrl& url);
+
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
+private slots:
+    void loadUrl();
+    void updateUrlBar(const QUrl& url);
+    void updateTitle(const QString& title);
+    void handleLinkClick(const QUrl& url);
+    void onLoadStarted();
+    void onLoadFinished(bool ok);
+    
+    // Actions
+    void goBack();
+    void goForward();
+    void reload();
+    void stop();
+    void zoomIn();
+    void zoomOut();
+    void resetZoom();
+    void viewSource();
+    void about();
+
+private:
+    void setupUi();
+    void setupActions();
+    void setupMenus();
+    void setupToolbar();
+    void setupStatusBar();
+    void setupConnections();
+    void loadSettings();
+    void saveSettings();
+    
+    QlithWidget* m_htmlWidget;
+    QLineEdit* m_urlEdit;
+    QProgressBar* m_progressBar;
+    QToolBar* m_navigationToolBar;
+    QStatusBar* m_statusBar;
+    
+    // Actions
+    QAction* m_backAction;
+    QAction* m_forwardAction;
+    QAction* m_reloadAction;
+    QAction* m_stopAction;
+    QAction* m_zoomInAction;
+    QAction* m_zoomOutAction;
+    QAction* m_resetZoomAction;
+    QAction* m_viewSourceAction;
+    QAction* m_exitAction;
+    QAction* m_aboutAction;
+    
+    // Menus
+    QMenu* m_fileMenu;
+    QMenu* m_viewMenu;
+    QMenu* m_helpMenu;
+    
+    float m_zoomFactor;
+    QUrl m_startUrl;
+    QList<QUrl> m_history;
+    int m_historyIndex;
+};
+
+#endif // MAINWINDOW_H
+
+================
+File: cmake/MacOSXBundleInfo.plist.in
+================
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+	<key>CFBundleGetInfoString</key>
+	<string>${MACOSX_BUNDLE_INFO_STRING}</string>
+	<key>CFBundleIconFile</key>
+	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.qlith.browser</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+	<key>CFBundleName</key>
+	<string>qlith</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+</dict>
+</plist>
+
+================
+File: cmake/qlithConfig.cmake.in
+================
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt5Widgets)
+find_dependency(Qt5Network)
+find_dependency(ZLIB)
+find_dependency(litehtml)
+
+include("${CMAKE_CURRENT_LIST_DIR}/qlithTargets.cmake")
+
+================
+File: src/CMakeLists.txt
+================
+set(QLITH_LIB_SRCS
+    qlithwidget.cpp
+    container_qpainter.cpp
+    qlithwidget.h
+    qlith_global.h
+    container_qpainter.h
+    container_qpainter_p.h
+)
+
+# Create qlith library
+add_library(qlith SHARED ${QLITH_LIB_SRCS})
+
+target_compile_definitions(qlith PRIVATE QLITH_LIBRARY)
+
+# Include directories
+target_include_directories(qlith 
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${ZLIB_INCLUDE_DIRS}
+)
+
+# Link with Qt, litehtml and zlib
+target_link_libraries(qlith
+    PUBLIC
+        Qt5::Widgets
+        Qt5::Network
+        litehtml
+    PRIVATE
+        ${ZLIB_LIBRARIES}
+)
+
+# Set output properties
+set_target_properties(qlith PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    EXPORT_NAME "qlith"
+)
+
+# Generate export header
+include(GenerateExportHeader)
+generate_export_header(qlith
+    EXPORT_FILE_NAME qlith_export.h
+)
+
+# Installation
+install(TARGETS qlith
+    EXPORT qlithTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+install(FILES
+    qlithwidget.h
+    qlith_global.h
+    container_qpainter.h
+    ${CMAKE_CURRENT_BINARY_DIR}/qlith_export.h
+    DESTINATION include/qlith
+)
+
+# Export targets
+install(EXPORT qlithTargets
+    FILE qlithTargets.cmake
+    NAMESPACE qlith::
+    DESTINATION lib/cmake/qlith
+)
+
+# Create and install config file
+configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/qlithConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/qlithConfig.cmake
+    @ONLY
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/qlithConfig.cmake
+    ${CMAKE_BINARY_DIR}/qlithConfigVersion.cmake
+    DESTINATION lib/cmake/qlith
+)
+
+================
+File: src/container_qpainter_p.h
+================
+// this_file: qlith/src/container_qpainter_p.h
+#ifndef CONTAINER_QPAINTER_P_H
+#define CONTAINER_QPAINTER_P_H
+
+#include <QFont>
+#include <QFontMetrics>
+#include <QMap>
+#include <QString>
+
+// Font information cache
+struct font_metrics_t
+{
+    QFont font;
+    QFontMetrics metrics;
+    
+    font_metrics_t() : metrics(font) {}
+    font_metrics_t(const QFont& f) : font(f), metrics(font) {}
+};
+
+#endif // CONTAINER_QPAINTER_P_H
+
+================
+File: src/container_qpainter.cpp
+================
+// this_file: qlith-mini/src/container_qpainter.cpp
+#include "container_qpainter.h"
+#include "container_qpainter_p.h"
+
+#include <QApplication>
+#include <QDebug>
+#include <QDir>
+#include <QFontDatabase>
+#include <QFontMetrics>
+#include <QPainter>
+#include <QScreen>
+#include <QUrl>
+#include <QFile>
+
+// Default font settings
+static const int DEFAULT_FONT_SIZE = 16;
+static const QString DEFAULT_FONT_FAMILY = "Arial";
+
+// Constructor
+ContainerQPainter::ContainerQPainter(QObject* parent)
+    : QObject(parent)
+    , m_painter(nullptr)
+    , m_devicePixelRatio(1.0)
+    , m_defaultFontName(DEFAULT_FONT_FAMILY)
+    , m_defaultFontSize(DEFAULT_FONT_SIZE)
+    , m_nextFontId(1)
+{
+    // Initialize with system fonts
+    QFontDatabase fontDb;
+    if (fontDb.families().contains("Arial")) {
+        m_defaultFontName = "Arial";
+    } else if (fontDb.families().contains("Helvetica")) {
+        m_defaultFontName = "Helvetica";
+    } else if (!fontDb.families().isEmpty()) {
+        m_defaultFontName = fontDb.families().first();
+    }
+    
+    // Get device pixel ratio from primary screen
+    if (QApplication::primaryScreen()) {
+        m_devicePixelRatio = QApplication::primaryScreen()->devicePixelRatio();
+    }
+}
+
+// Destructor
+ContainerQPainter::~ContainerQPainter()
+{
+    // Clean up any remaining resources
+    m_images.clear();
+    m_fonts.clear();
+}
+
+// Set the base URL for resolving relative paths
+void ContainerQPainter::setBaseUrl(const QString& baseUrl)
+{
+    m_baseUrl = baseUrl;
+}
+
+// Get the current base URL
+QString ContainerQPainter::baseUrl() const
+{
+    return m_baseUrl;
+}
+
+// Set the device pixel ratio for high-DPI screens
+void ContainerQPainter::setDevicePixelRatio(qreal ratio)
+{
+    m_devicePixelRatio = ratio;
+}
+
+// Get the current device pixel ratio
+qreal ContainerQPainter::devicePixelRatio() const
+{
+    return m_devicePixelRatio;
+}
+
+// Set the default font name
+void ContainerQPainter::setDefaultFontName(const QString& fontName)
+{
+    m_defaultFontName = fontName;
+}
+
+// Get the default font name
+QString ContainerQPainter::defaultFontName() const
+{
+    return m_defaultFontName;
+}
+
+// Set the default font size
+void ContainerQPainter::setDefaultFontSize(int size)
+{
+    m_defaultFontSize = size;
+}
+
+// Get the default font size
+int ContainerQPainter::defaultFontSize() const
+{
+    return m_defaultFontSize;
+}
+
+// Start painting on the given QPainter
+void ContainerQPainter::beginPaint(QPainter* painter, const QRect& rect)
+{
+    m_painter = painter;
+    m_paintRect = rect;
+    
+    if (m_painter) {
+        m_painter->save();
+        m_painter->setClipRect(m_paintRect);
+    }
+}
+
+// Finish painting
+void ContainerQPainter::endPaint()
+{
+    if (m_painter) {
+        m_painter->restore();
+        m_painter = nullptr;
+    }
+}
+
+// Create a font for use with the container
+litehtml::uint_ptr ContainerQPainter::create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+{
+    // Create a QFont from the parameters
+    QFont font;
+    font.setFamily(QString::fromUtf8(descr.family.c_str()));
+    font.setPixelSize(descr.size);
+    font.setWeight(descr.weight);
+    font.setItalic(descr.style == litehtml::font_style_italic);
+    font.setUnderline(descr.decoration_line & litehtml::text_decoration_line_underline);
+    font.setStrikeOut(descr.decoration_line & litehtml::text_decoration_line_line_through);
+    
+    // Store font metrics
+    font_metrics_t metrics(font);
+    
+    // Fill in the metrics if requested
+    if (fm) {
+        QFontMetrics qfm(font);
+        fm->height = qfm.height();
+        fm->ascent = qfm.ascent();
+        fm->descent = qfm.descent();
+        fm->x_height = qfm.boundingRect('x').height();
+    }
+    
+    // Store the font and assign an ID
+    int fontId = m_nextFontId++;
+    m_fonts[fontId] = metrics;
+    
+    return static_cast<litehtml::uint_ptr>(fontId);
+}
+
+// Delete a font created with create_font
+void ContainerQPainter::delete_font(litehtml::uint_ptr hFont)
+{
+    int fontId = static_cast<int>(hFont);
+    m_fonts.remove(fontId);
+}
+
+// Get text width for measurement
+int ContainerQPainter::text_width(const char* text, litehtml::uint_ptr hFont)
+{
+    int fontId = static_cast<int>(hFont);
+    if (!m_fonts.contains(fontId)) {
+        return 0;
+    }
+    
+    const font_metrics_t& metrics = m_fonts[fontId];
+    return metrics.metrics.horizontalAdvance(QString::fromUtf8(text));
+}
+
+// Draw text with the given font and color
+void ContainerQPainter::draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos)
+{
+    if (!m_painter) return;
+    
+    int fontId = static_cast<int>(hFont);
+    if (!m_fonts.contains(fontId)) {
+        return;
+    }
+    
+    // Set up painter
+    m_painter->save();
+    m_painter->setPen(QColor(color.red, color.green, color.blue, color.alpha));
+    m_painter->setFont(m_fonts[fontId].font);
+    
+    // Draw the text
+    const QFontMetrics& metrics = m_fonts[fontId].metrics;
+    m_painter->drawText(pos.x, pos.y + metrics.ascent(), QString::fromUtf8(text));
+    
+    m_painter->restore();
+}
+
+// Convert points to pixels
+int ContainerQPainter::pt_to_px(int pt) const
+{
+    // Standard conversion: 1 point = 1/72 inch
+    // Use device pixel ratio for high DPI screens
+    return static_cast<int>(pt * m_devicePixelRatio * (96.0 / 72.0));
+}
+
+// Get the default font size
+int ContainerQPainter::get_default_font_size() const
+{
+    return m_defaultFontSize;
+}
+
+// Get the default font name
+const char* ContainerQPainter::get_default_font_name() const
+{
+    static QByteArray fontName;
+    fontName = m_defaultFontName.toUtf8();
+    return fontName.constData();
+}
+
+// Draw list marker (bullet, number, etc.)
+void ContainerQPainter::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    // Draw based on marker type
+    QColor markerColor(marker.color.red, marker.color.green, marker.color.blue, marker.color.alpha);
+    m_painter->setPen(markerColor);
+    m_painter->setBrush(markerColor);
+    
+    if (marker.image.empty()) {
+        // Draw the marker based on type
+        QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
+        
+        switch (marker.marker_type) {
+            case litehtml::list_style_type_circle:
+                m_painter->drawEllipse(rect);
+                break;
+                
+            case litehtml::list_style_type_disc:
+                m_painter->setBrush(markerColor);
+                m_painter->drawEllipse(rect);
+                break;
+                
+            case litehtml::list_style_type_square:
+                m_painter->drawRect(rect);
+                break;
+                
+            default:
+                // For other types (decimal, alpha, roman, etc.), draw the text
+                if (marker.index >= 0) {
+                    QString indexStr = QString::number(marker.index);
+                    m_painter->drawText(rect, Qt::AlignCenter, indexStr);
+                }
+                break;
+        }
+    } else {
+        // Draw an image marker if available
+        QString imgUrl = QString::fromUtf8(marker.image.c_str());
+        if (m_images.contains(imgUrl)) {
+            QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
+            m_painter->drawImage(rect, m_images[imgUrl]);
+        }
+    }
+    
+    m_painter->restore();
+}
+
+// Load image from URL
+void ContainerQPainter::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
+{
+    QString url = QString::fromUtf8(src);
+    QString base = QString::fromUtf8(baseurl);
+    
+    // Resolve relative URLs
+    QUrl resolvedUrl;
+    if (QUrl(url).isRelative() && !base.isEmpty()) {
+        resolvedUrl = QUrl(base).resolved(QUrl(url));
+    } else {
+        resolvedUrl = QUrl(url);
+    }
+    
+    QString urlString = resolvedUrl.toString();
+    
+    // Skip if already loaded
+    if (m_images.contains(urlString)) {
+        return;
+    }
+    
+    // For local files, load directly
+    if (resolvedUrl.isLocalFile()) {
+        QImage img(resolvedUrl.toLocalFile());
+        if (!img.isNull()) {
+            m_images[urlString] = img;
+            if (redraw_on_ready) {
+                // Emit a signal or update UI if needed
+            }
+        }
+    } else {
+        // For remote URLs, we'd need to implement network fetching
+        // For now, just log that we need to implement this
+        qDebug() << "Remote image loading not implemented for:" << urlString;
+    }
+}
+
+// Get image size for layout
+void ContainerQPainter::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
+{
+    QString url = QString::fromUtf8(src);
+    QString base = QString::fromUtf8(baseurl);
+    
+    // Resolve URL
+    QUrl resolvedUrl;
+    if (QUrl(url).isRelative() && !base.isEmpty()) {
+        resolvedUrl = QUrl(base).resolved(QUrl(url));
+    } else {
+        resolvedUrl = QUrl(url);
+    }
+    
+    QString urlString = resolvedUrl.toString();
+    
+    // If image is loaded, get its size
+    if (m_images.contains(urlString)) {
+        const QImage& img = m_images[urlString];
+        sz.width = img.width();
+        sz.height = img.height();
+    } else {
+        // Default size if image not loaded yet
+        sz.width = 0;
+        sz.height = 0;
+    }
+}
+
+// Draw image background
+void ContainerQPainter::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QString imgUrl = QString::fromStdString(url);
+    if (m_images.contains(imgUrl)) {
+        const QImage& img = m_images[imgUrl];
+        
+        QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+        m_painter->setClipRect(clipRect);
+        
+        // Calculate image position and size based on background-position and background-size
+        // In this simplified implementation, we just place it at the origin_box position
+        QRect imgRect(layer.origin_box.x, layer.origin_box.y, img.width(), img.height());
+        
+        // Handle different background-repeat values
+        if (layer.repeat == litehtml::background_repeat_no_repeat) {
+            m_painter->drawImage(imgRect, img);
+        } else if (layer.repeat == litehtml::background_repeat_repeat_x) {
+            for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                m_painter->drawImage(QRect(x, layer.origin_box.y, img.width(), img.height()), img);
+            }
+        } else if (layer.repeat == litehtml::background_repeat_repeat_y) {
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                m_painter->drawImage(QRect(layer.origin_box.x, y, img.width(), img.height()), img);
+            }
+        } else if (layer.repeat == litehtml::background_repeat_repeat) {
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                    m_painter->drawImage(QRect(x, y, img.width(), img.height()), img);
+                }
+            }
+        }
+    }
+    
+    m_painter->restore();
+}
+
+// Draw solid fill background
+void ContainerQPainter::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QColor bgColor(color.red, color.green, color.blue, color.alpha);
+    m_painter->fillRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height, bgColor);
+    
+    m_painter->restore();
+}
+
+// Draw linear gradient
+void ContainerQPainter::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Create a linear gradient
+    QLinearGradient qgradient;
+    qgradient.setStart(gradient.start.x, gradient.start.y);
+    qgradient.setFinalStop(gradient.end.x, gradient.end.y);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+}
+
+// Draw radial gradient
+void ContainerQPainter::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Create a radial gradient
+    QRadialGradient qgradient(gradient.position.x, gradient.position.y, gradient.radius.x);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+}
+
+// Draw conic gradient (not fully supported in Qt, approximated)
+void ContainerQPainter::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
+{
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Qt doesn't have direct support for conic gradients. This is a simplified implementation.
+    // For a more accurate implementation, we would need to draw a custom shader or image.
+    QConicalGradient qgradient(gradient.position.x, gradient.position.y, gradient.angle);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+}
+
+// Draw borders
+void ContainerQPainter::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root)
+{
+    if (!m_painter || root) return;
+    
+    m_painter->save();
+    
+    QRect borderRect(draw_pos.x, draw_pos.y, draw_pos.width, draw_pos.height);
+    
+    // Draw top border
+    if (borders.top.width > 0 && borders.top.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.top.color.red, borders.top.color.green, borders.top.color.blue, borders.top.color.alpha));
+        pen.setWidth(borders.top.width);
+        
+        switch (borders.top.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left(), borderRect.top() + borders.top.width/2, 
+                            borderRect.right(), borderRect.top() + borders.top.width/2);
+    }
+    
+    // Draw right border
+    if (borders.right.width > 0 && borders.right.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.right.color.red, borders.right.color.green, borders.right.color.blue, borders.right.color.alpha));
+        pen.setWidth(borders.right.width);
+        
+        switch (borders.right.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.right() - borders.right.width/2, borderRect.top(), 
+                            borderRect.right() - borders.right.width/2, borderRect.bottom());
+    }
+    
+    // Draw bottom border
+    if (borders.bottom.width > 0 && borders.bottom.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.bottom.color.red, borders.bottom.color.green, borders.bottom.color.blue, borders.bottom.color.alpha));
+        pen.setWidth(borders.bottom.width);
+        
+        switch (borders.bottom.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left(), borderRect.bottom() - borders.bottom.width/2, 
+                            borderRect.right(), borderRect.bottom() - borders.bottom.width/2);
+    }
+    
+    // Draw left border
+    if (borders.left.width > 0 && borders.left.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.left.color.red, borders.left.color.green, borders.left.color.blue, borders.left.color.alpha));
+        pen.setWidth(borders.left.width);
+        
+        switch (borders.left.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left() + borders.left.width/2, borderRect.top(), 
+                            borderRect.left() + borders.left.width/2, borderRect.bottom());
+    }
+    
+    m_painter->restore();
+}
+
+// Get viewport dimensions
+void ContainerQPainter::get_viewport(litehtml::position& viewport) const
+{
+    if (m_painter) {
+        QRect viewRect = m_painter->viewport();
+        viewport.x = viewRect.x();
+        viewport.y = viewRect.y();
+        viewport.width = viewRect.width();
+        viewport.height = viewRect.height();
+    } else {
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = 800;  // Default fallback width
+        viewport.height = 600; // Default fallback height
+    }
+}
+
+// Get media features for media queries
+void ContainerQPainter::get_media_features(litehtml::media_features& media) const
+{
+    QRect screenRect;
+    
+    if (QApplication::primaryScreen()) {
+        screenRect = QApplication::primaryScreen()->geometry();
+    } else {
+        // Fallback if no screen is available
+        screenRect = QRect(0, 0, 1024, 768);
+    }
+    
+    media.type = litehtml::media_type_screen;
+    media.width = screenRect.width();
+    media.height = screenRect.height();
+    media.device_width = screenRect.width();
+    media.device_height = screenRect.height();
+    media.color = 24; // Assume 24-bit color
+    media.monochrome = 0;
+    media.color_index = 0;
+    media.resolution = 96; // Standard resolution
+    
+    // Apply device pixel ratio for high DPI screens
+    if (m_devicePixelRatio > 1.0) {
+        media.resolution = static_cast<int>(media.resolution * m_devicePixelRatio);
+    }
+}
+
+// Handle document title
+void ContainerQPainter::set_caption(const char* caption)
+{
+    QString title = QString::fromUtf8(caption);
+    emit titleChanged(title);
+}
+
+// Set base URL for document
+void ContainerQPainter::set_base_url(const char* base_url)
+{
+    m_baseUrl = QString::fromUtf8(base_url);
+}
+
+// Handle document link elements
+void ContainerQPainter::link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el)
+{
+    // Implementation for link processing if needed
+}
+
+// Handle anchor clicks
+void ContainerQPainter::on_anchor_click(const char* url, const litehtml::element::ptr& el)
+{
+    QString linkUrl = QString::fromUtf8(url);
+    emit anchorClicked(linkUrl);
+}
+
+// Handle mouse events
+void ContainerQPainter::on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event)
+{
+    // Implementation for mouse events if needed
+}
+
+// Set cursor based on element
+void ContainerQPainter::set_cursor(const char* cursor)
+{
+    QString cursorName = QString::fromUtf8(cursor);
+    emit cursorChanged(cursorName);
+}
+
+// Transform text based on CSS text-transform
+void ContainerQPainter::transform_text(litehtml::string& text, litehtml::text_transform tt)
+{
+    if (text.empty()) return;
+    
+    QString qtext = QString::fromUtf8(text.c_str());
+    
+    switch (tt) {
+        case litehtml::text_transform_capitalize:
+            qtext = qtext.toLower();
+            if (!qtext.isEmpty()) {
+                qtext[0] = qtext[0].toUpper();
+            }
+            break;
+            
+        case litehtml::text_transform_uppercase:
+            qtext = qtext.toUpper();
+            break;
+            
+        case litehtml::text_transform_lowercase:
+            qtext = qtext.toLower();
+            break;
+            
+        default:
+            break;
+    }
+    
+    QByteArray utf8 = qtext.toUtf8();
+    text = std::string(utf8.constData(), utf8.length());
+}
+
+// Import CSS from URL
+void ContainerQPainter::import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl)
+{
+    // Implementation for CSS loading if needed
+    // For now, just leave it empty
+}
+
+// Set clipping region
+void ContainerQPainter::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius)
+{
+    if (!m_painter) return;
+    
+    QRect clipRect(pos.x, pos.y, pos.width, pos.height);
+    m_painter->setClipRect(clipRect, Qt::IntersectClip);
+}
+
+// Remove clipping
+void ContainerQPainter::del_clip()
+{
+    // QPainter handles clipping stack via save/restore, so we don't need explicit implementation
+}
+
+// Get language settings
+void ContainerQPainter::get_language(litehtml::string& language, litehtml::string& culture) const
+{
+    // Use the system locale for language
+    QLocale locale = QLocale::system();
+    
+    // Convert language code to string
+    language = locale.name().left(2).toStdString(); // e.g., "en"
+    culture = locale.name().toStdString();          // e.g., "en_US"
+}
+
+// Create custom element
+litehtml::element::ptr ContainerQPainter::create_element(const char* tag_name, 
+                                                        const litehtml::string_map& attributes,
+                                                        const std::shared_ptr<litehtml::document>& doc)
+{
+    // We don't need to create custom elements, let litehtml handle it
+    return nullptr;
+}
+
+// Callback for image loading
+void ContainerQPainter::onImageLoaded(const QString& url, const QImage& image)
+{
+    if (!image.isNull()) {
+        m_images[url] = image;
+    }
+}
+
+// Callback for CSS loading
+void ContainerQPainter::onCssLoaded(const QString& url, const QString& css)
+{
+    // Implementation for CSS loading callback if needed
+}
+
+================
+File: src/container_qpainter.h
+================
+// this_file: qlith/src/container_qpainter.h
+#ifndef CONTAINER_QPAINTER_H
+#define CONTAINER_QPAINTER_H
+
+#include <QColor>
+#include <QFont>
+#include <QFontMetrics>
+#include <QImage>
+#include <QMap>
+#include <QObject>
+#include <QPainter>
+#include <QRect>
+#include <QUrl>
+
+#include <litehtml/document.h>
+#include <litehtml/document_container.h>
+
+class ContainerQPainter : public QObject, public litehtml::document_container
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief Constructs a ContainerQPainter object.
+     * @param parent The parent QObject.
+     */
+    explicit ContainerQPainter(QObject* parent = nullptr);
+    
+    /**
+     * @brief Destroys the ContainerQPainter object.
+     */
+    ~ContainerQPainter() override;
+
+    /**
+     * @brief Set the base URL for resolving relative paths.
+     * @param baseUrl The base URL to use.
+     */
+    void setBaseUrl(const QString& baseUrl);
+    
+    /**
+     * @brief Get the current base URL.
+     * @return The base URL.
+     */
+    QString baseUrl() const;
+    
+    /**
+     * @brief Set the device pixel ratio for high-DPI screens.
+     * @param ratio The device pixel ratio.
+     */
+    void setDevicePixelRatio(qreal ratio);
+    
+    /**
+     * @brief Get the current device pixel ratio.
+     * @return The device pixel ratio.
+     */
+    qreal devicePixelRatio() const;
+    
+    /**
+     * @brief Set the default font name.
+     * @param fontName The default font name.
+     */
+    void setDefaultFontName(const QString& fontName);
+    
+    /**
+     * @brief Get the default font name.
+     * @return The default font name.
+     */
+    QString defaultFontName() const;
+    
+    /**
+     * @brief Set the default font size.
+     * @param size The default font size in pixels.
+     */
+    void setDefaultFontSize(int size);
+    
+    /**
+     * @brief Get the default font size.
+     * @return The default font size in pixels.
+     */
+    int defaultFontSize() const;
+    
+    /**
+     * @brief Start painting on the given QPainter.
+     * @param painter The QPainter to use for rendering.
+     * @param rect The rectangle to paint in.
+     */
+    void beginPaint(QPainter* painter, const QRect& rect);
+    
+    /**
+     * @brief Finish painting.
+     */
+    void endPaint();
+
+    // litehtml::document_container implementation
+    litehtml::uint_ptr create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm) override;
+    void delete_font(litehtml::uint_ptr hFont) override;
+    int text_width(const char* text, litehtml::uint_ptr hFont) override;
+    void draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override;
+    int pt_to_px(int pt) const override;
+    int get_default_font_size() const override;
+    const char* get_default_font_name() const override;
+    void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override;
+    void load_image(const char* src, const char* baseurl, bool redraw_on_ready) override;
+    void get_image_size(const char* src, const char* baseurl, litehtml::size& sz) override;
+    void draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url) override;
+    void draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color) override;
+    void draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient) override;
+    void draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient) override;
+    void draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient) override;
+    void draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root) override;
+    void get_viewport(litehtml::position& viewport) const override;
+    void get_media_features(litehtml::media_features& media) const override;
+    void set_caption(const char* caption) override;
+    void set_base_url(const char* base_url) override;
+    void link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el) override;
+    void on_anchor_click(const char* url, const litehtml::element::ptr& el) override;
+    void on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event) override;
+    void set_cursor(const char* cursor) override;
+    void transform_text(litehtml::string& text, litehtml::text_transform tt) override;
+    void import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl) override;
+    void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) override;
+    void del_clip() override;
+    void get_language(litehtml::string& language, litehtml::string& culture) const override;
+    litehtml::element::ptr create_element(const char* tag_name, 
+                                          const litehtml::string_map& attributes,
+                                          const std::shared_ptr<litehtml::document>& doc) override;
+
+    // URL resolving and resource loading
+    void onImageLoaded(const QString& url, const QImage& image);
+    void onCssLoaded(const QString& url, const QString& css);
+
+signals:
+    void titleChanged(const QString& title);
+    void anchorClicked(const QString& url);
+    void cursorChanged(const QString& cursor);
+
+private:
+    QPainter* m_painter;
+    QRect m_paintRect;
+    QString m_baseUrl;
+    qreal m_devicePixelRatio;
+    QString m_defaultFontName;
+    int m_defaultFontSize;
+    
+    QMap<QString, QImage> m_images;
+    QMap<int, struct font_metrics_t> m_fonts;
+    int m_nextFontId;
+};
+
+#endif // CONTAINER_QPAINTER_H
+
+================
+File: src/qlith_global.h
+================
+// this_file: qlith/src/qlith_global.h
+#ifndef QLITH_GLOBAL_H
+#define QLITH_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+#include "qlith_export.h"
+
+#endif // QLITH_GLOBAL_H
+
+================
+File: src/qlithwidget.cpp
+================
+#include "qlithwidget.h"
+#include "container_qpainter.h"
+
+#include <QMouseEvent>
+#include <QPainter>
+#include <QResizeEvent>
+#include <QApplication>
+#include <QMimeData>
+#include <QClipboard>
+#include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QFile>
+#include <QDir>
+#include <QUrl>
+#include <QDesktopServices>
+#include <QStandardPaths>
+#include <QDateTime>
+#include <QBuffer>
+#include <QTemporaryFile>
+#include <QLocale>
+
+// Helper function for debugging
+static void saveDebugContent(const QString &content, const QString &identifier, const QString &extension)
+{
+#ifdef QLITH_DEBUG_DIR
+    QDir dir(QLITH_DEBUG_DIR);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+    
+    // Create a filename based on the current timestamp and identifier
+    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
+    QString filename = dir.filePath(QString("%1_%2%3").arg(timestamp).arg(identifier.section('/', -1).section('?', 0, 0)).arg(extension));
+    
+    // Save content to file
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+        stream << content;
+        file.close();
+        qDebug() << "Debug content saved to" << filename;
+    } else {
+        qWarning() << "Failed to save debug content to" << filename;
+    }
+#endif
+}
+
+// Forward declaration
+class QlithWidget;
+
+// Private implementation class
+class QlithWidgetPrivate : public QObject {
+    Q_OBJECT
+public:
+    QlithWidgetPrivate(QlithWidget *owner);
+    ~QlithWidgetPrivate();
+    
+    // Content loading methods
+    void loadHtml(const QString &html, const QUrl &url);
+    void loadUrl(const QUrl &url);
+    void loadLocalFile(const QString &filePath);
+    void loadRemoteUrl(const QUrl &url);
+    
+    // Layout handling
+    void updateWithLayout();
+
+public slots:
+    // Handle network reply for assets (images, CSS, etc.)
+    void handleNetworkReply(QNetworkReply *reply);
+
+public:
+    QlithWidget *q;
+    ContainerQPainter *container;
+    QNetworkAccessManager *networkManager;
+    std::shared_ptr<litehtml::document> document;
+    QMap<QUrl, QNetworkReply*> pendingResources;
+    
+    QString currentHtml;
+    QUrl currentUrl;
+    QUrl baseUrl;
+    QColor backgroundColor;
+    QString defaultCss;
+    
+    bool loading;
+    bool needsLayout;
+};
+
+// Implementation of QlithWidgetPrivate methods
+QlithWidgetPrivate::QlithWidgetPrivate(QlithWidget *owner)
+    : QObject(owner)
+    , q(owner)
+    , container(new ContainerQPainter(owner))
+    , networkManager(new QNetworkAccessManager(owner))
+    , loading(false)
+    , needsLayout(true)
+    , currentUrl("about:blank")
+    , backgroundColor(Qt::white)
+    , defaultCss(
+        "html { background-color: white; color: black; font-family: Arial, sans-serif; }"
+        "body { margin: 8px; }"
+        "a { color: blue; text-decoration: underline; }"
+        "img { border: none; }"
+    )
+{
+    // Connect container signals
+    QObject::connect(container, &ContainerQPainter::titleChanged, 
+                    owner, &QlithWidget::titleChanged);
+    
+    QObject::connect(container, &ContainerQPainter::anchorClicked, 
+                    [this](const QString &url) {
+                        if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
+                            emit q->linkClicked(QUrl(url));
+                        } else {
+                            QUrl resolved = currentUrl.resolved(QUrl(url));
+                            emit q->linkClicked(resolved);
+                        }
+                    });
+    
+    // Connect network manager signals
+    QObject::connect(networkManager, &QNetworkAccessManager::finished,
+                    this, &QlithWidgetPrivate::handleNetworkReply);
+}
+
+QlithWidgetPrivate::~QlithWidgetPrivate() {
+    // Clear any pending requests
+    for (QNetworkReply* reply : pendingResources.values()) {
+        reply->abort();
+        reply->deleteLater();
+    }
+    pendingResources.clear();
+}
+
+// Load HTML content
+void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
+    currentHtml = html;
+    currentUrl = url;
+    
+    // Set base URL for the container
+    container->setBaseUrl(url.toString());
+    
+    // Create and render document
+    if (document) {
+        document.reset();
+    }
+    
+    // Prepare master CSS
+    QString masterCss = defaultCss;
+    
+    // Create context for litehtml
+    // Implementation depends on the litehtml version, here's a simplified approach
+    QByteArray htmlData = html.toUtf8();
+    
+    try {
+        // Create litehtml document
+        document = litehtml::document::createFromString(
+            htmlData.constData(), 
+            container
+        );
+        
+        if (document) {
+            document->render(q->width());
+            needsLayout = false;
+            q->update();
+            emit q->loadFinished(true);
+        } else {
+            qWarning() << "Failed to create litehtml document";
+            emit q->loadFinished(false);
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Exception creating document:" << e.what();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load URL
+void QlithWidgetPrivate::loadUrl(const QUrl &url) {
+    // Skip if same URL and already loaded
+    if (url == currentUrl && !needsLayout) {
+        return;
+    }
+    
+    currentUrl = url;
+    loading = true;
+    needsLayout = true;
+    
+    emit q->loadStarted();
+    
+    // Handle different URL schemes
+    if (url.scheme() == "file") {
+        loadLocalFile(url.toLocalFile());
+    } else if (url.scheme() == "http" || url.scheme() == "https") {
+        loadRemoteUrl(url);
+    } else if (url.scheme() == "about" && url.path() == "blank") {
+        loadHtml("<html><body></body></html>", url);
+    } else {
+        qWarning() << "Unsupported URL scheme:" << url.scheme();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load local file
+void QlithWidgetPrivate::loadLocalFile(const QString &filePath) {
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString html = QString::fromUtf8(file.readAll());
+        loadHtml(html, QUrl::fromLocalFile(filePath));
+    } else {
+        qWarning() << "Failed to open file:" << filePath << " - " << file.errorString();
+        emit q->loadFinished(false);
+    }
+}
+
+// Load remote URL
+void QlithWidgetPrivate::loadRemoteUrl(const QUrl &url) {
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, "Qlith/1.0");
+    
+    QNetworkReply *reply = networkManager->get(request);
+    
+    QObject::connect(reply, &QNetworkReply::finished, [this, reply, url]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+            QByteArray data = reply->readAll();
+            
+            if (contentType.contains("text/html", Qt::CaseInsensitive) || 
+                url.path().endsWith(".html", Qt::CaseInsensitive) ||
+                url.path().endsWith(".htm", Qt::CaseInsensitive)) {
+                
+                QString html = QString::fromUtf8(data);
+                loadHtml(html, url);
+            } else {
+                qWarning() << "URL did not return HTML content:" << url;
+                emit q->loadFinished(false);
+            }
+        } else {
+            qWarning() << "Failed to load URL:" << url << " - " << reply->errorString();
+            emit q->loadFinished(false);
+        }
+        
+        reply->deleteLater();
+    });
+}
+
+// Handle network reply for assets (images, CSS, etc.)
+void QlithWidgetPrivate::handleNetworkReply(QNetworkReply *reply) {
+    if (!reply) return;
+    
+    QUrl url = reply->url();
+    QString urlStr = url.toString();
+    
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        
+        // Handle based on content type
+        QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+        
+        if (contentType.startsWith("image/", Qt::CaseInsensitive) ||
+            url.path().endsWith(".png", Qt::CaseInsensitive) ||
+            url.path().endsWith(".jpg", Qt::CaseInsensitive) ||
+            url.path().endsWith(".jpeg", Qt::CaseInsensitive) ||
+            url.path().endsWith(".gif", Qt::CaseInsensitive)) {
+            
+            // Handle image
+            QImage image;
+            if (image.loadFromData(data)) {
+                container->onImageLoaded(urlStr, image);
+                q->update();
+            }
+        } else if (contentType.contains("text/css", Qt::CaseInsensitive) ||
+                  url.path().endsWith(".css", Qt::CaseInsensitive)) {
+            
+            // Handle CSS
+            QString css = QString::fromUtf8(data);
+            container->onCssLoaded(urlStr, css);
+            q->update();
+        }
+    }
+    
+    // Remove reply from pending list
+    pendingResources.remove(url);
+    reply->deleteLater();
+}
+
+// Redraw with layout if needed
+void QlithWidgetPrivate::updateWithLayout() {
+    if (needsLayout && document) {
+        document->render(q->width());
+        needsLayout = false;
+    }
+    q->update();
+}
+
+//
+// QlithWidget implementation
+//
+
+QlithWidget::QlithWidget(QWidget* parent)
+    : QWidget(parent)
+    , d_ptr(new QlithWidgetPrivate(this))
+{
+    // Set widget attributes
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+}
+
+QlithWidget::~QlithWidget()
+{
+}
+
+void QlithWidget::setHtml(const QString& html)
+{
+    Q_D(QlithWidget);
+    emit loadStarted();
+    d->loadHtml(html, d->baseUrl.isEmpty() ? QUrl("about:blank") : d->baseUrl);
+}
+
+void QlithWidget::load(const QUrl& url)
+{
+    Q_D(QlithWidget);
+    d->loadUrl(url);
+}
+
+void QlithWidget::setBaseUrl(const QUrl& url)
+{
+    Q_D(QlithWidget);
+    if (d->baseUrl != url) {
+        d->baseUrl = url;
+        d->container->setBaseUrl(url.toString());
+        emit baseUrlChanged(url);
+    }
+}
+
+QUrl QlithWidget::baseUrl() const
+{
+    Q_D(const QlithWidget);
+    return d->baseUrl;
+}
+
+void QlithWidget::setBackgroundColor(const QColor& color)
+{
+    Q_D(QlithWidget);
+    if (d->backgroundColor != color) {
+        d->backgroundColor = color;
+        update();
+        emit backgroundColorChanged(color);
+    }
+}
+
+QColor QlithWidget::backgroundColor() const
+{
+    Q_D(const QlithWidget);
+    return d->backgroundColor;
+}
+
+void QlithWidget::setDefaultStyleSheet(const QString& css)
+{
+    Q_D(QlithWidget);
+    d->defaultCss = css;
+    // Reload if we have a document
+    if (d->document) {
+        setHtml(d->currentHtml);
+    }
+}
+
+QString QlithWidget::documentTitle() const
+{
+    Q_D(const QlithWidget);
+    // This would require accessing the document title
+    // We would need to implement this with litehtml
+    return QString();
+}
+
+std::shared_ptr<litehtml::document> QlithWidget::document() const
+{
+    Q_D(const QlithWidget);
+    return d->document;
+}
+
+void QlithWidget::reload()
+{
+    Q_D(QlithWidget);
+    if (d->currentUrl.isValid()) {
+        load(d->currentUrl);
+    } else if (!d->currentHtml.isEmpty()) {
+        setHtml(d->currentHtml);
+    }
+}
+
+void QlithWidget::stop()
+{
+    Q_D(QlithWidget);
+    // Abort any ongoing network requests
+    for (QNetworkReply* reply : d->pendingResources.values()) {
+        reply->abort();
+        reply->deleteLater();
+    }
+    d->pendingResources.clear();
+    d->loading = false;
+}
+
+// Widget events
+
+void QlithWidget::paintEvent(QPaintEvent* event)
+{
+    Q_D(QlithWidget);
+    QPainter painter(this);
+    
+    // Fill background
+    painter.fillRect(rect(), d->backgroundColor);
+    
+    // Render document if available
+    if (d->document) {
+        d->container->beginPaint(&painter, rect());
+        
+        litehtml::position clip(0, 0, width(), height());
+        d->document->draw((litehtml::uint_ptr)&painter, 0, 0, &clip);
+        
+        d->container->endPaint();
+    }
+}
+
+void QlithWidget::resizeEvent(QResizeEvent* event)
+{
+    Q_D(QlithWidget);
+    if (d->document) {
+        // Mark for relayout
+        d->needsLayout = true;
+        // Layout immediately
+        d->updateWithLayout();
+    }
+    QWidget::resizeEvent(event);
+}
+
+void QlithWidget::mousePressEvent(QMouseEvent* event)
+{
+    Q_D(QlithWidget);
+    if (d->document) {
+        litehtml::position::vector redraw_boxes;
+        int x = event->pos().x();
+        int y = event->pos().y();
+        
+        if (event->button() == Qt::LeftButton) {
+            d->document->on_lbutton_down(x, y, x, y, redraw_boxes);
+            if (!redraw_boxes.empty()) {
+                update();
+            }
+        }
+    }
+    QWidget::mousePressEvent(event);
+}
+
+void QlithWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    Q_D(QlithWidget);
+    if (d->document) {
+        litehtml::position::vector redraw_boxes;
+        int x = event->pos().x();
+        int y = event->pos().y();
+        
+        if (event->button() == Qt::LeftButton) {
+            d->document->on_lbutton_up(x, y, x, y, redraw_boxes);
+            if (!redraw_boxes.empty()) {
+                update();
+            }
+        }
+    }
+    QWidget::mouseReleaseEvent(event);
+}
+
+void QlithWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    Q_D(QlithWidget);
+    if (d->document) {
+        litehtml::position::vector redraw_boxes;
+        int x = event->pos().x();
+        int y = event->pos().y();
+        
+        d->document->on_mouse_over(x, y, x, y, redraw_boxes);
+        if (!redraw_boxes.empty()) {
+            update();
+        }
+    }
+    QWidget::mouseMoveEvent(event);
+}
+
+void QlithWidget::wheelEvent(QWheelEvent* event)
+{
+    // We're not implementing scrolling in this basic widget
+    // A scrollable version would handle this
+    QWidget::wheelEvent(event);
+}
+
+void QlithWidget::keyPressEvent(QKeyEvent* event)
+{
+    // Handle key events if needed
+    QWidget::keyPressEvent(event);
+}
+
+#include "qlithwidget.moc"
+
+================
+File: src/qlithwidget.h
+================
+// this_file: qlith/src/qlithwidget.h
+#ifndef QLITHWIDGET_H
+#define QLITHWIDGET_H
+
+#include <QWidget>
+#include <QUrl>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QTimer>
+#include <QColor>
+#include <QScopedPointer>
+#include <memory>
+
+#include <litehtml/document.h>
+#include "qlith_global.h"
+
+class ContainerQPainter;
+class QlithWidgetPrivate;
+
+/**
+ * @brief The QlithWidget class provides a Qt widget for displaying HTML content using litehtml.
+ * 
+ * QlithWidget renders HTML and CSS using the litehtml library, providing a lightweight HTML
+ * rendering capability within Qt applications.
+ */
+class QLITH_EXPORT QlithWidget : public QWidget
+{
+    Q_OBJECT
+    Q_PROPERTY(QUrl baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+
+public:
+    /**
+     * @brief Constructs a QlithWidget.
+     * @param parent The parent widget.
+     */
+    explicit QlithWidget(QWidget* parent = nullptr);
+    
+    /**
+     * @brief Destroys the QlithWidget.
+     */
+    ~QlithWidget() override;
+
+    /**
+     * @brief Load HTML content from a string.
+     * @param html The HTML content to load.
+     */
+    void setHtml(const QString& html);
+    
+    /**
+     * @brief Load HTML content from a URL.
+     * @param url The URL to load.
+     */
+    void load(const QUrl& url);
+    
+    /**
+     * @brief Set the base URL for resolving relative URLs.
+     * @param url The base URL.
+     */
+    void setBaseUrl(const QUrl& url);
+    
+    /**
+     * @brief Get the current base URL.
+     * @return The base URL.
+     */
+    QUrl baseUrl() const;
+    
+    /**
+     * @brief Set the background color of the widget.
+     * @param color The background color.
+     */
+    void setBackgroundColor(const QColor& color);
+    
+    /**
+     * @brief Get the current background color.
+     * @return The background color.
+     */
+    QColor backgroundColor() const;
+    
+    /**
+     * @brief Set the default CSS stylesheet to use.
+     * @param css The CSS stylesheet.
+     */
+    void setDefaultStyleSheet(const QString& css);
+    
+    /**
+     * @brief Get the document title.
+     * @return The title of the HTML document.
+     */
+    QString documentTitle() const;
+    
+    /**
+     * @brief Get the litehtml document object.
+     * @return A shared pointer to the litehtml document.
+     */
+    std::shared_ptr<litehtml::document> document() const;
+
+public slots:
+    /**
+     * @brief Reload the current content.
+     */
+    void reload();
+    
+    /**
+     * @brief Stop loading the current content.
+     */
+    void stop();
+
+signals:
+    /**
+     * @brief Signal emitted when the base URL changes.
+     * @param url The new base URL.
+     */
+    void baseUrlChanged(const QUrl& url);
+    
+    /**
+     * @brief Signal emitted when the background color changes.
+     * @param color The new background color.
+     */
+    void backgroundColorChanged(const QColor& color);
+    
+    /**
+     * @brief Signal emitted when loading of content starts.
+     */
+    void loadStarted();
+    
+    /**
+     * @brief Signal emitted when loading of content finishes.
+     */
+    void loadFinished(bool ok);
+    
+    /**
+     * @brief Signal emitted when the document title changes.
+     * @param title The new document title.
+     */
+    void titleChanged(const QString& title);
+    
+    /**
+     * @brief Signal emitted when a link is clicked.
+     * @param url The URL of the clicked link.
+     */
+    void linkClicked(const QUrl& url);
+
+protected:
+    // Reimplemented widget events
+    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+
+private:
+    QScopedPointer<QlithWidgetPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QlithWidget)
+};
+
+#endif // QLITHWIDGET_H
+
+================
+File: build_macos.sh
+================
+#!/bin/bash
+# this_file: qlith-mini/build_macos.sh
+# Build script for qlith-mini on macOS
+
+set -e
+
+# Default build type
+BUILD_TYPE=${BUILD_TYPE:-Release}
+
+# Get the script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
+EXTERNAL_DIR="$PROJECT_ROOT/../external"
+
+# Check for external dependencies
+if [ ! -d "$EXTERNAL_DIR/litehtml" ]; then
+    echo "Error: litehtml dependency not found at $EXTERNAL_DIR/litehtml"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+if [ ! -d "$EXTERNAL_DIR/gumbo-parser" ]; then
+    echo "Error: gumbo-parser dependency not found at $EXTERNAL_DIR/gumbo-parser"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+# Check for Qt5
+QT_DIR="/usr/local/Cellar/qt@5/5.15.16_1"
+if [ ! -d "$QT_DIR" ]; then
+    echo "Error: Qt5 not found at $QT_DIR"
+    echo "Please install Qt5 using Homebrew (brew install qt@5)"
+    exit 1
+fi
+echo "Using Qt5 from: $QT_DIR"
+
+# Clean build
+if [ "$1" == "clean" ]; then
+    echo "Cleaning build directory..."
+    rm -rf "$PROJECT_ROOT/build"
+fi
+
+# Create build directory if it doesn't exist
+mkdir -p "$PROJECT_ROOT/build"
+cd "$PROJECT_ROOT/build"
+
+# Run CMake with the appropriate options
+echo "Configuring qlith-mini with CMake..."
+cmake "$PROJECT_ROOT" \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_PREFIX_PATH="$QT_DIR"
+
+# Build the project
+echo "Building qlith-mini..."
+cmake --build . -- -j$(sysctl -n hw.ncpu)
+
+echo "Build complete."
+echo "To run the browser: ./browser/qlith"
+
+# Create an alias script for easy launching
+if [ -f "$PROJECT_ROOT/build/browser/qlith" ]; then
+    ln -sf "$PROJECT_ROOT/build/browser/qlith" "$PROJECT_ROOT/qlith-run"
+    chmod +x "$PROJECT_ROOT/qlith-run"
+    echo "Created launch script: $PROJECT_ROOT/qlith-run"
+fi
+
+================
+File: CMakeLists.txt
+================
+cmake_minimum_required(VERSION 3.10)
+project(qlith VERSION 1.0 LANGUAGES CXX)
+
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+# Enable Qt features
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+# C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Debug options
+set(QLITH_DEBUG_DIR "${CMAKE_BINARY_DIR}/debug" CACHE PATH "Directory to store debug files")
+add_definitions(-DQLITH_DEBUG_DIR="${QLITH_DEBUG_DIR}")
+
+# External dependencies paths
+set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/../external")
+set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
+set(GUMBO_DIR "${EXTERNAL_DIR}/gumbo-parser")
+
+# Set the correct Qt5 path
+set(Qt5_DIR "/usr/local/Cellar/qt@5/5.15.16_1/lib/cmake/Qt5")
+
+# Find Qt5 packages
+find_package(Qt5 COMPONENTS Widgets Network Svg REQUIRED)
+
+# Find or build litehtml
+add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
+
+# Find or build gumbo-parser
+#add_subdirectory(${GUMBO_DIR} ${CMAKE_BINARY_DIR}/gumbo-parser)
+
+# Find the zlib package
+find_package(ZLIB REQUIRED)
+
+# Include module path for custom Find*.cmake files
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Add subdirectories
+add_subdirectory(src)
+add_subdirectory(browser)
+
+# Install CMake config files
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/qlithConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+# Packaging
+set(CPACK_PACKAGE_NAME "qlith")
+set(CPACK_PACKAGE_VENDOR "qlith")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Qt-based lightweight HTML renderer")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "qlith")
+include(CPack)
+
+================
+File: README.md
+================
+# qlith-mini
+
+A lightweight HTML rendering widget for Qt applications using the litehtml library.
+
+## Overview
+
+qlith-mini is a library that provides a Qt widget for rendering HTML content. It uses the [litehtml](https://github.com/litehtml/litehtml) library for HTML/CSS parsing and rendering, and Qt for the actual drawing and UI integration.
+
+Features:
+- Lightweight HTML rendering in Qt applications
+- Support for most common HTML and CSS features
+- Simple Qt widget integration
+- Support for local and remote content
+- Image and CSS resource loading
+
+## Requirements
+
+- Qt 5.15 or later
+- CMake 3.10 or later
+- A C++17 compatible compiler
+- litehtml and gumbo-parser libraries (included as submodules)
+
+## Building
+
+### macOS
+
+1. Clone the repository with submodules:
+   ```bash
+   git clone --recurse-submodules https://github.com/yourusername/qlith-mini.git
+   cd qlith-mini
+   ```
+
+2. Install dependencies using Homebrew:
+   ```bash
+   brew install qt@5 cmake
+   ```
+
+3. Run the build script:
+   ```bash
+   ./build_macos.sh
+   ```
+
+4. Run the example browser:
+   ```bash
+   ./qlith-run
+   ```
+
+### Linux
+
+1. Clone the repository with submodules:
+   ```bash
+   git clone --recurse-submodules https://github.com/yourusername/qlith-mini.git
+   cd qlith-mini
+   ```
+
+2. Install dependencies:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install qt5-default qtbase5-dev cmake g++
+   
+   # Fedora
+   sudo dnf install qt5-qtbase-devel cmake gcc-c++
+   ```
+
+3. Build the project:
+   ```bash
+   mkdir -p build && cd build
+   cmake ..
+   make -j$(nproc)
+   ```
+
+4. Run the example browser:
+   ```bash
+   ./browser/qlith
+   ```
+
+## Usage
+
+### Basic Usage
+
+```cpp
+#include <QApplication>
+#include <QMainWindow>
+#include <qlith/qlithwidget.h>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    
+    QMainWindow window;
+    QlithWidget *htmlWidget = new QlithWidget(&window);
+    window.setCentralWidget(htmlWidget);
+    
+    // Load HTML content
+    htmlWidget->setHtml("<html><body><h1>Hello World</h1></body></html>");
+    
+    // Or load from a URL
+    // htmlWidget->load(QUrl("https://example.com"));
+    
+    window.resize(800, 600);
+    window.show();
+    
+    return app.exec();
+}
+```
+
+### Advanced Usage
+
+```cpp
+QlithWidget *htmlWidget = new QlithWidget(this);
+
+// Set base URL for resolving relative paths
+htmlWidget->setBaseUrl(QUrl("file:///path/to/resources/"));
+
+// Set background color
+htmlWidget->setBackgroundColor(Qt::white);
+
+// Set default CSS
+htmlWidget->setDefaultStyleSheet("body { font-family: Arial; }");
+
+// Connect to signals
+connect(htmlWidget, &QlithWidget::loadFinished, 
+        this, &MainWindow::onLoadFinished);
+connect(htmlWidget, &QlithWidget::linkClicked, 
+        this, &MainWindow::onLinkClicked);
+```
+
+## License
+
+qlith-mini is licensed under the MIT License. See the LICENSE file for details.
+
+## Credits
+
+This project uses the following open source libraries:
+- [litehtml](https://github.com/litehtml/litehtml)
+- [gumbo-parser](https://github.com/google/gumbo-parser)
+- [Qt](https://www.qt.io/)
+
+
+
+================================================================
+End of Codebase
+================================================================

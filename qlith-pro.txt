@@ -130,6 +130,8 @@ src/
   stillimageqt.cpp
   styleimage.cpp
   transformationmatrix.cpp
+build_macos.sh
+CMakeLists.txt
 
 ================================================================
 Files
@@ -668,9 +670,14 @@ File: include/qlith/common.h
 #include <cmath>
 #include <string>
 #include <memory>
+#include <string>
+#include <cassert>
+
+// Define ASSERT macro
+// #define ASSERT(condition) assert(condition) // Keep Q_ASSERT below
 
 namespace litehtml {
-  class web_color;
+  struct web_color;
 }
 
 class Color;
@@ -678,7 +685,6 @@ class Color;
 Color toColor(const litehtml::web_color& clr);
 
 #include "qlith/floatpoint.h"
-#include "qlith/floatrect.h"
 #include "qlith/intpoint.h"
 #include "qlith/intsize.h"
 #include "qlith/floatsize.h"
@@ -704,7 +710,8 @@ typedef QVector<float> DashArray;
 
 /////////
 
-#define ASSERT(string) Q_ASSERT(string)
+// Use Q_ASSERT for Qt projects
+#define ASSERT(condition) Q_ASSERT(condition)
 
 #define CRASH(string) Q_ASSERT(false)
 
@@ -765,6 +772,7 @@ struct NamedColor {
     int RGBValue;
 };
 
+// Use QString as the primary String type
 typedef QString String;
 
 template <class Key>
@@ -1971,10 +1979,10 @@ File: include/qlith/floatrect.h
 // this_file: qlith-pro/include/qlith/floatrect.h
 #pragma once
 
-#include "qlith/common.h"
-#include "qlith/intrect.h"
 #include "qlith/floatpoint.h"
 #include "qlith/floatsize.h"
+#include "qlith/common.h"
+#include "qlith/intrect.h"
 //#include "vector.h"
 
 QT_BEGIN_NAMESPACE
@@ -5675,17 +5683,17 @@ File: resources/res.qrc
 ================
 <RCC>
     <qresource prefix="/">
-        <file>res/font/Cousine-Regular.ttf</file>
-        <file>res/font/DroidSans.ttf</file>
-        <file>res/font/arialuni.ttf</file>
-        <file>res/font/fa-regular-400.ttf</file>
-        <file>res/css/master.css</file>
-        <file>res/css/test1.css</file>
-        <file>res/img/test2.png</file>
-        <file>res/img/test.png</file>
-        <file>res/css/reset.css</file>
-        <file>res/css/bootstrap.css</file>
-        <file>res/img/test3.png</file>
+        <file>font/Cousine-Regular.ttf</file>
+        <file>font/DroidSans.ttf</file>
+        <file>font/arialuni.ttf</file>
+        <file>font/fa-regular-400.ttf</file>
+        <file>css/master.css</file>
+        <file>css/test1.css</file>
+        <file>img/test2.png</file>
+        <file>img/test.png</file>
+        <file>css/reset.css</file>
+        <file>css/bootstrap.css</file>
+        <file>img/test3.png</file>
     </qresource>
 </RCC>
 
@@ -13654,7 +13662,7 @@ void GraphicsContext::clipPath(WindRule clipRule)
     p->setClipPath(newPath, Qt::IntersectClip);
 }
 
-void GraphicsContext::drawFocusRing(const QVector<Path>& paths, int width, int offset, const Color& color)
+void GraphicsContext::drawFocusRing(const QVector<Path>& /*paths*/, int /*width*/, int /*offset*/, const Color& /*color*/)
 {
     // FIXME: implement
 }
@@ -13664,7 +13672,7 @@ void GraphicsContext::drawFocusRing(const QVector<Path>& paths, int width, int o
  * RenderTheme handles drawing focus on widgets which
  * need it.
  */
-void GraphicsContext::drawFocusRing(const QVector<IntRect>& rects, int /* width */, int /* offset */, const Color& color)
+void GraphicsContext::drawFocusRing(const QVector<IntRect>& /*rects*/, int /* width */, int /* offset */, const Color& /*color*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;
@@ -14128,7 +14136,7 @@ void GraphicsContext::concatCTM(const AffineTransform& transform)
     notImplemented();
 }*/
 
-void GraphicsContext::setPlatformStrokeColor(const Color& color, ColorSpace colorSpace)
+void GraphicsContext::setPlatformStrokeColor(const Color& color, ColorSpace /*colorSpace*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;
@@ -14166,7 +14174,7 @@ void GraphicsContext::setPlatformStrokeThickness(float thickness)
     p->setPen(newPen);
 }
 
-void GraphicsContext::setPlatformFillColor(const Color& color, ColorSpace colorSpace)
+void GraphicsContext::setPlatformFillColor(const Color& color, ColorSpace /*colorSpace*/)
 {
     if (paintingDisabled() || !color.isValid())
         return;
@@ -18579,6 +18587,231 @@ AffineTransform::operator QTransform() const
 {
     return QTransform(a(), b(), c(), d(), e(), f());
 }
+
+================
+File: build_macos.sh
+================
+#!/bin/bash
+# this_file: qlith-pro/build_macos.sh
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+# Set script to print each command as it is executed
+set -x
+
+# Default build type
+BUILD_TYPE=${BUILD_TYPE:-Release}
+
+# Define paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
+BUILD_DIR="$PROJECT_ROOT/build"
+EXTERNAL_DIR="$PROJECT_ROOT/../external"
+
+# Check for external dependencies
+if [ ! -d "$EXTERNAL_DIR/litehtml" ]; then
+    echo "Error: litehtml dependency not found at $EXTERNAL_DIR/litehtml"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+if [ ! -d "$EXTERNAL_DIR/gumbo-parser" ]; then
+    echo "Error: gumbo-parser dependency not found at $EXTERNAL_DIR/gumbo-parser"
+    echo "Please ensure you have cloned the external repositories."
+    exit 1
+fi
+
+# Check for Qt5
+QT_PATH=$(brew --prefix qt@5 2>/dev/null || echo "")
+if [ -z "$QT_PATH" ]; then
+    echo "Error: Qt5 not found. Please install Qt5 using Homebrew (brew install qt@5)"
+    exit 1
+fi
+echo "Using Qt5 from: $QT_PATH"
+
+# Create the build directory if it doesn't exist
+mkdir -p "$BUILD_DIR"
+
+# Change to the build directory
+cd "$BUILD_DIR"
+
+# Configure the project using CMake
+echo "Configuring project..."
+cmake "$PROJECT_ROOT" \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_PREFIX_PATH="$QT_PATH" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+# Build the project
+echo "Building project..."
+cmake --build . -- -j$(sysctl -n hw.ncpu)
+
+echo "Build complete."
+echo "Executable is located at: $BUILD_DIR/bin/qlith-pro"
+
+# Create an alias script for easy launching
+if [ -f "$BUILD_DIR/bin/qlith-pro" ]; then
+    ln -sf "$BUILD_DIR/bin/qlith-pro" "$PROJECT_ROOT/qlith-pro-run"
+    chmod +x "$PROJECT_ROOT/qlith-pro-run"
+    echo "Created launch script: $PROJECT_ROOT/qlith-pro-run"
+fi
+
+================
+File: CMakeLists.txt
+================
+cmake_minimum_required(VERSION 3.16)
+project(qlith-pro VERSION 0.1.0 LANGUAGES CXX C)
+
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+# Enable Qt features
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+# Set UI search paths
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# External dependencies paths
+set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
+set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
+
+# Find Qt5 packages
+find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network REQUIRED)
+
+# Build external dependencies - litehtml (which includes gumbo)
+add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
+
+# Define source files
+set(SOURCES
+    # Gui sources
+    src/gui/container_qt5.cpp
+    src/gui/fontcache.cpp
+    src/gui/main.cpp
+    src/gui/mainwindow.cpp
+    
+    # Core sources
+    src/affinetransform.cpp
+    src/bitmapimage.cpp
+    src/color.cpp
+    src/common.cpp
+    src/contextshadow.cpp
+    src/floatpoint.cpp
+    src/floatpoint3d.cpp
+    src/floatquad.cpp
+    src/floatrect.cpp
+    src/floatsize.cpp
+    src/gradient.cpp
+    src/graphicscontext.cpp
+    src/image.cpp
+    src/imagedecoder.cpp
+    src/imagedecoderqt.cpp
+    src/imageobserver.cpp
+    src/imagesource.cpp
+    src/intpoint.cpp
+    src/intrect.cpp
+    src/intsize.cpp
+    src/mimetyperegistry.cpp
+    src/mimetyperegistryqt.cpp
+    src/pathqt.cpp
+    src/pngimagedecoder.cpp
+    src/purgeablebuffer.cpp
+    src/rgba32bufferqt.cpp
+    src/shadowdata.cpp
+    src/sharedbuffer.cpp
+    src/stillimageqt.cpp
+    src/styleimage.cpp
+    src/transformationmatrix.cpp
+    src/litehtml-qt.js_plugin_import.cpp
+)
+
+# Process Qt UI files
+set(UI_FILES
+    resources/mainwindow.ui
+)
+qt5_wrap_ui(UI_HEADERS ${UI_FILES})
+
+# Process Qt resources
+set(RESOURCE_FILES
+    resources/res.qrc
+)
+qt5_add_resources(RESOURCES ${RESOURCE_FILES})
+
+# Create executable
+add_executable(${PROJECT_NAME} ${SOURCES} ${UI_HEADERS} ${RESOURCES})
+
+# Include directories
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/qlith
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
+        ${CMAKE_CURRENT_BINARY_DIR}  # For UI headers
+        ${LITEHTML_DIR}/include
+        ${LITEHTML_DIR}/include/litehtml
+        ${LITEHTML_DIR}/src/gumbo/include
+)
+
+# Link libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    litehtml
+    gumbo
+)
+
+# Add preprocessor definitions
+target_compile_definitions(${PROJECT_NAME} PRIVATE 
+    QT_DEPRECATED_WARNINGS
+    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
+)
+
+# Install rules
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    BUNDLE DESTINATION .
+)
+
+# Set output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Add compiler-specific flags
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    
+    # Add macOS-specific flags if needed
+    if(APPLE)
+        target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
+        set(CMAKE_MACOSX_RPATH 1)
+    endif()
+elseif(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+endif()
+
+# Set application properties
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.github.twardoch.qlith-pro"
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+)
+
+message(STATUS "qlith-pro configuration complete")
 
 
 
