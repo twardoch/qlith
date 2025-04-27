@@ -151,6 +151,9 @@ public:
   QPoint scrollPosition() const;
   QSize documentSize() const;
 
+signals:
+  void linkClicked(const QString& url);
+
 protected:
   virtual void paintEvent(QPaintEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
