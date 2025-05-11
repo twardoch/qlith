@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QEventLoop>
 #include <QTimer>
+#include <QThread>
 
 MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
                                                           ui(new Ui::MainWindow),
@@ -134,20 +135,30 @@ MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
   {
     QString filePath = args.at(1);
     qDebug() << "MainWindow: Loading file from command line:" << filePath;
-    // Simplified URL/File loading logic
-    QUrl urlToLoad = QUrl::fromUserInput(filePath); // Handles local files and web URLs
-    if (urlToLoad.isValid())
-    {
-      loadUrl(urlToLoad.toString());
-      if (urlEdit)
-      {
-        urlEdit->setText(urlToLoad.toString());
+
+    // Handle relative paths more robustly
+    QFileInfo fileInfo(filePath);
+    if (fileInfo.exists() && fileInfo.isReadable()) {
+      loadFile(filePath);
+    } else if (fileInfo.isRelative()) {
+      // Try to resolve relative path
+      QString absPath = QDir::current().absoluteFilePath(filePath);
+      if (QFileInfo(absPath).exists() && QFileInfo(absPath).isReadable()) {
+        qDebug() << "MainWindow: Resolved relative path to:" << absPath;
+        loadFile(absPath);
+      } else {
+        qWarning() << "MainWindow: File not found:" << filePath;
+        loadExample(); // Fallback to example
       }
-    }
-    else
-    {
-      qWarning() << "MainWindow: Invalid URL or file path from command line:" << filePath;
+    } else {
+      qWarning() << "MainWindow: Invalid or nonexistent file:" << filePath;
       loadExample(); // Fallback to example
+    }
+    
+    // Update URL field if it exists
+    QLineEdit* urlEdit = findChild<QLineEdit*>();
+    if (urlEdit) {
+      urlEdit->setText(filePath);
     }
   }
   else
@@ -247,7 +258,26 @@ void MainWindow::loadUrl(const QString &url)
   }
 
   qDebug() << "loadUrl: Loading URL:" << url;
-  m_litehtmlWidget->loadUrl(url);
+  
+  // Try to convert to a QUrl with proper handling of relative paths
+  QUrl qUrl;
+  if (QFileInfo(url).isRelative() && !url.startsWith("http://") && !url.startsWith("https://")) {
+    // Handle relative file paths
+    QString absolutePath = QDir::current().absoluteFilePath(url);
+    qUrl = QUrl::fromLocalFile(absolutePath);
+    qDebug() << "loadUrl: Converted relative path to absolute URL:" << qUrl.toString();
+  } else {
+    qUrl = QUrl::fromUserInput(url);
+  }
+  
+  // If it's a valid file URL, load directly with the file method
+  if (qUrl.isValid() && qUrl.isLocalFile()) {
+    loadFile(qUrl.toLocalFile());
+    return;
+  }
+  
+  // Otherwise use the standard URL loading
+  m_litehtmlWidget->loadUrl(qUrl.toString());
 }
 
 void MainWindow::loadExample()
@@ -299,109 +329,81 @@ void MainWindow::loadFile(const QString& filePath)
       return;
     }
   }
-  
-  // Check if the file exists
+
+  // Convert path to absolute if it's relative
+  QString absoluteFilePath = filePath;
   QFileInfo fileInfo(filePath);
-  if (!fileInfo.exists() || !fileInfo.isReadable()) {
-    qWarning() << "File does not exist or is not readable:" << filePath;
-    // Create error document instead of failing
-    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>File does not exist or is not readable: %1</p></body></html>")
-      .arg(filePath);
+  if (!fileInfo.isAbsolute()) {
+    absoluteFilePath = QDir::current().absoluteFilePath(filePath);
+    fileInfo = QFileInfo(absoluteFilePath);
+    qDebug() << "Converted relative path to absolute:" << absoluteFilePath;
+  }
+  
+  // Check if the file exists and is readable
+  if (!fileInfo.exists()) {
+    qWarning() << "File does not exist:" << absoluteFilePath;
+    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>File does not exist: %1</p></body></html>")
+      .arg(absoluteFilePath);
     m_litehtmlWidget->loadHtml(errorHtml);
+    emit documentLoaded(false);
+    return;
+  }
+  
+  if (!fileInfo.isReadable()) {
+    qWarning() << "File is not readable:" << absoluteFilePath;
+    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>File is not readable: %1</p></body></html>")
+      .arg(absoluteFilePath);
+    m_litehtmlWidget->loadHtml(errorHtml);
+    emit documentLoaded(false);
     return;
   }
   
   // Read the file content
-  QFile file(filePath);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qWarning() << "Failed to open file:" << filePath;
-    // Create error document for file open failure
+  QFile file(absoluteFilePath);
+  if (!file.open(QIODevice::ReadOnly)) {
+    qWarning() << "Failed to open file:" << absoluteFilePath << "Error:" << file.errorString();
     QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>Failed to open file: %1</p><p>Error: %2</p></body></html>")
-      .arg(filePath)
+      .arg(absoluteFilePath)
       .arg(file.errorString());
     m_litehtmlWidget->loadHtml(errorHtml);
+    emit documentLoaded(false);
     return;
   }
   
-  // Read the HTML content
-  QByteArray htmlData = file.readAll();
+  // Read the content - use binary mode to avoid text conversion issues
+  QByteArray fileData = file.readAll();
   file.close();
   
-  // Convert to string
-  QString htmlContent = QString::fromUtf8(htmlData);
-
-  // Log the content size
-  qDebug() << "HTML content size:" << htmlContent.size() << "bytes";
-  qDebug() << "First 100 chars of content:" << htmlContent.left(100);
+  if (fileData.isEmpty()) {
+    qWarning() << "File is empty:" << absoluteFilePath;
+    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>File is empty: %1</p></body></html>")
+      .arg(absoluteFilePath);
+    m_litehtmlWidget->loadHtml(errorHtml);
+    emit documentLoaded(false);
+    return;
+  }
   
-  // Check if we're in debug mode
+  // Convert to string with proper UTF-8 handling
+  QString htmlContent = QString::fromUtf8(fileData);
+
+  // Log the content for debugging
+  qDebug() << "HTML content size:" << htmlContent.size() << "bytes";
+  qDebug() << "First 100 chars of content:" << htmlContent.left(100).replace('\n', "\\n");
+  
+  // Get the base URL for relative paths (the directory containing the HTML file)
+  QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath()).toString();
+  qDebug() << "Base URL for relative paths:" << baseUrl;
+  
+  // In debug mode, update the text editor
   if (m_debugMode) {
-    // In debug mode, set the HTML content to the text editor
     QPlainTextEdit* htmlEditor = findChild<QPlainTextEdit*>();
     if (htmlEditor) {
       htmlEditor->setPlainText(htmlContent);
-      // Don't automatically render - let the user click the render button
-    }
-    emit documentLoaded(true);
-  } else {
-    // In normal mode, load the HTML into the widget
-    if (m_litehtmlWidget) {
-      // Reset the widget size to ensure proper rendering
-      if (m_renderSize.isValid()) {
-        qDebug() << "Setting widget size to:" << m_renderSize;
-        m_litehtmlWidget->setMinimumSize(m_renderSize.width(), m_renderSize.height());
-        m_litehtmlWidget->resize(m_renderSize);
-      }
-      
-      // Make sure the widget is visible
-      m_litehtmlWidget->setVisible(true);
-      
-      // Process events to ensure widget is laid out
-      QApplication::processEvents();
-      
-      // Load the HTML with the file's directory as the base URL for relative paths
-      QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath() + "/").toString();
-      qDebug() << "Loading HTML with base URL:" << baseUrl;
-      
-      // Create a local connection to handle document loading
-      QEventLoop loadWaitLoop;
-      bool loadSuccess = false;
-      
-      // Use a direct connection to ensure we get the signal
-      QMetaObject::Connection conn = connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, 
-        [&loadWaitLoop, &loadSuccess](bool success) {
-          qDebug() << "MainWindow: Document loaded signal received with status:" << success;
-          loadSuccess = success;
-          loadWaitLoop.quit();
-        }, Qt::DirectConnection);
-      
-      // Set a timeout to prevent hanging
-      QTimer::singleShot(3000, &loadWaitLoop, [&loadWaitLoop]() {
-        qWarning() << "MainWindow: Document load timeout occurred";
-        loadWaitLoop.quit();
-      });
-      
-      // Load the HTML content
-      m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
-      
-      // Wait for loading to complete or timeout
-      qDebug() << "MainWindow: Waiting for document to load...";
-      loadWaitLoop.exec();
-      
-      // Disconnect the temporary connection
-      disconnect(conn);
-      
-      // Emit our own documentLoaded signal
-      emit documentLoaded(loadSuccess);
-      
-      // Force a repaint of the window to ensure UI updates
-      update();
-      QApplication::processEvents();
-    } else {
-      qWarning() << "LiteHTML widget is not initialized";
-      emit documentLoaded(false);
     }
   }
+  
+  // Load the HTML content with base URL for proper relative path resolution
+  m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
 }
 
 void MainWindow::setRenderSize(const QSize& size)

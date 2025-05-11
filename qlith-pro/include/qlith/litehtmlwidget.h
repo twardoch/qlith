@@ -156,6 +156,17 @@ private:
      */
     void onDocSizeChanged(int w, int h);
 
+    /**
+     * @brief Create a fallback document when the main document fails to load
+     * @param errorMessage Error message to display in the fallback document
+     */
+    void createFallbackDocument(const QString& errorMessage);
+    
+    /**
+     * @brief Render the currently loaded document
+     */
+    void renderDocument();
+
 private:
     container_qt5* m_container;     ///< HTML container implementation
     litehtml::document::ptr m_htmlDocument;

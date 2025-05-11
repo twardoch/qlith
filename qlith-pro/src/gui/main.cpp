@@ -14,6 +14,7 @@
 #include "qlith/context.h"
 #include "qlith/mainwindow.h"
 #include <QDebug>
+#include <QWidget>
 
 #include "qlith/fontcache.h"
 
@@ -165,34 +166,43 @@ int main(int argc, char **argv)
       w.repaint();
       QApplication::processEvents();
       
-      // Verify widget exists and has been properly initialized
-      litehtmlWidget* htmlWidget = w.findChild<litehtmlWidget*>();
+      // Verify widget exists but don't access its methods directly
+      QWidget* htmlWidget = w.findChild<QWidget*>();
       if (htmlWidget) {
-        qDebug() << "HTML widget found, current size:" << htmlWidget->size();
-        qDebug() << "Document size:" << htmlWidget->documentSize();
+        qDebug() << "Widget found, current size:" << htmlWidget->size();
         
         // Force a render update on the widget
         htmlWidget->update();
         QApplication::processEvents();
       } else {
-        qWarning() << "Could not find litehtmlWidget in MainWindow";
+        qWarning() << "Could not find widget in MainWindow";
       }
       
       // Perform export operations
+      bool exportSuccess = false;
+      
       if (!svgPath.isEmpty()) {
         qDebug() << "Exporting to SVG:" << svgPath;
-        bool svgResult = w.exportToSvg(svgPath);
-        qDebug() << "SVG export result:" << (svgResult ? "Success" : "Failed");
+        exportSuccess = w.exportToSvg(svgPath);
+        qDebug() << "SVG export result:" << (exportSuccess ? "Success" : "Failed");
       }
       
       if (!pngPath.isEmpty()) {
         qDebug() << "Exporting to PNG:" << pngPath;
-        bool result = w.exportToPng(pngPath);
-        qDebug() << "PNG export result:" << (result ? "Success" : "Failed");
+        exportSuccess = w.exportToPng(pngPath);
+        qDebug() << "PNG export result:" << (exportSuccess ? "Success" : "Failed");
       }
       
-      // Quit after export with a short delay to ensure proper cleanup
-      QTimer::singleShot(1000, &app, &QApplication::quit);
+      // Quit immediately after export without waiting for user to close window
+      if (exportSuccess) {
+        qDebug() << "Export completed successfully. Exiting application.";
+        QTimer::singleShot(100, &app, QApplication::quit);
+        return app.exec();
+      } else {
+        qCritical() << "Export failed! Exiting application.";
+        QTimer::singleShot(100, &app, QApplication::quit);
+        return 1;  // Return non-zero exit code on failure
+      }
     }
   }
 

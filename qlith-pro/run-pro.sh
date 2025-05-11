@@ -75,4 +75,4 @@ else
     "$app_path" "$html_file"
 fi
 
-# "./qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro" "./examples/simple_test.html"
+# "./qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro" "./examples/basic_layout.html"

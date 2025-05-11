@@ -102,7 +102,9 @@ container_qt5 *litehtmlWidget::getContainer() const
 void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
 {
     qDebug() << "loadHtml: Loading HTML with base URL:" << baseUrl;
-    qDebug() << "loadHtml: First 100 chars of HTML:" << html.left(100);
+    qDebug() << "loadHtml: First 100 chars of HTML:" << html.left(100).replace("\n", "\\n");
+    qDebug() << "loadHtml: HTML length:" << html.length();
+    qDebug() << "loadHtml: Current widget size:" << size(); 
 
     if (html.isEmpty())
     {
@@ -141,191 +143,191 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
 
     try
     {
-        if (!baseUrl.isEmpty())
-        {
-            qDebug() << "loadHtml: Setting base URL:" << baseUrl;
-            m_container->set_base_url(baseUrl.toStdString().c_str());
-        }
-
-        // Ensure HTML content is valid and contains required elements
-        QString processedHtml = html;
-        
-        // Add DOCTYPE if not present
-        if (!processedHtml.contains("<!DOCTYPE", Qt::CaseInsensitive)) {
-            qDebug() << "loadHtml: Adding DOCTYPE declaration";
-            processedHtml = "<!DOCTYPE html>\n" + processedHtml;
-        }
-        
-        // Add <html> tags if not present
-        if (!processedHtml.contains("<html", Qt::CaseInsensitive)) {
-            qDebug() << "loadHtml: Adding HTML tags";
-            processedHtml = processedHtml.startsWith("<!DOCTYPE") ?
-                processedHtml.section('>', 0, 0) + ">\n<html>" + processedHtml.section('>', 1) + "</html>" :
-                "<!DOCTYPE html>\n<html>" + processedHtml + "</html>";
-        }
-        
-        // Add <body> tags if not present
-        if (!processedHtml.contains("<body", Qt::CaseInsensitive)) {
-            qDebug() << "loadHtml: Adding BODY tags";
-            int htmlPos = processedHtml.indexOf("<html", 0, Qt::CaseInsensitive);
-            int htmlEndPos = processedHtml.indexOf(">", htmlPos);
-            int headEnd = processedHtml.indexOf("</head>", htmlEndPos, Qt::CaseInsensitive);
-            
-            if (headEnd != -1) {
-                processedHtml.insert(headEnd + 7, "<body>");
-                processedHtml.insert(processedHtml.lastIndexOf("</html>"), "</body>");
-            } else {
-                // No head tag, insert body after html opening tag
-                processedHtml.insert(htmlEndPos + 1, "<body>");
-                processedHtml.insert(processedHtml.lastIndexOf("</html>"), "</body>");
-            }
-        }
-        
-        qDebug() << "loadHtml: Prepared HTML size:" << processedHtml.size();
-        qDebug() << "loadHtml: First 100 chars of processed HTML:" << processedHtml.left(100);
-
-        // Clear existing document if necessary
+        // Clear existing document first 
         if (m_htmlDocument)
         {
             qDebug() << "loadHtml: Releasing existing document";
             m_htmlDocument.reset();
         }
 
-        qDebug() << "loadHtml: Creating HTML document...";
-        
-        // Create std::string from processed HTML to ensure proper null termination
-        std::string htmlStdString = processedHtml.toUtf8().toStdString();
-        
-        // Validate HTML string is not empty
-        if (htmlStdString.empty()) {
-            qWarning() << "loadHtml: HTML string is empty after conversion to std::string";
-            htmlStdString = "<!DOCTYPE html><html><body><p>Error: HTML content was empty after processing</p></body></html>";
+        // Set base URL if provided
+        if (!baseUrl.isEmpty())
+        {
+            qDebug() << "loadHtml: Setting base URL:" << baseUrl;
+            // Make sure it's properly terminated with a slash for relative paths
+            QString baseUrlWithSlash = baseUrl;
+            if (!baseUrlWithSlash.endsWith('/')) {
+                baseUrlWithSlash += '/';
+            }
+            qDebug() << "loadHtml: Normalized base URL:" << baseUrlWithSlash;
+            m_container->set_base_url(baseUrlWithSlash.toStdString().c_str());
         }
+
+        // Make a local copy to ensure the string stays in scope
+        QString localHtml = html;
         
-        // Create document with detailed error handling
+        // Prepare HTML for parsing - ensure it's properly structured
+        if (!localHtml.contains("<!DOCTYPE", Qt::CaseInsensitive)) {
+            qDebug() << "loadHtml: Adding DOCTYPE declaration";
+            localHtml = "<!DOCTYPE html>\n" + localHtml;
+        }
+
+        // Convert to UTF-8
+        QByteArray utf8Data = localHtml.toUtf8();
+        std::string htmlData(utf8Data.constData(), utf8Data.size());
+        
+        qDebug() << "loadHtml: Creating litehtml document from string, size:" << htmlData.size();
+        
+        // Create the document
         try {
-            m_htmlDocument = litehtml::document::createFromString(htmlStdString.c_str(), m_container);
+            m_htmlDocument = litehtml::document::createFromString(htmlData.c_str(), m_container);
             
             if (!m_htmlDocument) {
-                qWarning() << "loadHtml: Failed to create litehtml document, creating fallback";
-                std::string fallbackHtml = "<!DOCTYPE html><html><body><h1>Error</h1><p>Failed to create HTML document.</p></body></html>";
-                m_htmlDocument = litehtml::document::createFromString(fallbackHtml.c_str(), m_container);
+                qCritical() << "loadHtml: Failed to create litehtml document. Creating a simple fallback.";
+                // Create a super simple document as a last resort
+                QString simpleHtml = "<!DOCTYPE html><html><body>Failed to load document</body></html>";
+                QByteArray simpleUtf8 = simpleHtml.toUtf8();
+                m_htmlDocument = litehtml::document::createFromString(simpleUtf8.constData(), m_container);
+                
+                if (!m_htmlDocument) {
+                    qCritical() << "loadHtml: Even failed to create a simple fallback document";
+                    emit documentLoaded(false);
+                    return;
+                }
             }
-        } catch (const std::exception& e) {
-            qCritical() << "loadHtml: Exception creating document:" << e.what();
-            std::string fallbackHtml = "<!DOCTYPE html><html><body><h1>Error</h1><p>Exception creating document: ";
-            fallbackHtml += e.what();
-            fallbackHtml += "</p></body></html>";
-            m_htmlDocument = litehtml::document::createFromString(fallbackHtml.c_str(), m_container);
-        }
-        
-        if (!m_htmlDocument) {
-            qCritical() << "loadHtml: Could not create document even with fallback HTML";
-            emit documentLoaded(false);
-            return;
-        }
-
-        qDebug() << "loadHtml: Document created successfully.";
-
-        // Reset scroll position
-        m_scrollX = 0;
-        m_scrollY = 0;
-        if (m_vScrollBar) m_vScrollBar->setValue(0);
-        if (m_hScrollBar) m_hScrollBar->setValue(0);
-        m_documentSizeSet = false;
-
-        // Calculate render width - ensure it's reasonable
-        int renderWidth = width();
-        if (renderWidth <= 0 || renderWidth > 10000) {
-            renderWidth = m_renderSize.isValid() ? m_renderSize.width() : 800;
-        }
-        if (renderWidth < 200) renderWidth = 800;
-        
-        qDebug() << "loadHtml: Rendering document with width:" << renderWidth;
-        
-        // Render the document with calculated width
-        try {
-            m_htmlDocument->render(renderWidth);
-            qDebug() << "loadHtml: Document rendered with dimensions:" << m_htmlDocument->width() << "x" << m_htmlDocument->height();
-        } catch (const std::exception& e) {
-            qCritical() << "loadHtml: Exception rendering document:" << e.what();
             
-            // Try again with a simpler document
-            std::string fallbackHtml = "<!DOCTYPE html><html><body><h1>Error</h1><p>Exception rendering document: ";
-            fallbackHtml += e.what();
-            fallbackHtml += "</p></body></html>";
-            m_htmlDocument = litehtml::document::createFromString(fallbackHtml.c_str(), m_container);
-            m_htmlDocument->render(renderWidth);
-        }
-        
-        // Validate document dimensions
-        if (m_htmlDocument->width() <= 0 || m_htmlDocument->height() <= 0) {
-            qWarning() << "loadHtml: Document has invalid dimensions after render:" 
-                     << m_htmlDocument->width() << "x" << m_htmlDocument->height();
+            qDebug() << "loadHtml: Document created successfully";
             
-            // Set a default document size
-            m_documentSize = QSize(std::max(renderWidth, 800), 600);
-        } else {
-            // Update document size with actual dimensions
-            m_documentSize = QSize(m_htmlDocument->width(), m_htmlDocument->height());
-        }
-        
-        // Ensure the document size is set
-        m_documentSizeSet = true;
-        qDebug() << "loadHtml: Document size set to:" << m_documentSize;
-        
-        // Update scrollbars based on document size
-        onDocSizeChanged(m_documentSize.width(), m_documentSize.height());
-        
-        // Force an update before emitting documentLoaded
-        update();
-        QApplication::processEvents();
-        
-        // Set a delay to ensure rendering completes
-        QTimer::singleShot(250, this, [this]() {
-            // One more update to be sure
+            // Render the document
+            int renderWidth = width() > 0 ? width() : 800;
+            qDebug() << "loadHtml: Rendering with width:" << renderWidth;
+            
+            m_htmlDocument->render(renderWidth);
+            
+            int docWidth = m_htmlDocument->width();
+            int docHeight = m_htmlDocument->height();
+            
+            qDebug() << "loadHtml: Document dimensions after render:" << docWidth << "x" << docHeight;
+            
+            if (docWidth <= 0 || docHeight <= 0) {
+                qWarning() << "loadHtml: Document has invalid dimensions, using defaults";
+                m_documentSize = QSize(renderWidth, 600);
+            } else {
+                m_documentSize = QSize(docWidth, docHeight);
+            }
+            
+            m_documentSizeSet = true;
+            
+            // Update scrollbars
+            onDocSizeChanged(m_documentSize.width(), m_documentSize.height());
+            
+            // Force a repaint
             update();
             QApplication::processEvents();
             
-            // Log document status
-            qDebug() << "loadHtml: Final document state - Size:" << m_documentSize
-                     << "Valid:" << (m_htmlDocument ? "true" : "false");
-            
+            qDebug() << "loadHtml: Document loaded successfully";
             emit documentLoaded(true);
-        });
+        }
+        catch (const std::exception &e) {
+            qCritical() << "loadHtml: Exception creating document:" << e.what();
+            createFallbackDocument(QString("Exception creating document: %1").arg(e.what()));
+        }
     }
     catch (const std::exception &e)
     {
         qCritical() << "loadHtml: Exception during HTML document processing:" << e.what();
-        try {
-            QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>Exception: %1</p></body></html>").arg(e.what());
-            std::string errorStdString = errorHtml.toUtf8().toStdString();
-            m_htmlDocument = litehtml::document::createFromString(errorStdString.c_str(), m_container);
-            
-            // Set document size
-            m_documentSize = QSize(width() > 0 ? width() : 800, 600);
-            m_documentSizeSet = true;
-            update();
-        } catch (...) {
-            qCritical() << "loadHtml: Could not create error document after exception.";
-        }
+        createFallbackDocument(QString("Exception: %1").arg(e.what()));
         emit documentLoaded(false);
     }
     catch (...)
     {
         qCritical() << "loadHtml: Unknown C++ exception during HTML document processing.";
-        try {
-            QString errorHtml = "<!DOCTYPE html><html><body><h1>Error</h1><p>Unknown C++ exception occurred.</p></body></html>";
-            std::string errorStdString = errorHtml.toUtf8().toStdString();
-            m_htmlDocument = litehtml::document::createFromString(errorStdString.c_str(), m_container);
-            
-            // Set document size
-            m_documentSize = QSize(width() > 0 ? width() : 800, 600);
-            m_documentSizeSet = true;
-            update();
-        } catch (...) {
-            qCritical() << "loadHtml: Could not create error document after unknown exception.";
+        createFallbackDocument("Unknown C++ exception occurred");
+        emit documentLoaded(false);
+    }
+}
+
+// Helper method to create a fallback document
+void litehtmlWidget::createFallbackDocument(const QString& errorMessage)
+{
+    try {
+        qDebug() << "createFallbackDocument: Creating fallback document with error message:" << errorMessage;
+        
+        QString fallbackHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>%1</p></body></html>")
+            .arg(errorMessage);
+        std::string fallbackStdString = fallbackHtml.toUtf8().toStdString();
+        
+        if (!m_container) {
+            qCritical() << "createFallbackDocument: m_container is null";
+            return;
         }
+        
+        m_htmlDocument = litehtml::document::createFromString(fallbackStdString.c_str(), m_container);
+        
+        if (m_htmlDocument) {
+            qDebug() << "createFallbackDocument: Fallback document created successfully";
+            renderDocument();
+        } else {
+            qCritical() << "createFallbackDocument: Failed to create fallback document";
+        }
+    } catch (const std::exception& e) {
+        qCritical() << "createFallbackDocument: Exception creating fallback document:" << e.what();
+    } catch (...) {
+        qCritical() << "createFallbackDocument: Unknown exception creating fallback document";
+    }
+}
+
+// Helper method to render the loaded document
+void litehtmlWidget::renderDocument()
+{
+    // Calculate render width
+    int renderWidth = width();
+    if (renderWidth <= 0 || renderWidth > 10000) {
+        renderWidth = 800;
+    }
+    if (renderWidth < 200) renderWidth = 800;
+    
+    qDebug() << "renderDocument: Rendering document with width:" << renderWidth;
+    
+    try {
+        if (!m_htmlDocument) {
+            qCritical() << "renderDocument: m_htmlDocument is null";
+            return;
+        }
+        
+        m_htmlDocument->render(renderWidth);
+        qDebug() << "renderDocument: Document rendered with dimensions:" << m_htmlDocument->width() << "x" << m_htmlDocument->height();
+        
+        // Get document size
+        m_documentSize = QSize(m_htmlDocument->width(), m_htmlDocument->height());
+        if (m_documentSize.width() <= 0 || m_documentSize.height() <= 0) {
+            qWarning() << "renderDocument: Document has invalid dimensions - using defaults";
+            m_documentSize = QSize(renderWidth, 600);
+        }
+        
+        m_documentSizeSet = true;
+        qDebug() << "renderDocument: Document size set to:" << m_documentSize;
+        
+        // Update scrollbars
+        onDocSizeChanged(m_documentSize.width(), m_documentSize.height());
+        
+        // Force a repaint
+        update();
+        QApplication::processEvents();
+        
+        qDebug() << "renderDocument: Document rendered successfully";
+        emit documentLoaded(true);
+    } catch (const std::exception& e) {
+        qCritical() << "renderDocument: Exception rendering document:" << e.what();
+        m_documentSize = QSize(renderWidth, 600);
+        m_documentSizeSet = true;
+        update();
+        emit documentLoaded(false);
+    } catch (...) {
+        qCritical() << "renderDocument: Unknown exception rendering document";
+        m_documentSize = QSize(renderWidth, 600);
+        m_documentSizeSet = true;
+        update();
         emit documentLoaded(false);
     }
 }
@@ -496,8 +498,10 @@ void litehtmlWidget::paintEvent(QPaintEvent *event)
         }
 
         qDebug() << "paintEvent: Drawing document with clip:" << clip.x << clip.y << clip.width << clip.height;
+        
         // Draw the document with the validated clip rect - this is the core functionality
         m_container->draw(m_htmlDocument, &painter, 0, 0, &clip);
+        
         qDebug() << "paintEvent: Document drawing completed successfully";
     }
     catch (const std::exception &e)
