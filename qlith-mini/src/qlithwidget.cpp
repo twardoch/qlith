@@ -163,8 +163,16 @@ void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
         );
         
         if (document) {
-            qDebug() << "QlithWidget: Document created successfully, rendering with width:" << q->width();
-            document->render(q->width());
+            // Get device pixel ratio for proper scaling
+            qreal devicePixelRatio = container->devicePixelRatio();
+            int scaledWidth = qRound(q->width() / devicePixelRatio);
+            
+            qDebug() << "QlithWidget: Document created successfully, rendering with device pixel ratio:" 
+                     << devicePixelRatio << ", widget width:" << q->width() 
+                     << ", scaled width for rendering:" << scaledWidth;
+                     
+            // Render using scaled width to account for device pixel ratio
+            document->render(scaledWidth);
             needsLayout = false;
             q->update();
             
@@ -309,7 +317,16 @@ void QlithWidgetPrivate::handleNetworkReply(QNetworkReply *reply) {
 // Redraw with layout if needed
 void QlithWidgetPrivate::updateWithLayout() {
     if (needsLayout && document) {
-        document->render(q->width());
+        // Get device pixel ratio for proper scaling
+        qreal devicePixelRatio = container->devicePixelRatio();
+        int scaledWidth = qRound(q->width() / devicePixelRatio);
+        
+        qDebug() << "QlithWidget::updateWithLayout - Rendering with device pixel ratio:" 
+                 << devicePixelRatio << ", widget width:" << q->width() 
+                 << ", scaled width for rendering:" << scaledWidth;
+                 
+        // Render using scaled width to account for device pixel ratio
+        document->render(scaledWidth);
         needsLayout = false;
     }
     q->update();
@@ -402,6 +419,24 @@ std::shared_ptr<litehtml::document> QlithWidget::document() const
     return d->document;
 }
 
+QSize QlithWidget::documentSize() const
+{
+    Q_D(const QlithWidget);
+    if (d->document) {
+        return QSize(d->document->width(), d->document->height());
+    }
+    return QSize();
+}
+
+bool QlithWidget::needsVerticalScrolling() const
+{
+    Q_D(const QlithWidget);
+    if (d->document) {
+        return d->document->height() > height();
+    }
+    return false;
+}
+
 void QlithWidget::reload()
 {
     Q_D(QlithWidget);
@@ -438,7 +473,17 @@ void QlithWidget::paintEvent(QPaintEvent* event)
     if (d->document) {
         d->container->beginPaint(&painter, rect());
         
-        litehtml::position clip(0, 0, width(), height());
+        // Create clip position that accommodates the full document height
+        int docWidth = d->document->width();
+        int docHeight = d->document->height();
+        
+        // Use the maximum of widget height and document height to ensure all content is rendered
+        litehtml::position clip(0, 0, width(), qMax(height(), docHeight));
+        
+        qDebug() << "QlithWidget::paintEvent - Document size:" << docWidth << "x" << docHeight
+                 << ", Widget size:" << width() << "x" << height()
+                 << ", Using clip size:" << clip.width << "x" << clip.height;
+        
         d->document->draw((litehtml::uint_ptr)&painter, 0, 0, &clip);
         
         d->container->endPaint();

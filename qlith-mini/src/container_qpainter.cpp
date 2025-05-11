@@ -195,7 +195,10 @@ int ContainerQPainter::pt_to_px(int pt) const
 {
     // Standard conversion: 1 point = 1/72 inch
     // Use device pixel ratio for high DPI screens
-    return static_cast<int>(pt * m_devicePixelRatio * (96.0 / 72.0));
+    // First convert points to device-independent pixels (DIPs)
+    // Then apply device pixel ratio to get device pixels
+    double dips = pt * (96.0 / 72.0); // Convert point to DIP (96 DPI standard)
+    return qRound(dips * m_devicePixelRatio);
 }
 
 // Get the default font size
@@ -564,15 +567,25 @@ void ContainerQPainter::get_viewport(litehtml::position& viewport) const
 {
     if (m_painter) {
         QRect viewRect = m_painter->viewport();
+        
+        // Use the device pixel ratio to scale the viewport correctly
+        qreal dpr = m_devicePixelRatio;
+        
         viewport.x = viewRect.x();
         viewport.y = viewRect.y();
         viewport.width = viewRect.width();
-        viewport.height = viewRect.height();
+        
+        // Set height to a large value to ensure full content is considered during layout
+        // This prevents content from being cut off
+        viewport.height = qMax(viewRect.height(), 10000);  // Use large height to ensure full document is rendered
+        
+        qDebug() << "Container viewport size:" << viewport.width << "x" << viewport.height
+                 << "(device pixel ratio:" << dpr << ")";
     } else {
         viewport.x = 0;
         viewport.y = 0;
         viewport.width = 800;  // Default fallback width
-        viewport.height = 600; // Default fallback height
+        viewport.height = 10000; // Large fallback height to ensure full content rendering
     }
 }
 

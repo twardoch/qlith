@@ -94,6 +94,18 @@ public:
      * @return A shared pointer to the litehtml document.
      */
     std::shared_ptr<litehtml::document> document() const;
+    
+    /**
+     * @brief Get the size of the document (width and height).
+     * @return The size of the document.
+     */
+    QSize documentSize() const;
+    
+    /**
+     * @brief Check if the document needs vertical scrolling.
+     * @return True if the document needs vertical scrolling, false otherwise.
+     */
+    bool needsVerticalScrolling() const;
 
 public slots:
     /**

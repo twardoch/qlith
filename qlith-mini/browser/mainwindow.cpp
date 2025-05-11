@@ -532,20 +532,6 @@ bool MainWindow::exportToPng(const QString& filePath)
     
     qDebug() << "exportToPng: Starting PNG export to" << filePath;
     
-    // Get sizes - in qlith-mini we need to get document size directly from the document
-    QSize widgetSize = m_htmlWidget->size();
-    QSize documentSize;
-    
-    // Get document size from litehtml document if available
-    auto doc = m_htmlWidget->document();
-    if (doc) {
-        documentSize = QSize(doc->width(), doc->height());
-    }
-    
-    qDebug() << "PNG Export - Widget size:" << widgetSize;
-    qDebug() << "PNG Export - Document size:" << documentSize;
-    qDebug() << "PNG Export - Requested render size:" << m_renderSize;
-    
     // Create directory if it doesn't exist
     QFileInfo fileInfo(filePath);
     QDir dir = fileInfo.dir();
@@ -556,19 +542,59 @@ bool MainWindow::exportToPng(const QString& filePath)
         }
     }
     
-    // Determine the export size
-    QSize exportSize;
-    if (m_renderSize.isValid()) {
-        exportSize = m_renderSize;
-    } else if (documentSize.isValid() && documentSize.width() > 0 && documentSize.height() > 0) {
-        exportSize = documentSize;
-    } else if (widgetSize.isValid() && widgetSize.width() > 0 && widgetSize.height() > 0) {
-        exportSize = widgetSize;
-    } else {
-        exportSize = QSize(800, 600); // Default size if all else fails
+    // Get document object to determine its true size
+    auto doc = m_htmlWidget->document();
+    if (!doc) {
+        qWarning() << "exportToPng: No document available for rendering";
+        return false;
     }
     
-    qDebug() << "PNG Export - Using export size:" << exportSize;
+    // Get sizes - in qlith-mini we need to get document size directly from the document
+    QSize widgetSize = m_htmlWidget->size();
+    QSize documentSize(doc->width(), doc->height());
+    QSize originalRenderSize = m_renderSize;
+    
+    qDebug() << "PNG Export - Widget size:" << widgetSize;
+    qDebug() << "PNG Export - Document size:" << documentSize;
+    qDebug() << "PNG Export - Requested render size:" << m_renderSize;
+    
+    // Ensure the widget is large enough to render the full content
+    QSize targetSize;
+    if (m_renderSize.isValid()) {
+        // If render size is specified, use it but ensure it's at least as large as the document
+        targetSize = QSize(
+            qMax(m_renderSize.width(), documentSize.width()),
+            qMax(m_renderSize.height(), documentSize.height())
+        );
+    } else {
+        // If no render size specified, use the document size
+        targetSize = documentSize;
+    }
+    
+    qDebug() << "PNG Export - Target render size:" << targetSize;
+    
+    // Temporarily resize widget to ensure full content is visible
+    m_htmlWidget->resize(targetSize);
+    
+    // Force a relayout
+    m_htmlWidget->reload();
+    
+    // Process events to ensure the layout is complete
+    QApplication::processEvents();
+    
+    // Get the document size again after resize, as it may have changed
+    if (doc) {
+        documentSize = QSize(doc->width(), doc->height());
+        qDebug() << "PNG Export - Document size after resize:" << documentSize;
+    }
+    
+    // Create a pixmap that's large enough for the entire document
+    QSize exportSize = QSize(
+        qMax(targetSize.width(), documentSize.width()),
+        qMax(targetSize.height(), documentSize.height())
+    );
+    
+    qDebug() << "PNG Export - Final export size:" << exportSize;
     
     // Create a pixmap with the export size
     QPixmap pixmap(exportSize);
@@ -577,29 +603,7 @@ bool MainWindow::exportToPng(const QString& filePath)
     // Create a painter for the pixmap
     QPainter painter(&pixmap);
     
-    // Apply appropriate scaling
-    if (documentSize.isValid() && documentSize.width() > 0 && documentSize.height() > 0) {
-        // Scale based on document size while maintaining aspect ratio
-        double scaleX = (double)exportSize.width() / documentSize.width();
-        double scaleY = (double)exportSize.height() / documentSize.height();
-        
-        // Use the minimum scale factor to fit while preserving aspect ratio
-        double scale = qMin(scaleX, scaleY);
-        painter.scale(scale, scale);
-        
-        // Center the content
-        if (scaleX > scaleY) {
-            double offsetX = (exportSize.width() - documentSize.width() * scale) / (2 * scale);
-            painter.translate(offsetX, 0);
-        } else {
-            double offsetY = (exportSize.height() - documentSize.height() * scale) / (2 * scale);
-            painter.translate(0, offsetY);
-        }
-        
-        qDebug() << "PNG Export - Applied scale:" << scale << "with centering";
-    }
-    
-    // Let the widget render into the painter
+    // Let the widget render into the painter - document will draw at full height
     qDebug() << "Rendering widget to pixmap";
     m_htmlWidget->render(&painter);
     painter.end();
@@ -611,6 +615,12 @@ bool MainWindow::exportToPng(const QString& filePath)
         qInfo() << "Successfully exported PNG to:" << filePath;
     } else {
         qWarning() << "Failed to save PNG to:" << filePath;
+    }
+    
+    // Restore original widget size if we resized it
+    if (originalRenderSize.isValid()) {
+        m_htmlWidget->resize(originalRenderSize);
+        m_htmlWidget->reload();
     }
     
     return result;

@@ -80,7 +80,7 @@ class QlithRunner:
         os.environ["QT_QPA_PLATFORM"] = "offscreen"
         os.environ["QLITH_SKIP_DEFAULT_LOAD"] = "1"
         os.environ["QLITH_DEBUG"] = "1"
-        os.environ["QT_SCALE_FACTOR"] = "2"  # Make rendering larger
+        os.environ["QT_SCALE_FACTOR"] = "1"  # Changed from 2 to 1 for proper rendering
 
     def get_engine_path(self, engine: str) -> Path:
         """Get the path to the engine executable.
@@ -268,6 +268,12 @@ class QlithRunner:
                         console.print(
                             f"    [green]Copied file to:[/green] {output_file}"
                         )
+
+                        # Delete the original file after successful copy
+                        rel_output_file.unlink()
+                        console.print(
+                            f"    [green]Deleted original file:[/green] {rel_output_file.absolute()}"
+                        )
                     except Exception as e:
                         console.print(f"    [red]Error copying file:[/red] {e}")
 
@@ -320,6 +326,12 @@ class QlithRunner:
                                             shutil.copy2(f, output_file)
                                             console.print(
                                                 f"    [green]Copied file to:[/green] {output_file}"
+                                            )
+
+                                            # Delete the original file after successful copy
+                                            f.unlink()
+                                            console.print(
+                                                f"    [green]Deleted original file:[/green] {f.absolute()}"
                                             )
                                             break
                                         except Exception as e:

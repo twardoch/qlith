@@ -30,6 +30,8 @@
 #include <QSvgGenerator>
 #include <QPlainTextEdit>
 #include <QApplication>
+#include <QEventLoop>
+#include <QTimer>
 
 MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
                                                           ui(new Ui::MainWindow),
@@ -302,7 +304,10 @@ void MainWindow::loadFile(const QString& filePath)
   QFileInfo fileInfo(filePath);
   if (!fileInfo.exists() || !fileInfo.isReadable()) {
     qWarning() << "File does not exist or is not readable:" << filePath;
-    emit documentLoaded(false);
+    // Create error document instead of failing
+    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>File does not exist or is not readable: %1</p></body></html>")
+      .arg(filePath);
+    m_litehtmlWidget->loadHtml(errorHtml);
     return;
   }
   
@@ -310,7 +315,11 @@ void MainWindow::loadFile(const QString& filePath)
   QFile file(filePath);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qWarning() << "Failed to open file:" << filePath;
-    emit documentLoaded(false);
+    // Create error document for file open failure
+    QString errorHtml = QString("<!DOCTYPE html><html><body><h1>Error</h1><p>Failed to open file: %1</p><p>Error: %2</p></body></html>")
+      .arg(filePath)
+      .arg(file.errorString());
+    m_litehtmlWidget->loadHtml(errorHtml);
     return;
   }
   
@@ -323,6 +332,7 @@ void MainWindow::loadFile(const QString& filePath)
 
   // Log the content size
   qDebug() << "HTML content size:" << htmlContent.size() << "bytes";
+  qDebug() << "First 100 chars of content:" << htmlContent.left(100);
   
   // Check if we're in debug mode
   if (m_debugMode) {
@@ -353,17 +363,40 @@ void MainWindow::loadFile(const QString& filePath)
       QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath() + "/").toString();
       qDebug() << "Loading HTML with base URL:" << baseUrl;
       
-      // Add validation to ensure we have proper HTML structure
-      if (!htmlContent.contains("<!DOCTYPE", Qt::CaseInsensitive) && 
-          !htmlContent.contains("<html", Qt::CaseInsensitive)) {
-        qDebug() << "Adding HTML wrapper tags to content";
-        htmlContent = "<!DOCTYPE html><html><body>" + htmlContent + "</body></html>";
-      }
+      // Create a local connection to handle document loading
+      QEventLoop loadWaitLoop;
+      bool loadSuccess = false;
       
+      // Use a direct connection to ensure we get the signal
+      QMetaObject::Connection conn = connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, 
+        [&loadWaitLoop, &loadSuccess](bool success) {
+          qDebug() << "MainWindow: Document loaded signal received with status:" << success;
+          loadSuccess = success;
+          loadWaitLoop.quit();
+        }, Qt::DirectConnection);
+      
+      // Set a timeout to prevent hanging
+      QTimer::singleShot(3000, &loadWaitLoop, [&loadWaitLoop]() {
+        qWarning() << "MainWindow: Document load timeout occurred";
+        loadWaitLoop.quit();
+      });
+      
+      // Load the HTML content
       m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
       
-      // The documentLoaded signal will be emitted by the onDocumentLoaded slot
-      // which is connected to the widget's documentLoaded signal
+      // Wait for loading to complete or timeout
+      qDebug() << "MainWindow: Waiting for document to load...";
+      loadWaitLoop.exec();
+      
+      // Disconnect the temporary connection
+      disconnect(conn);
+      
+      // Emit our own documentLoaded signal
+      emit documentLoaded(loadSuccess);
+      
+      // Force a repaint of the window to ensure UI updates
+      update();
+      QApplication::processEvents();
     } else {
       qWarning() << "LiteHTML widget is not initialized";
       emit documentLoaded(false);
@@ -550,6 +583,10 @@ bool MainWindow::exportToPng(const QString& filePath)
 
 void MainWindow::onDocumentLoaded(bool success)
 {
-  qDebug() << "MainWindow::onDocumentLoaded called with status:" << (success ? "success" : "failure");
+  qDebug() << "MainWindow::onDocumentLoaded - Success:" << success;
+  
+  // Additional document loading logic could go here
+  
+  // Forward the signal
   emit documentLoaded(success);
 }
