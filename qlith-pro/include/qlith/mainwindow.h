@@ -22,6 +22,33 @@ Q_OBJECT
 public:
   explicit MainWindow(bool debugMode = false, QWidget *parent = nullptr);
   ~MainWindow();
+  
+  /**
+   * @brief Load HTML file
+   * @param filePath Path to the HTML file
+   */
+  void loadFile(const QString& filePath);
+  
+  /**
+   * @brief Export the current view to an SVG file
+   * @param filePath Path where to save the SVG file
+   * @return True if export was successful, false otherwise
+   */
+  bool exportToSvg(const QString& filePath);
+  
+  /**
+   * @brief Export the current view to a PNG file
+   * @param filePath Path where to save the PNG file
+   * @return True if export was successful, false otherwise
+   */
+  bool exportToPng(const QString& filePath);
+
+signals:
+  /**
+   * @brief Signal emitted when a document is loaded
+   * @param success True if document was loaded successfully
+   */
+  void documentLoaded(bool success);
 
 protected:
   /**
@@ -41,6 +68,12 @@ private slots:
    * @param url The URL to navigate to
    */
   void loadUrl(const QString& url);
+  
+  /**
+   * @brief Handle document loaded event from litehtmlWidget
+   * @param success True if loading was successful
+   */
+  void onDocumentLoaded(bool success);
 
 private:
   /**

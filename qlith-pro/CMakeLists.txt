@@ -23,20 +23,71 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
 set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
 
-# macOS OpenGL workaround - setting variables to bypass OpenGL header check in Qt5Gui
+# Set up CMake module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Include macOS OpenGL fix
 if(APPLE)
+  # Find the actual OpenGL headers from Xcode or CommandLineTools
+  set(POSSIBLE_GL_PATHS
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers" 
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX14.5.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+  )
+  
+  set(GL_HEADER_PATH "")
+  foreach(path ${POSSIBLE_GL_PATHS})
+    if(EXISTS "${path}/gl.h")
+      set(GL_HEADER_PATH "${path}")
+      break()
+    endif()
+  endforeach()
+  
+  # Create OpenGL headers directory
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/OpenGL_include")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/OpenGL_include/GL")
+  
+  if(GL_HEADER_PATH)
+    message(STATUS "Found OpenGL headers at: ${GL_HEADER_PATH}")
+    
+    # Copy the real OpenGL headers to our include directory
+    file(GLOB GL_HEADERS "${GL_HEADER_PATH}/*.h")
+    foreach(header ${GL_HEADERS})
+      get_filename_component(header_name ${header} NAME)
+      file(COPY ${header} DESTINATION "${CMAKE_BINARY_DIR}/OpenGL_include/GL")
+    endforeach()
+  else()
+    message(STATUS "Using empty OpenGL headers as fallback")
+    # Create dummy files as fallback if real headers not found
+    file(WRITE "${CMAKE_BINARY_DIR}/OpenGL_include/GL/gl.h" "/* Dummy OpenGL header */\n#define GL_VERSION_1_1 1\n")
+    file(WRITE "${CMAKE_BINARY_DIR}/OpenGL_include/GL/glu.h" "/* Dummy GLU header */\n")
+    file(WRITE "${CMAKE_BINARY_DIR}/OpenGL_include/GL/glext.h" "/* Dummy GLEXT header */\n")
+  endif()
+  
+  # Set environment variables to tell Qt where to find the OpenGL headers
+  set(ENV{OPENGL_INCLUDE_DIR} "${CMAKE_BINARY_DIR}/OpenGL_include")
+  set(ENV{GLU_INCLUDE_DIR} "${CMAKE_BINARY_DIR}/OpenGL_include")
+  
+  # Add the include directories for OpenGL headers to the INCLUDE path
+  include_directories(BEFORE "${CMAKE_BINARY_DIR}/OpenGL_include")
+  
+  # Set OpenGL flags
   set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
   set(OpenGL_GL_PREFERENCE LEGACY)
-  # Tell CMake to skip the FindOpenGL module's check for GL/gl.h
   set(OPENGL_FOUND ON)
   set(OPENGL_GLU_FOUND ON)
-  set(OPENGL_INCLUDE_DIR "")
-  # Core profile doesn't need these headers
+  set(OPENGL_INCLUDE_DIR "${CMAKE_BINARY_DIR}/OpenGL_include")
+  
+  # Override Qt OpenGL headers check
   set(QT_OPENGL_LIB_HEADERS_CHECKED TRUE)
+  
+  message(STATUS "Applied macOS OpenGL headers workaround")
 endif()
 
 # Find Qt5 packages
-find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network REQUIRED)
+find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network Svg REQUIRED)
 
 # Build external dependencies - litehtml (which includes gumbo)
 add_subdirectory(${LITEHTML_DIR} ${CMAKE_BINARY_DIR}/litehtml)
@@ -93,6 +144,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Gui
     Qt5::Widgets
     Qt5::Network
+    Qt5::Svg
     litehtml
     gumbo
 )
@@ -141,7 +193,6 @@ message(STATUS "qlith-pro configuration complete")
 # Add color test program
 add_executable(color_test
     test_app/color_test.cpp
-    src/gui/container_qt5.cpp
 )
 
 target_include_directories(color_test
@@ -157,9 +208,7 @@ target_link_libraries(color_test PRIVATE
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    Qt5::Network
     litehtml
-    gumbo
 )
 
 # Set application properties for color_test

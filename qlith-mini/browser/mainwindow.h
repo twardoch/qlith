@@ -41,6 +41,27 @@ public:
      * @param url The URL to load.
      */
     void load(const QUrl& url);
+    
+    /**
+     * @brief Export the current view to an SVG file.
+     * @param filePath The path where to save the SVG file.
+     * @return True if export was successful, false otherwise.
+     */
+    bool exportToSvg(const QString& filePath);
+    
+    /**
+     * @brief Export the current view to a PNG file.
+     * @param filePath The path where to save the PNG file.
+     * @return True if export was successful, false otherwise.
+     */
+    bool exportToPng(const QString& filePath);
+
+signals:
+    /**
+     * @brief Signal emitted when page loading is finished.
+     * @param ok True if loading was successful, false otherwise.
+     */
+    void loadFinished(bool ok);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -80,6 +101,11 @@ private:
     QToolBar* m_navigationToolBar;
     QStatusBar* m_statusBar;
     
+    // Menus
+    QMenu* m_fileMenu;
+    QMenu* m_viewMenu;
+    QMenu* m_helpMenu;
+    
     // Actions
     QAction* m_backAction;
     QAction* m_forwardAction;
@@ -92,15 +118,13 @@ private:
     QAction* m_exitAction;
     QAction* m_aboutAction;
     
-    // Menus
-    QMenu* m_fileMenu;
-    QMenu* m_viewMenu;
-    QMenu* m_helpMenu;
-    
-    float m_zoomFactor;
-    QUrl m_startUrl;
+    // History management
     QList<QUrl> m_history;
     int m_historyIndex;
+    QUrl m_startUrl;
+    
+    // Zoom
+    float m_zoomFactor;
 };
 
 #endif // MAINWINDOW_H 

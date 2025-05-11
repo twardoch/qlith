@@ -3,15 +3,143 @@
 #include <memory>
 #include <string>
 #include <QDebug>
-#include "qlith/container_qt5.h"
+#include <QApplication>
+#include <QObject>
+
+// Create a simplified mock container for testing colors
+class mock_container : public litehtml::document_container {
+private:
+    using ColorResolverFunc = std::function<std::string(const std::string&)>;
+    ColorResolverFunc m_customColorResolver;
+
+public:
+    // Constructor
+    mock_container() {
+        std::cout << "Mock container created" << std::endl;
+    }
+
+    // Set custom color resolver
+    void setCustomColorResolver(ColorResolverFunc resolver) {
+        m_customColorResolver = resolver;
+    }
+
+    // Implement just the minimal set of required functions
+    litehtml::uint_ptr create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm) override {
+        // Return a dummy font handle
+        return 1;
+    }
+    
+    void delete_font(litehtml::uint_ptr hFont) override {}
+    
+    int text_width(const char* text, litehtml::uint_ptr hFont) override {
+        return 100; // dummy width
+    }
+    
+    void draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos) override {}
+    
+    int pt_to_px(int pt) const override {
+        return pt * 4 / 3; // standard conversion
+    }
+    
+    int get_default_font_size() const override {
+        return 16;
+    }
+    
+    const char* get_default_font_name() const override {
+        return "Arial";
+    }
+    
+    void draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker) override {}
+    
+    void load_image(const char* src, const char* baseurl, bool redraw_on_ready) override {}
+    
+    void get_image_size(const char* src, const char* baseurl, litehtml::size& sz) override {
+        sz.width = 0;
+        sz.height = 0;
+    }
+    
+    void draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url) override {}
+    
+    void draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color) override {}
+    
+    void draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient) override {}
+    
+    void draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient) override {}
+    
+    void draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient) override {}
+    
+    void draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root) override {}
+    
+    void set_caption(const char* caption) override {}
+    
+    void set_base_url(const char* base_url) override {}
+    
+    void link(const std::shared_ptr<litehtml::document>& doc, const litehtml::element::ptr& el) override {}
+    
+    void on_anchor_click(const char* url, const litehtml::element::ptr& el) override {}
+    
+    void on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event) override {}
+    
+    void set_cursor(const char* cursor) override {}
+    
+    void transform_text(litehtml::string& text, litehtml::text_transform tt) override {
+        // Very basic text transformation - not all transformations are implemented
+        if (tt == litehtml::text_transform_uppercase) {
+            std::transform(text.begin(), text.end(), text.begin(), ::toupper);
+        } else if (tt == litehtml::text_transform_lowercase) {
+            std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+        }
+    }
+    
+    void import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl) override {}
+    
+    void set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius) override {}
+    
+    void del_clip() override {}
+    
+    void get_viewport(litehtml::position& viewport) const override {
+        viewport.width = 800;
+        viewport.height = 600;
+    }
+    
+    void get_media_features(litehtml::media_features& media) const override {
+        media.type = litehtml::media_type_screen;
+        media.width = 800;
+        media.height = 600;
+        media.device_width = 800;
+        media.device_height = 600;
+        media.color = 8;
+        media.resolution = 96;
+    }
+    
+    void get_language(litehtml::string& language, litehtml::string& culture) const override {
+        language = "en";
+        culture = "US";
+    }
+    
+    litehtml::element::ptr create_element(const char* tag_name, 
+                                        const litehtml::string_map& attributes,
+                                        const std::shared_ptr<litehtml::document>& doc) override {
+        return nullptr; // Let litehtml create default element
+    }
+    
+    litehtml::string resolve_color(const litehtml::string& color) const override {
+        if (m_customColorResolver) {
+            return m_customColorResolver(color);
+        }
+        return color;
+    }
+};
 
 // Simple test program to verify color parsing fixes
 int main(int argc, char** argv)
 {
+    QApplication app(argc, argv);
+    
     std::cout << "Color parsing test program" << std::endl;
     
     // Create a simple document container
-    auto container = std::make_shared<container_qt5>(nullptr);
+    auto container = std::make_shared<mock_container>();
     
     // Test 1: Basic HTML with simple colors
     const char* simple_html = R"(

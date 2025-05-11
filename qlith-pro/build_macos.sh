@@ -41,6 +41,81 @@ if [ -z "$QT_PATH" ]; then
 fi
 echo "Using Qt5 from: $QT_PATH"
 
+# Apply OpenGL headers workaround for macOS
+QT5_CONFIG_FILE="$QT_PATH/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake"
+if [ -f "$QT5_CONFIG_FILE" ]; then
+    # Create a backup if it doesn't exist
+    if [ ! -f "${QT5_CONFIG_FILE}.original" ]; then
+        sudo cp "$QT5_CONFIG_FILE" "${QT5_CONFIG_FILE}.original"
+        echo "Created backup of original Qt5GuiConfigExtras.cmake"
+    fi
+
+    # Check if we need to apply the fix
+    if ! grep -q "QtGui_OpenGL_Headers" "$QT5_CONFIG_FILE"; then
+        echo "Applying comprehensive OpenGL headers fix to Qt5GuiConfigExtras.cmake..."
+
+        # Copy the fixed version to a temporary location
+        mkdir -p /tmp/qt5fix
+        cat >/tmp/qt5fix/opengl_fix.cmake <<EOF
+set(_GL_INCDIRS "/System/Library/Frameworks/OpenGL.framework/Headers" "/System/Library/Frameworks/AGL.framework/Headers")
+
+# Try to find OpenGL headers in standard locations
+find_path(_qt5gui_OPENGL_INCLUDE_DIR gl.h
+    PATHS \${_GL_INCDIRS}
+)
+
+# Check Xcode SDK locations as fallback
+if (NOT _qt5gui_OPENGL_INCLUDE_DIR)
+    message(STATUS "Checking Xcode SDK locations for OpenGL headers...")
+    find_path(_qt5gui_OPENGL_INCLUDE_DIR gl.h
+        PATHS
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers"
+    )
+endif()
+
+# If still not found, create a dummy directory with empty headers
+if (NOT _qt5gui_OPENGL_INCLUDE_DIR)
+    message(STATUS "Failed to find \"gl.h\" in \"\${_GL_INCDIRS}\". Using dummy headers.")
+    
+    # Create a dummy GL directory with empty headers
+    set(_qt5gui_OPENGL_INCLUDE_DIR "\${CMAKE_BINARY_DIR}/QtGui_OpenGL_Headers")
+    file(MAKE_DIRECTORY "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL")
+    
+    # Create minimal dummy headers
+    if (NOT EXISTS "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/gl.h")
+        file(WRITE "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/gl.h" "/* Dummy OpenGL header */\\n#define GL_VERSION_1_1 1\\n")
+    endif()
+    if (NOT EXISTS "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/glu.h")
+        file(WRITE "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/glu.h" "/* Dummy GLU header */\\n")
+    endif()
+    if (NOT EXISTS "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/glext.h")
+        file(WRITE "\${_qt5gui_OPENGL_INCLUDE_DIR}/GL/glext.h" "/* Dummy GLEXT header */\\n")
+    endif()
+endif()
+
+unset(_GL_INCDIRS)
+
+# Always append the OpenGL include directory, even if it's a dummy one
+list(APPEND Qt5Gui_INCLUDE_DIRS \${_qt5gui_OPENGL_INCLUDE_DIR})
+set_property(TARGET Qt5::Gui APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES \${_qt5gui_OPENGL_INCLUDE_DIR})
+
+# Keep the rest of the original file below this line
+EOF
+
+        # Get the rest of the original file (after the problematic part)
+        sed -n '/macro(_qt5gui_find_extra_libs/,$p' "${QT5_CONFIG_FILE}.original" >>/tmp/qt5fix/opengl_fix.cmake
+
+        # Apply the fix
+        sudo cp /tmp/qt5fix/opengl_fix.cmake "$QT5_CONFIG_FILE"
+        echo "Applied OpenGL headers fix."
+    else
+        echo "OpenGL headers fix already applied."
+    fi
+else
+    echo "Warning: Could not find Qt5GuiConfigExtras.cmake to patch."
+fi
+
 # Create the build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
 

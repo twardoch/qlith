@@ -39,7 +39,18 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     parser.addPositionalArgument("url", "The URL to open, optional.", "[url]");
     
+    // Add export options
+    QCommandLineOption svgOption(QStringList() << "svg", "Render to SVG file and quit.", "path");
+    parser.addOption(svgOption);
+    
+    QCommandLineOption pngOption(QStringList() << "png", "Render to PNG file and quit.", "path");
+    parser.addOption(pngOption);
+    
     parser.process(app);
+    
+    // Get export paths
+    QString svgPath = parser.value(svgOption);
+    QString pngPath = parser.value(pngOption);
     
     // Create debug directory if in debug mode
 #ifdef QLITH_DEBUG_DIR
@@ -51,7 +62,14 @@ int main(int argc, char *argv[])
     
     // Create main window
     MainWindow mainWindow;
-    mainWindow.show();
+    
+    // Handle export mode
+    bool exportMode = !svgPath.isEmpty() || !pngPath.isEmpty();
+    
+    // If not in export mode, show the window
+    if (!exportMode) {
+        mainWindow.show();
+    }
     
     // Load URL if specified
     const QStringList args = parser.positionalArguments();
@@ -74,10 +92,38 @@ int main(int argc, char *argv[])
             url = QUrl::fromUserInput(userInput);
         }
         mainWindow.load(url);
+        
+        // If in export mode, perform export after page load
+        if (exportMode) {
+            QObject::connect(&mainWindow, &MainWindow::loadFinished, [&]() {
+                if (!svgPath.isEmpty()) {
+                    mainWindow.exportToSvg(svgPath);
+                }
+                if (!pngPath.isEmpty()) {
+                    mainWindow.exportToPng(pngPath);
+                }
+                // Quit after export
+                QApplication::quit();
+            });
+        }
     } else {
         // Load default homepage
         QString homePage = "https://example.com";
         mainWindow.load(QUrl(homePage));
+        
+        // If in export mode, perform export after page load
+        if (exportMode) {
+            QObject::connect(&mainWindow, &MainWindow::loadFinished, [&]() {
+                if (!svgPath.isEmpty()) {
+                    mainWindow.exportToSvg(svgPath);
+                }
+                if (!pngPath.isEmpty()) {
+                    mainWindow.exportToPng(pngPath);
+                }
+                // Quit after export
+                QApplication::quit();
+            });
+        }
     }
     
     return app.exec();

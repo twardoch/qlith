@@ -1,5 +1,12 @@
-Be inventive and in `test_files` write a series of self-contained HTML files with embedded CSS that explore the limits of the CSS parser and layout engine. 
+# TODO
 
-First write a FILES.md in there and make a list of the files you’re going to create. Briefly describe what each file will do/test. Note: each file should not be a "unit test" but instead a small example that combines various aspects of HTML+CSS including layout. Make sure to explore all aspects supported by litehtml. 
+1. DONE: Analyze the `examples` folder. This folder contains a series of example HTML files. 
 
-Once you’ve written FILES.md in the test_files folder, start writing the actual HTML files. Make each self-contained, so they include CSS and HTML. They may even include small base64-encoded PNGs. 
+2. DONE: Check `./qlith_mini/runme.sh` and `./qlith_pro/runme.sh`. They show how to run the two apps that are based on litehtml. 
+
+3. DONE: Extend the CLI of both apps (mini and pro): --svg path should render the widget into SVG, --png path should render the widget into PNG. If any of these switches is used, the app should quit after the rendering is done. The switches can be combined.
+
+4. DONE: Write a `./examples/runme.sh` that will run both tools and for each will read every HTML file in the `./test_files` folder, render it to both PNG and SVG, and save the output to the `./test_files/mini` and `./test_files/pro` folders respectively.
+
+===
+
