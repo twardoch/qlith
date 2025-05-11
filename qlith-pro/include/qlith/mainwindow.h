@@ -7,18 +7,20 @@
 #include <QResizeEvent>
 #include <QString>
 
+// Forward declarations only
+// class litehtml_context; // No longer needed
+class litehtmlWidget;
+
 namespace Ui {
 class MainWindow;
 }
-
-class litehtmlWidget;
 
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
 
 public:
-  explicit MainWindow(QWidget *parent = nullptr);
+  explicit MainWindow(bool debugMode = false, QWidget *parent = nullptr);
   ~MainWindow();
 
 protected:
@@ -46,6 +48,18 @@ private:
    */
   void loadExample();
 
+  // /**
+  //  * @brief Initialize the HTML context and load master CSS - No longer needed
+  //  */
+  // void initializeContext();
+
+  /**
+   * @brief Set up the scrollbar for the HTML content
+   */
+  void setupScrollbar();
+
   Ui::MainWindow *ui;
-  litehtmlWidget *m_litehtmlWidget;
+  litehtmlWidget *m_litehtmlWidget; // Keep this for managing the widget instance
+  // litehtml_context m_context; // No longer needed
+  bool m_debugMode; // Debug mode flag
 };

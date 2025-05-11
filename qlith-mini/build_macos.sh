@@ -1,5 +1,9 @@
 #!/bin/bash
 # this_file: qlith-mini/build_macos.sh
+dir=${0%/*}
+if [ "$dir" = "$0" ]; then dir="."; fi
+cd "$dir"
+
 # Build script for qlith-mini on macOS
 
 set -e
@@ -26,7 +30,7 @@ if [ ! -d "$EXTERNAL_DIR/gumbo-parser" ]; then
 fi
 
 # Check for Qt5
-QT_DIR="/usr/local/Cellar/qt@5/5.15.16_1"
+QT_DIR="/usr/local/Cellar/qt@5/5.15.16_2"
 if [ ! -d "$QT_DIR" ]; then
     echo "Error: Qt5 not found at $QT_DIR"
     echo "Please install Qt5 using Homebrew (brew install qt@5)"
@@ -58,8 +62,8 @@ echo "Build complete."
 echo "To run the browser: ./browser/qlith"
 
 # Create an alias script for easy launching
-if [ -f "$PROJECT_ROOT/build/browser/qlith" ]; then
-    ln -sf "$PROJECT_ROOT/build/browser/qlith" "$PROJECT_ROOT/qlith-run"
+if [ -f "$PROJECT_ROOT/build/browser/qlith.app/Contents/MacOS/qlith" ]; then
+    ln -sf "$PROJECT_ROOT/build/browser/qlith.app/Contents/MacOS/qlith" "$PROJECT_ROOT/qlith-run"
     chmod +x "$PROJECT_ROOT/qlith-run"
     echo "Created launch script: $PROJECT_ROOT/qlith-run"
 fi

@@ -2,22 +2,21 @@
 #pragma once
 
 #include <QWidget>
-#include <QString>
 #include <QPoint>
 #include <QSize>
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QResizeEvent>
+#include <QWheelEvent>
 #include <QScrollBar>
 #include <QTimer>
-#include <memory>
+#include <QColor>
 
-// Forward declarations
-class container_qt5;
-namespace litehtml {
-    class document;
-    typedef std::shared_ptr<document> document_ptr;
-}
+#include "litehtml.h"
+#include "qlith/container_qt5.h"
 
 /**
- * A Qt widget that renders HTML using the litehtml library
+ * @brief Widget for displaying HTML content using litehtml
  */
 class litehtmlWidget : public QWidget
 {
@@ -25,100 +24,146 @@ class litehtmlWidget : public QWidget
 
 public:
     /**
-     * Constructor
+     * @brief Constructor
      * @param parent Parent widget
      */
     explicit litehtmlWidget(QWidget* parent = nullptr);
-
+    
     /**
-     * Destructor
+     * @brief Destructor
      */
     ~litehtmlWidget();
-
+    
     /**
-     * Get the container object
+     * @brief Get the container object
      * @return Pointer to the container_qt5 instance
      */
     container_qt5* getContainer() const;
-
+    
     /**
-     * Load HTML content
-     * @param html HTML content to load
+     * @brief Load HTML content
+     * @param html HTML content
      * @param baseUrl Base URL for resolving relative paths
      */
     void loadHtml(const QString& html, const QString& baseUrl = QString());
-
+    
     /**
-     * Load HTML content from a URL
-     * @param url The URL to load the HTML content from
+     * @brief Load URL content
+     * @param url URL of the content
      */
     void loadUrl(const QString& url);
-
+    
     /**
-     * Set the scroll position
-     * @param x New horizontal scroll position
-     * @param y New vertical scroll position
+     * @brief Set the scroll position
+     * @param x X position
+     * @param y Y position
      */
     void setScrollPos(int x, int y);
-
+    
     /**
-     * Set the scroll position
+     * @brief Set the scroll position
      * @param pos New scroll position
      */
     void setScrollPosition(const QPoint& pos);
-
+    
     /**
-     * Get the current scroll position
+     * @brief Get current scroll position
      * @return Current scroll position
      */
     QPoint scrollPosition() const;
-
+    
     /**
-     * Get the current scroll position
+     * @brief Get current scroll position
      * @return Current scroll position
      */
     QPoint scrollPos() const;
-
+    
     /**
-     * Get the size of the HTML document
-     * @return Document size
+     * @brief Get document size
+     * @return Size of the document
      */
     QSize documentSize() const;
 
 signals:
     /**
-     * Emitted when a link is clicked
-     * @param url URL of the clicked link
-     */
-    void linkClicked(const QString& url);
-
-    /**
-     * Emitted when the title changes
+     * @brief Signal emitted when the title changes
      * @param title New title
      */
     void titleChanged(const QString& title);
+    
+    /**
+     * @brief Signal emitted when an anchor is clicked
+     * @param url URL of the clicked anchor
+     */
+    void anchorClicked(const QString& url);
+    
+    /**
+     * @brief Signal emitted when document is loaded
+     * @param success True if loading was successful
+     */
+    void documentLoaded(bool success);
 
 protected:
+    /**
+     * @brief Handle paint events
+     * @param event The paint event
+     */
     void paintEvent(QPaintEvent* event) override;
+    
+    /**
+     * @brief Handle resize events
+     * @param event The resize event
+     */
     void resizeEvent(QResizeEvent* event) override;
+    
+    /**
+     * @brief Handle mouse press events
+     * @param event The mouse event
+     */
     void mousePressEvent(QMouseEvent* event) override;
+    
+    /**
+     * @brief Handle mouse release events
+     * @param event The mouse event
+     */
     void mouseReleaseEvent(QMouseEvent* event) override;
+    
+    /**
+     * @brief Handle mouse move events
+     * @param event The mouse event
+     */
     void mouseMoveEvent(QMouseEvent* event) override;
+    
+    /**
+     * @brief Handle mouse wheel events
+     * @param event The wheel event
+     */
     void wheelEvent(QWheelEvent* event) override;
 
-private slots:
+private:
+    /**
+     * @brief Create scrollbars for the widget
+     */
+    void createScrollBars();
+    
+    /**
+     * @brief Update document size from container
+     */
+    void updateDocumentSize(int w, int h);
+    
+    /**
+     * @brief Handle document size changes
+     */
     void onDocSizeChanged(int w, int h);
-    void anchorClicked(const QString& url);
 
 private:
-    container_qt5* m_container;
-    litehtml::document_ptr m_htmlDocument;
-    QScrollBar* m_vScrollBar;
-    QScrollBar* m_hScrollBar;
-    int m_scrollX;
-    int m_scrollY;
-    bool m_documentSizeSet;
-    QSize m_documentSize;
-    QTimer m_updateTimer;
-    bool m_needUpdate;
+    container_qt5* m_container;     ///< HTML container implementation
+    litehtml::document::ptr m_htmlDocument;
+    QScrollBar* m_vScrollBar;       ///< Vertical scroll bar
+    QScrollBar* m_hScrollBar;       ///< Horizontal scroll bar
+    int m_scrollX;                  ///< X scroll position
+    int m_scrollY;                  ///< Y scroll position
+    QColor m_backgroundColor;       ///< Background color
+    bool m_documentSizeSet;         ///< Flag indicating if document size is set
+    QSize m_documentSize;           ///< Size of the document
 }; 

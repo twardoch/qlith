@@ -5,6 +5,8 @@
 #include <QSurfaceFormat>
 #include <QDir>
 #include <QStandardPaths>
+#include <QFileInfo>
+#include <QFile>
 
 #include "mainwindow.h"
 
@@ -54,7 +56,23 @@ int main(int argc, char *argv[])
     // Load URL if specified
     const QStringList args = parser.positionalArguments();
     if (!args.isEmpty()) {
-        QUrl url = QUrl::fromUserInput(args.first());
+        QString userInput = args.first();
+        QUrl url;
+
+        // Check if the user input is a relative path to an existing file
+        QFileInfo fileInfo(userInput);
+        if (fileInfo.exists() && fileInfo.isRelative())
+        {
+            // If it's a relative path and the file exists, convert to absolute path
+            url = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+        }
+        else
+        {
+            // Otherwise, let QUrl try to figure it out (handles absolute paths, URLs)
+            // Or if it's a relative path but the file *doesn't* exist,
+            // fromUserInput might interpret it as a search term or a non-file URL, which is fine.
+            url = QUrl::fromUserInput(userInput);
+        }
         mainWindow.load(url);
     } else {
         // Load default homepage

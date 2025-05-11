@@ -1,6 +1,10 @@
 #!/bin/bash
 # this_file: qlith-pro/build_macos.sh
 
+dir=${0%/*}
+if [ "$dir" = "$0" ]; then dir="."; fi
+cd "$dir"
+
 # Exit immediately if a command exits with a non-zero status.
 set -e
 

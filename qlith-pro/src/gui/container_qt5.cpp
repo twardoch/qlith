@@ -12,10 +12,11 @@
 #include <QDir>
 #include <QUrl>
 #include <cmath>
+#include <QFontDatabase>
 
-// Default font settings
-static const int DEFAULT_FONT_SIZE = 16;
-static const QString DEFAULT_FONT_FAMILY = "Arial";
+// Default font settings - no longer needed as members are used
+// static const int DEFAULT_FONT_SIZE = 16;
+// static const QString DEFAULT_FONT_FAMILY = "Arial";
 
 // Convert litehtml position to QRect
 static QRect positionToRect(const litehtml::position& pos) {
@@ -31,7 +32,7 @@ static QColor webColorToQColor(const litehtml::web_color& color) {
 static litehtml::position::vector g_clips;
 
 // Initialize static members
-int container_qt5::m_defaultFontSize = DEFAULT_FONT_SIZE;
+// int container_qt5::m_defaultFontSize = DEFAULT_FONT_SIZE; // Now a non-static member
 
 // Constructor
 container_qt5::container_qt5(QWidget* parent)
@@ -40,21 +41,48 @@ container_qt5::container_qt5(QWidget* parent)
     , m_owner(parent)
     , m_painter(nullptr)
     , m_nextFontId(1)
-    , m_defaultFontName(DEFAULT_FONT_FAMILY)
+// m_defaultFontName and m_defaultFontSize are initialized below
 {
     Q_ASSERT(m_owner != nullptr);
-    
-    // Try to get device pixel ratio from screen
-    qreal devicePixelRatio = 1.0;
-    if (QGuiApplication::primaryScreen()) {
-        devicePixelRatio = QGuiApplication::primaryScreen()->devicePixelRatio();
+
+    QFontDatabase fontDb;
+
+    // First, try to find common system fonts in this specific order
+    QStringList preferredFonts = {"Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", "Roboto", "Verdana", "SansSerif"};
+
+    bool fontFound = false;
+    for (const QString &fontName : preferredFonts)
+    {
+        if (fontDb.families().contains(fontName, Qt::CaseInsensitive))
+        {
+            m_defaultFontName = fontName;
+            fontFound = true;
+            qDebug() << "container_qt5: Using preferred font:" << m_defaultFontName;
+            break;
+        }
     }
+
+    // If none of the preferred fonts were found, fall back to the first available system font
+    if (!fontFound)
+    {
+        if (!fontDb.families().isEmpty())
+        {
+            m_defaultFontName = fontDb.families().first();
+            qDebug() << "container_qt5: Default font family set to the first available:" << m_defaultFontName;
+        }
+        else
+        {
+            m_defaultFontName = "Arial"; // Ultimate fallback
+            qWarning() << "container_qt5: No system fonts found, falling back to Arial for defaultFontName.";
+        }
+    }
+
+    m_defaultFontSize = 16; // Default size in pixels
+    qDebug() << "container_qt5: Initialized with default font:" << m_defaultFontName << "size:" << m_defaultFontSize;
 }
 
-// Destructor
 container_qt5::~container_qt5()
 {
-    // Clean up resources
     m_images.clear();
     m_fonts.clear();
 }
@@ -63,11 +91,6 @@ container_qt5::~container_qt5()
 void container_qt5::set_document(std::shared_ptr<litehtml::document> doc)
 {
     _doc = doc;
-}
-
-// Get the default font size
-int container_qt5::getDefaultFontSize() {
-    return m_defaultFontSize;
 }
 
 // Set the scroll position
@@ -125,25 +148,30 @@ void container_qt5::repaint(QPainter& painter)
     // Set up painter
     setPainter(&painter);
     painter.setRenderHint(QPainter::Antialiasing);
-    
-    // Get widget size
-    QRect rc = m_owner->rect();
-    
-    // Render document at appropriate width
-    _doc->render(std::max(rc.width(), 1));
-    
-    // Set up clipping rectangle
-    litehtml::position clipPos;
-    clipPos.width = rc.width();
-    clipPos.height = rc.height();
-    clipPos.x = rc.x();
-    clipPos.y = rc.y();
-    
-    // Draw the document
-    try {
+
+    try
+    {
+        // Get widget size
+        QRect rc = m_owner ? m_owner->rect() : QRect(0, 0, 800, 600);
+
+        // Ensure positive dimensions
+        int docWidth = std::max(rc.width(), 1);
+
+        // Render document at appropriate width
+        _doc->render(docWidth);
+
+        // Set up clipping rectangle
+        litehtml::position clipPos;
+        clipPos.width = rc.width();
+        clipPos.height = rc.height();
+        clipPos.x = rc.x();
+        clipPos.y = rc.y();
+
+        // Draw the document - painter is guaranteed to be valid here
         _doc->draw(reinterpret_cast<litehtml::uint_ptr>(&painter), getScroll().x(), getScroll().y(), &clipPos);
     }
-    catch (std::exception& e) {
+    catch (const std::exception &e)
+    {
         qWarning() << "Exception in container_qt5::repaint:" << e.what();
     }
     catch (...) {
@@ -154,41 +182,77 @@ void container_qt5::repaint(QPainter& painter)
     setPainter(nullptr);
 
     // Notify if document size has changed
-    if (_doc->width() != m_lastDocWidth || _doc->height() != m_lastDocHeight) {
-        emit docSizeChanged(_doc->width(), _doc->height());
-        emit documentSizeChanged(_doc->width(), _doc->height());
-        m_lastDocWidth = _doc->width();
-        m_lastDocHeight = _doc->height();
+    if (_doc)
+    {
+        int newWidth = _doc->width();
+        int newHeight = _doc->height();
+
+        if (newWidth != m_lastDocWidth || newHeight != m_lastDocHeight)
+        {
+            emit docSizeChanged(newWidth, newHeight);
+            emit documentSizeChanged(newWidth, newHeight);
+            m_lastDocWidth = newWidth;
+            m_lastDocHeight = newHeight;
+        }
     }
 }
 
 // litehtml::document_container implementation
 
 // Font creation
-litehtml::uint_ptr container_qt5::create_font(const litehtml::font_description& descr, const litehtml::document* doc, litehtml::font_metrics* fm)
+litehtml::uint_ptr container_qt5::create_font(const litehtml::font_description &descr, const litehtml::document * /*doc*/, litehtml::font_metrics *fm)
 {
-    // Create QFont from font description
     QFont font;
-    font.setFamily(QString::fromUtf8(descr.family.c_str()));
-    font.setPixelSize(descr.size);
+    QString fontFamily = QString::fromUtf8(descr.family.c_str());
+    QFontDatabase fontDb; // Keep QFontDatabase for checking
+
+    // Simplified font family handling, closer to qlith-mini
+    // If a specific font family is requested, try to use it.
+    // Otherwise, or if not found, fall back to the container's default.
+    if (!fontFamily.isEmpty() && fontDb.families().contains(fontFamily, Qt::CaseInsensitive)) {
+        font.setFamily(fontFamily);
+    } else {
+        // Fallback to a generic family based on style hint if family is a generic one
+        // This is a simplified version of the previous complex logic.
+        bool genericSet = false;
+        if (fontFamily.compare("serif", Qt::CaseInsensitive) == 0) {
+            font.setStyleHint(QFont::Serif);
+            genericSet = true;
+        } else if (fontFamily.compare("sans-serif", Qt::CaseInsensitive) == 0) {
+            font.setStyleHint(QFont::SansSerif);
+            genericSet = true;
+        } else if (fontFamily.compare("monospace", Qt::CaseInsensitive) == 0) {
+            font.setStyleHint(QFont::Monospace);
+            genericSet = true;
+        }
+        // If not a recognized generic or not found, use container's default.
+        if (!genericSet) {
+             qWarning() << "Font family not found or not a recognized generic:" << fontFamily << "- using default font:" << m_defaultFontName;
+            font.setFamily(m_defaultFontName);
+        }
+    }
+
+    // Set font size, ensuring it's positive or default.
+    int fontSize = descr.size > 0 ? descr.size : m_defaultFontSize;
+    font.setPixelSize(fontSize);
+
+    // Apply weight, style, and decorations directly as in qlith-mini.
     font.setWeight(descr.weight);
     font.setItalic(descr.style == litehtml::font_style_italic);
     font.setUnderline(descr.decoration_line & litehtml::text_decoration_line_underline);
     font.setStrikeOut(descr.decoration_line & litehtml::text_decoration_line_line_through);
-    
-    // Create metrics object
+
+    // Create and store font metrics.
     font_metrics_t metrics(font);
-    
-    // Fill in font metrics if requested
+
     if (fm) {
         QFontMetrics qfm(font);
         fm->height = qfm.height();
         fm->ascent = qfm.ascent();
         fm->descent = qfm.descent();
-        fm->x_height = qfm.boundingRect('x').height();
+        fm->x_height = qfm.boundingRect('x').height(); // Consistent with qlith-mini
     }
-    
-    // Store the font with a unique ID
+
     int fontId = m_nextFontId++;
     m_fonts[fontId] = metrics;
     
@@ -225,7 +289,20 @@ void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, litehtml
     
     int fontId = static_cast<int>(hFont);
     if (!m_fonts.contains(fontId)) {
-        qWarning() << "draw_text: Invalid font ID:" << fontId;
+        qWarning() << "draw_text: Invalid font ID:" << fontId << " - Using fallback font";
+
+        // Create a fallback font
+        QFont fallbackFont;
+        fallbackFont.setFamily(m_defaultFontName);
+        fallbackFont.setPixelSize(m_defaultFontSize);
+
+        // Draw with fallback font
+        m_painter->save();
+        m_painter->setPen(webColorToQColor(color));
+        m_painter->setFont(fallbackFont);
+        QFontMetrics metrics(fallbackFont);
+        m_painter->drawText(pos.x, pos.y + metrics.ascent(), QString::fromUtf8(text));
+        m_painter->restore();
         return;
     }
     
@@ -244,26 +321,27 @@ void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, litehtml
 // Convert points to pixels
 int container_qt5::pt_to_px(int pt) const
 {
-    // Standard conversion: 1 point = 1/72 inch
     qreal dpr = 1.0;
     if (QGuiApplication::primaryScreen()) {
         dpr = QGuiApplication::primaryScreen()->devicePixelRatio();
     }
-    
-    // 96 DPI is the standard screen resolution
-    return (pt * 96) / 72;
+    return (pt * 96) / 72; // Standard conversion, adjust dpr if needed for your logic
 }
 
 // Get default font size
 int container_qt5::get_default_font_size() const
 {
-    return m_defaultFontSize;
+    return this->m_defaultFontSize;
 }
 
 // Get default font name
 const char* container_qt5::get_default_font_name() const
 {
-    return m_defaultFontName.toUtf8().constData();
+    // CRITICAL FIX: Use a static QByteArray to ensure the pointer remains valid,
+    // similar to the working qlith-mini implementation.
+    static QByteArray fontNameHolder;
+    fontNameHolder = this->m_defaultFontName.toUtf8();
+    return fontNameHolder.constData();
 }
 
 // Draw a list marker (bullet, number, etc.)
@@ -545,8 +623,11 @@ void container_qt5::set_caption(const char* caption)
 // Set base URL
 void container_qt5::set_base_url(const char* base_url)
 {
-    // This is already used in the code but not implemented
-    // Store base URL if needed
+    if (base_url && *base_url)
+    {
+        m_baseUrl = QString::fromUtf8(base_url);
+        qDebug() << "container_qt5::set_base_url - Setting base URL to:" << m_baseUrl;
+    }
 }
 
 // Link handling
@@ -608,22 +689,47 @@ void container_qt5::transform_text(litehtml::string& text, litehtml::text_transf
 // Import CSS from external resources
 void container_qt5::import_css(litehtml::string& text, const litehtml::string& url, litehtml::string& baseurl)
 {
-    // Try to load the CSS file from resources first
+    // Log the import request
+    qDebug() << "container_qt5::import_css called for URL:" << QString::fromStdString(url) << "Base URL:" << QString::fromStdString(baseurl);
+    
     QString cssUrl = QString::fromStdString(url);
     
-    // Convert to resource path if needed
-    if (cssUrl.startsWith("://")) {
-        QFile file(cssUrl);
+    // Check if we've already loaded this CSS
+    if (m_loaded_css.contains(cssUrl)) {
+        text = m_loaded_css[cssUrl].constData();
+        qDebug() << "container_qt5::import_css - Using cached CSS for" << cssUrl;
+        return;
+    }
+    
+    // Basic implementation - handle file:// URLs
+    if (cssUrl.startsWith("file://", Qt::CaseInsensitive)) {
+        QString localPath = QUrl(cssUrl).toLocalFile();
+        QFile file(localPath);
+        
         if (file.open(QIODevice::ReadOnly)) {
             QByteArray cssData = file.readAll();
             text = cssData.constData();
+            m_loaded_css[cssUrl] = cssData;
+            qDebug() << "container_qt5::import_css - Loaded CSS from file:" << localPath;
             file.close();
-            return;
+        } else {
+            qWarning() << "container_qt5::import_css - Failed to open CSS file:" << localPath;
         }
+        return;
     }
     
-    // For external CSS, we would need to implement a network request
-    // For simplicity in this example, we're just handling resource files
+    // For other URLs, we provide a minimal default CSS
+    // In a production app, we would implement network requests here
+    static const char* defaultCSS = 
+        "html, body { margin: 0; padding: 0; font-family: Arial, sans-serif; }\n"
+        "h1 { font-size: 2em; margin: 0.67em 0; }\n"
+        "h2 { font-size: 1.5em; margin: 0.75em 0; }\n"
+        "h3 { font-size: 1.17em; margin: 0.83em 0; }\n"
+        "p { margin: 1em 0; }\n";
+    
+    text = defaultCSS;
+    m_loaded_css[cssUrl] = QByteArray(defaultCSS);
+    qDebug() << "container_qt5::import_css - Using default CSS for" << cssUrl;
 }
 
 // Set clipping rectangle
@@ -702,27 +808,88 @@ litehtml::string container_qt5::resolve_color(const litehtml::string& color) con
 // Drawing method
 void container_qt5::draw(std::shared_ptr<litehtml::document>& doc, QPainter* painter, int x, int y, const litehtml::position* clip)
 {
+    // Validate parameters
     if (!doc) {
-        qWarning() << "container_qt5::draw called with null document";
+        qCritical() << "container_qt5::draw called with null document";
         return;
     }
 
-    // Set up painter
-    setPainter(painter);
-    
-    try {
-        // Draw the document at the specified position with clipping
-        doc->draw(reinterpret_cast<litehtml::uint_ptr>(painter), x, y, clip);
+    if (!painter)
+    {
+        qCritical() << "container_qt5::draw called with null painter";
+        return;
     }
-    catch (std::exception& e) {
-        qWarning() << "Exception in container_qt5::draw:" << e.what();
+
+    // Store painter to use for drawing operations
+    m_painter = painter;
+
+    try
+    {
+        // Validate clip rectangle or use a safe default
+        litehtml::position safeClip;
+        if (clip)
+        {
+            safeClip = *clip;
+
+            // Ensure clip dimensions are positive
+            if (safeClip.width <= 0 || safeClip.height <= 0)
+            {
+                qWarning() << "container_qt5::draw called with invalid clip dimensions. Using safe defaults.";
+                // Use a safe default clip size
+                safeClip.width = painter->device() ? painter->device()->width() : 800;
+                safeClip.height = painter->device() ? painter->device()->height() : 600;
+            }
+        }
+        else
+        {
+            // Create a default clip based on painter's device
+            safeClip.x = 0;
+            safeClip.y = 0;
+            safeClip.width = painter->device() ? painter->device()->width() : 800;
+            safeClip.height = painter->device() ? painter->device()->height() : 600;
+        }
+
+        // Set up the painter for document rendering
+        painter->save();
+        painter->translate(x, y);
+
+        // Draw the document with the safe clip
+        try
+        {
+            // This is the critical call that may be causing the segfault
+            // We're adding additional error checking around it
+            if (doc.get() == nullptr)
+            {
+                qCritical() << "container_qt5::draw document pointer is null after validation";
+                return;
+            }
+
+            doc->draw(reinterpret_cast<litehtml::uint_ptr>(painter), 0, 0, &safeClip);
+            qDebug() << "container_qt5::draw completed successfully";
+        }
+        catch (const std::exception &e)
+        {
+            qCritical() << "Exception in document->draw:" << e.what();
+        }
+        catch (...)
+        {
+            qCritical() << "Unknown exception in document->draw";
+        }
+
+        // Clean up
+        painter->restore();
     }
-    catch (...) {
-        qWarning() << "Unknown exception in container_qt5::draw";
+    catch (const std::exception &e)
+    {
+        qCritical() << "Exception in container_qt5::draw:" << e.what();
     }
-    
-    // Clean up
-    setPainter(nullptr);
+    catch (...)
+    {
+        qCritical() << "Unknown exception in container_qt5::draw";
+    }
+
+    // Clear the painter reference
+    m_painter = nullptr;
 }
 
 // Mouse button down handler

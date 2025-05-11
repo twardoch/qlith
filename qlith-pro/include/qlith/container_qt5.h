@@ -44,9 +44,10 @@ private:
     int offsetX = 0;
     int offsetY = 0;
     QPoint m_Scroll{0,0};
-    int m_lastDocWidth = 1;
-    int m_lastDocHeight = 1;
-    static int m_defaultFontSize;
+    int m_lastDocWidth = 0, m_lastDocHeight = 0;
+    QString m_defaultFontName; // Default font name (e.g., "Arial")
+    int m_defaultFontSize;     // Default font size in pixels
+    QString m_baseUrl;         // Base URL for resolving relative paths
     QWidget* m_owner;
     QPainter* m_painter = nullptr;
     
@@ -61,27 +62,24 @@ private:
     
     QMap<int, font_metrics_t> m_fonts;
     int m_nextFontId = 1;
-    QString m_defaultFontName = "Arial";
 
-public:
-  /**
-   * Default constructor
-   */
-  explicit container_qt5(QWidget* parent = nullptr);
+  public:
+    /**
+     * Default constructor
+     */
+    explicit container_qt5(QWidget *parent = nullptr);
 
-  /**
-   * Destructor
-   */
-  ~container_qt5();
+    /**
+     * Destructor
+     */
+    ~container_qt5();
 
-  static int getDefaultFontSize();
+    void setLastMouseCoords(int x, int y, int xClient, int yClient);
 
-  void setLastMouseCoords(int x, int y, int xClient, int yClient);
-
-  std::shared_ptr<litehtml::document> getDocument()
-  {
-    return _doc;
-  }
+    std::shared_ptr<litehtml::document> getDocument()
+    {
+      return _doc;
+    }
 
   void set_document(std::shared_ptr<litehtml::document> doc);
 
@@ -136,6 +134,12 @@ public:
   void setScrollY(const int &val);
   void setPainter(QPainter* painter);
   void onImageLoaded(const QString& url, const QImage& image);
+
+  // Convert litehtml web_color to QColor
+  static QColor webColorToQColor(const litehtml::web_color &color)
+  {
+    return QColor(color.red, color.green, color.blue, color.alpha);
+  }
 };
 
 Q_DECLARE_METATYPE(container_qt5*)

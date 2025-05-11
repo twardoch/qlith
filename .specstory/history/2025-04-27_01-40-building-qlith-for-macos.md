@@ -1566,19 +1566,43 @@ Next, let's update the `loadExample` method to fix any resource references in th
 
 ---
 
+```diff
+    <html>
+    <head>
++     <link rel="stylesheet" href=":/css/reset.css">
++     <link rel="stylesheet" href=":/css/bootstrap.css">
+      <style>
+        body {
+```
 
+```diff
+        
+        <p style="text-align: center;"><a href="https://example.com">Visit Example Website</a></p>
++       
++       <p style="text-align: center;"><img src=":/img/test.png" alt="Test Image"></p>
+      </div>
+    </body>
+```
 
 ---
 
-
-
----
-
-
+Now, let's check the `container_qt5.cpp` file to ensure any font loading code is using the correct resource paths:
 
 ---
 
+<details>
+            <summary>Searched codebase "container_qt5.cpp" • **2** results</summary>
+        
+| File |
+|------|
+| `undefined` |
+| `undefined` |
 
+</details>
+
+---
+
+Read file: /Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/container_qt5.cpp
 
 ---
 
@@ -2792,6 +2816,612 @@ Thunderbolt Bus: MacBook Pro, Apple Inc., 63.5
 ---
 
 _**Assistant**_
+
+
+
+---
+
+The crash report indicates the app is failing in the litehtml CSS parser. Looking at the call stack, we're seeing infinite recursion in `litehtml::parse_name_color()` which is causing a stack overflow.
+
+I'll fix the CSS files being loaded in two steps:
+
+1. First, check the content of the CSS files that are causing issues
+2. Then fix how these files are loaded in the context
+
+---
+
+Read file: qlith-pro/resources/css/bootstrap.css
+
+---
+
+Let's check where the CSS files are loaded in the litehtml initialization:
+
+---
+
+<details>
+            <summary>Grep search for "bootstrap\.css" • **9** files</summary>
+        
+| File | Line | Match |
+|------|------|-------|
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/TODO.md` | L596 | `*   Test rendering with the included `bootstrap.css` (expect visual glitches, but it should parse and apply some styles).` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_00-34-implementing-todo-list-in-markdown.md` | L8485 | `-   <link rel="stylesheet" href="://res/css/bootstrap.css">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L448 | `bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L5092 | `File: resources/css/bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L6047 | `<file>res/css/bootstrap.css</file>` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-54-building-%40qlith-pro-for-macos.md` | L9512 | `<link rel="stylesheet" href="://res/css/bootstrap.css">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp` | L169 | `<link rel="stylesheet" href=":/css/bootstrap.css">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/resources/res.qrc` | L11 | `<file>css/bootstrap.css</file>` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-27_01-40-building-qlith-for-macos.md` | L1514 | `| 📄 `bootstrap.css` |` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L425 | `│   │   ├── bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L523 | `bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L639 | `File: resources/css/bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L5445 | `<link rel="stylesheet" href="://res/css/bootstrap.css">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/.specstory/history/2025-04-26_22-28-refactoring-plan-for-qlith-pro-project.md` | L16819 | `<file>res/css/bootstrap.css</file>` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L87 | `bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L4739 | `File: resources/css/bootstrap.css` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L5694 | `<file>css/bootstrap.css</file>` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro.txt` | L9159 | `<link rel="stylesheet" href="://res/css/bootstrap.css">` |
+| `file:///Users/adam/Developer/vcs/github.twardoch/pub/qlith/qlith-pro/src/gui/mainwindow.cpp` | L169 | `<link rel="stylesheet" href=":/css/bootstrap.css">` |
+
+</details>
+
+---
+
+Let's look at the litehtml container implementation to see how CSS resources are loaded:
+
+---
+
+<details>
+            <summary>Searched codebase "litehtml container implementation" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `external/litehtml/containers/windows/gdiplus/gdiplus_container.h` | L1-23 |
+| `external/litehtml/containers/windows/win32/win32_container.h` | L1-42 |
+| `external/litehtml/containers/cairo/container_cairo.h` | L1-41 |
+| `external/litehtml/containers/haiku/container_haiku.h` | L1-42 |
+| `external/litehtml/containers/windows/cairo/windows_container.h` | L1-39 |
+| `external/litehtml/containers/windows/win32/win32_container.cpp` | L185-267 |
+| `qlith-pro/include/qlith/container_qt5.h` | L1-45 |
+| `qlith-mini.txt` | L1645-1747 |
+| `external/litehtml/include/litehtml/document_container.h` | L1-40 |
+| `external/litehtml/containers/test/test_container.h` | L1-23 |
+| `external/litehtml/src/el_title.cpp` | L1-15 |
+| `external/litehtml/containers/cairo/container_cairo.h` | L41-64 |
+| `external/litehtml/src/document.cpp` | L1-48 |
+| `qlith-mini/src/container_qpainter.cpp` | L710-731 |
+| `external/litehtml/containers/windows/win32/win32_container.h` | L42-71 |
+| `qlith-pro/include/qlith/litehtmlwidget.h` | L1-73 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `external/litehtml/containers/haiku/container_haiku.h` | L42-68 |
+| `external/litehtml/src/el_base.cpp` | L1-13 |
+| `external/litehtml/containers/windows/win32/win32_container.h` | L71-79 |
+| `external/litehtml/containers/haiku/container_haiku.h` | L68-87 |
+| `external/litehtml/containers/test/test_container.h` | L23-49 |
+| `qlith-mini.txt` | L990-1061 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L1-32 |
+| `qlith-mini/src/container_qpainter.h` | L1-43 |
+
+</details>
+
+---
+
+Let's look at the Qt container implementation and how it loads CSS:
+
+---
+
+<details>
+            <summary>Searched codebase "import_css" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `external/litehtml/src/el_link.cpp` | L1-39 |
+| `qlith-pro.txt` | L6046-6112 |
+| `external/litehtml/src/stylesheet.cpp` | L72-143 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `external/litehtml/src/stylesheet.cpp` | L23-72 |
+| `external/litehtml/src/stylesheet.cpp` | L1-23 |
+| `external/litehtml/support/webpage/web_page.cpp` | L73-151 |
+| `qlith-mini/src/container_qpainter.cpp` | L646-710 |
+| `external/litehtml/include/litehtml/stylesheet.h` | L1-62 |
+| `qlith-mini.txt` | L1516-1589 |
+| `external/litehtml/containers/haiku/container_haiku.cpp` | L479-562 |
+| `external/litehtml/containers/test/test_container.cpp` | L213-255 |
+| `qlith-pro/src/litehtml-qt.js_plugin_import.cpp` | L1-13 |
+| `external/litehtml/include/litehtml/document_container.h` | L60-79 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `qlith-mini.txt` | L2036-2103 |
+| `qlith-pro/include/qlith/context.h` | L1-37 |
+| `external/litehtml/include/litehtml/css_parser.h` | L1-53 |
+| `external/litehtml/src/css_properties.cpp` | L362-389 |
+| `external/litehtml/src/el_style.cpp` | L1-44 |
+| `external/litehtml/containers/cairo/render2png.cpp` | L133-183 |
+| `external/litehtml/src/css_properties.cpp` | L389-446 |
+| `qlith-mini/src/qlithwidget.cpp` | L246-311 |
+| `external/litehtml/src/css_properties.cpp` | L1-26 |
+| `external/litehtml/src/document.cpp` | L48-92 |
+
+</details>
+
+---
+
+Now, let's look for stylesheet related information in the qlith-pro container implementations:
+
+---
+
+<details>
+            <summary>Searched codebase "container_qt5 stylesheet" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-pro/src/gui/container_qt5.cpp` | L479-552 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `qlith-pro/include/qlith/container_qt5.h` | L1-45 |
+| `qlith-pro/include/qlith/container_qt5.h` | L45-103 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L218-269 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L663-728 |
+| `qlith-pro.txt` | L5833-5920 |
+| `qlith-pro.txt` | L18695-18782 |
+| `qlith-mini.txt` | L1404-1452 |
+| `qlith-pro.txt` | L5765-5833 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L156-218 |
+| `qlith-mini.txt` | L1880-1925 |
+| `qlith-pro/include/qlith/container_qt5.h` | L124-141 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L81-156 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `qlith-mini/src/qlithwidget.cpp` | L90-135 |
+| `qlith-pro.txt` | L6046-6112 |
+| `qlith-mini/src/container_qpainter.cpp` | L537-579 |
+| `qlith-pro.txt` | L6165-6206 |
+| `qlith-pro.txt` | L8491-8546 |
+| `qlith-pro/include/qlith/container_qt5_wrapper.h` | L1-11 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L32-80 |
+| `qlith-mini/src/container_qpainter.cpp` | L82-152 |
+
+</details>
+
+---
+
+Let's also check how stylesheet loading is implemented:
+
+---
+
+<details>
+            <summary>Searched codebase "import_css implementation" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `external/litehtml/src/el_link.cpp` | L1-39 |
+| `external/litehtml/src/stylesheet.cpp` | L72-143 |
+| `qlith-pro.txt` | L6046-6112 |
+| `external/litehtml/src/stylesheet.cpp` | L23-72 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `external/litehtml/src/stylesheet.cpp` | L1-23 |
+| `external/litehtml/support/webpage/web_page.cpp` | L73-151 |
+| `qlith-mini/src/container_qpainter.cpp` | L646-710 |
+| `external/litehtml/include/litehtml/stylesheet.h` | L1-62 |
+| `qlith-mini.txt` | L1516-1589 |
+| `external/litehtml/include/litehtml/document_container.h` | L60-79 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `external/litehtml/containers/haiku/container_haiku.cpp` | L479-562 |
+| `external/litehtml/containers/test/test_container.cpp` | L213-255 |
+| `qlith-pro/src/litehtml-qt.js_plugin_import.cpp` | L1-13 |
+| `external/litehtml/containers/cairo/render2png.cpp` | L133-183 |
+| `qlith-mini.txt` | L2036-2103 |
+| `external/litehtml/src/css_properties.cpp` | L362-389 |
+| `external/litehtml/include/litehtml/css_parser.h` | L1-53 |
+| `external/litehtml/src/el_style.cpp` | L1-44 |
+| `qlith-mini/src/container_qpainter.cpp` | L710-731 |
+| `external/litehtml/src/style.cpp` | L481-542 |
+| `qlith-mini/src/qlithwidget.cpp` | L246-311 |
+| `external/litehtml/src/document.cpp` | L48-92 |
+| `external/litehtml/src/css_properties.cpp` | L389-446 |
+
+</details>
+
+---
+
+Let's also check for any CSS loading implementations in the qlith-pro project:
+
+---
+
+<details>
+            <summary>Searched codebase "css loading implementation qlith-pro" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-mini.txt` | L1880-1925 |
+| `qlith-mini.txt` | L2036-2103 |
+| `qlith-mini/src/qlithwidget.cpp` | L53-90 |
+| `qlith-mini/src/qlithwidget.cpp` | L246-311 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-mini/src/qlithwidget.cpp` | L90-135 |
+| `qlith-mini.txt` | L2103-2196 |
+| `qlith-mini.txt` | L1925-1993 |
+| `qlith-pro/resources/css/master.css` | L1-1 |
+| `qlith-mini/src/qlithwidget.cpp` | L135-203 |
+| `qlith-mini/src/qlithwidget.cpp` | L311-404 |
+| `qlith-mini/src/qlithwidget.h` | L1-65 |
+| `qlith-pro/include/qlith/context.h` | L1-37 |
+| `qlith-mini/src/container_qpainter.cpp` | L710-731 |
+| `qlith-pro.txt` | L5289-5392 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L155-247 |
+| `qlith-pro/include/qlith/container_qt5.h` | L1-45 |
+| `qlith-pro.txt` | L6046-6112 |
+| `qlith-pro/resources/css/bootstrap.css` | Lundefined-undefined |
+| `qlith-mini.txt` | L1993-2036 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-pro/resources/css/test1.css` | L1-1 |
+| `qlith-mini/src/qlithwidget.cpp` | L203-246 |
+| `qlith-mini.txt` | L1816-1880 |
+| `qlith-pro/include/qlith/container_qt5.h` | L103-124 |
+
+</details>
+
+---
+
+Let's check the content of the master.css file:
+
+---
+
+Read file: qlith-pro/resources/css/master.css
+
+---
+
+Let's also check how the container loads CSS resources in qlith-mini:
+
+---
+
+<details>
+            <summary>Searched codebase "onCssLoaded container_qpainter" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-mini/src/container_qpainter.cpp` | L710-731 |
+| `qlith-mini/src/container_qpainter.h` | L121-150 |
+| `qlith-mini/src/container_qpainter.h` | L1-43 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-mini.txt` | L2036-2103 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-mini/src/container_qpainter.cpp` | L1-82 |
+| `qlith-pro.txt` | L6046-6112 |
+| `qlith-pro/include/qlith/container_qt5.h` | L1-45 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `qlith-mini.txt` | L908-990 |
+| `qlith-mini.txt` | L1880-1925 |
+| `qlith-mini/src/qlithwidget.cpp` | L246-311 |
+| `qlith-mini/src/qlithwidget.cpp` | L90-135 |
+| `qlith-mini/src/container_qpainter.cpp` | L265-330 |
+| `qlith-mini/src/container_qpainter.cpp` | L646-710 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L218-269 |
+| `qlith-mini.txt` | L1516-1589 |
+| `qlith-mini/src/container_qpainter.cpp` | L82-152 |
+| `qlith-mini.txt` | L1105-1155 |
+| `qlith-mini.txt` | L1645-1747 |
+| `qlith-mini.txt` | L1404-1452 |
+| `qlith-mini/src/container_qpainter.h` | L101-121 |
+| `qlith-mini/src/container_qpainter.cpp` | L537-579 |
+| `qlith-pro.txt` | L5765-5833 |
+
+</details>
+
+---
+
+Let's check how CSS is loaded in qlith-pro:
+
+---
+
+<details>
+            <summary>Searched codebase "import_css handle css loading qlith-pro" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-mini.txt` | L2036-2103 |
+| `qlith-pro.txt` | L6046-6112 |
+| `qlith-mini/src/qlithwidget.cpp` | L246-311 |
+| `qlith-pro/include/qlith/context.h` | L1-37 |
+| `qlith-pro/resources/css/master.css` | L1-1 |
+| `qlith-mini.txt` | L1880-1925 |
+| `qlith-mini/src/qlithwidget.cpp` | L90-135 |
+| `qlith-mini.txt` | L1925-1993 |
+| `qlith-mini/src/qlithwidget.cpp` | L53-90 |
+| `qlith-mini/src/container_qpainter.cpp` | L710-731 |
+| `qlith-mini.txt` | L1516-1589 |
+| `qlith-mini/src/qlithwidget.cpp` | L135-203 |
+| `qlith-pro/resources/css/test1.css` | L1-1 |
+| `qlith-mini/src/container_qpainter.cpp` | L646-710 |
+| `qlith-mini.txt` | L2103-2196 |
+| `qlith-pro/resources/css/bootstrap.css` | Lundefined-undefined |
+| `qlith-pro/include/qlith/container_qt5.h` | L1-45 |
+| `qlith-pro.txt` | L5289-5392 |
+| `qlith-mini.txt` | L1993-2036 |
+| `qlith-mini/src/qlithwidget.cpp` | L203-246 |
+| `qlith-mini/src/qlithwidget.cpp` | L311-404 |
+| `qlith-pro/include/qlith/container_qt5.h` | L103-124 |
+| `qlith-pro.txt` | L18695-18782 |
+| `qlith-pro.txt` | L1116-1175 |
+
+</details>
+
+---
+
+Let's check the `container_qpainter` CSS loading implementation:
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Let's look at the `onCssLoaded` method specifically and see how the CSS is imported:
+
+---
+
+Read file: qlith-mini/src/container_qpainter.cpp
+
+---
+
+Let's check how CSS is loaded in `qlith-pro` by looking at the `container_qt5.cpp` file:
+
+---
+
+Read file: qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+Now let's check the implementation of the `onCssLoaded` function:
+
+---
+
+Tool call timed out after 5s (codebase search)
+
+---
+
+Let me search for files that might handle CSS loading:
+
+---
+
+<details>
+            <summary>Searched codebase "CSS loading litehtml" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L247-260 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L80-147 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L155-247 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L1-32 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L147-223 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L223-254 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L1-65 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L156-218 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L269-325 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L65-124 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L728-781 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L479-552 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L663-728 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L254-305 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L218-269 |
+| `qlith-pro/src/common.cpp` | L1-86 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L355-394 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L391-420 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L451-479 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L305-355 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L124-155 |
+
+</details>
+
+---
+
+Let me search for more specific implementation details about CSS loading in the litehtml container:
+
+---
+
+<details>
+            <summary>Searched codebase "CSS loading parsing import_css" • **0** results</summary>
+        
+No results found
+</details>
+
+---
+
+Let me check the container implementation that handles CSS loading:
+
+---
+
+<details>
+            <summary>Searched codebase "container_qt5 import_css" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L479-552 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L663-728 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L218-269 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L156-218 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L81-156 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L1-32 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L269-325 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L451-479 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L728-781 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L391-420 |
+| `qlith-pro/src/gui/main.cpp` | L1-36 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L1-65 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L65-124 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L420-451 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L80-147 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L32-80 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L155-247 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L223-254 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L147-223 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L254-305 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L247-260 |
+
+</details>
+
+---
+
+Let's look at the CSS importing mechanism in litehtml itself:
+
+---
+
+<details>
+            <summary>Searched codebase "import_css implementation in litehtml" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `external/litehtml/src/el_link.cpp` | L1-39 |
+| `external/litehtml/support/webpage/web_page.cpp` | L73-151 |
+| `external/litehtml/src/stylesheet.cpp` | L72-143 |
+| `external/litehtml/src/el_style.cpp` | L1-44 |
+| `external/litehtml/src/el_text.cpp` | L1-86 |
+| `external/litehtml/src/stylesheet.cpp` | L1-23 |
+| `external/litehtml/include/litehtml/document_container.h` | L60-79 |
+| `external/litehtml/include/litehtml/html_tag.h` | L1-52 |
+| `external/litehtml/src/html_tag.cpp` | L290-378 |
+| `external/litehtml/include/litehtml/document.h` | L1-44 |
+| `external/litehtml/include/litehtml/stylesheet.h` | L1-62 |
+| `external/litehtml/containers/haiku/container_haiku.h` | L42-68 |
+| `external/litehtml/containers/haiku/container_haiku.cpp` | L479-562 |
+| `external/litehtml/src/css_properties.cpp` | L1-26 |
+| `external/litehtml/include/litehtml/css_properties.h` | L549-618 |
+| `external/litehtml/src/css_properties.cpp` | L258-278 |
+| `external/litehtml/src/stylesheet.cpp` | L23-72 |
+| `external/litehtml/src/html_tag.cpp` | L1-86 |
+| `external/litehtml/include/litehtml/font_description.h` | L1-45 |
+| `external/litehtml/include/litehtml/master_css.h` | L1-140 |
+| `external/litehtml/include/litehtml/css_parser.h` | L1-53 |
+| `external/litehtml/containers/windows/win32/win32_container.h` | L1-42 |
+| `external/litehtml/include/litehtml/el_style.h` | L1-22 |
+| `external/litehtml/src/document.cpp` | L48-92 |
+| `external/litehtml/containers/test/test_container.cpp` | L213-255 |
+
+</details>
+
+---
+
+Now let's look at the container_qt5 implementation in the qlith-pro project:
+
+---
+
+<details>
+            <summary>Searched codebase "container_qt5 import_css implementation" • **25** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `qlith-pro/src/gui/container_qt5.cpp` | L608-663 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L552-608 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L1-81 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L479-552 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L663-728 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L325-391 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L218-269 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L156-218 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L65-118 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L269-325 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L81-156 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L451-479 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L1-32 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L728-781 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L391-420 |
+| `qlith-pro/src/gui/container_qt5.cpp` | L420-451 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L32-80 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L1-65 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L80-147 |
+| `qlith-pro/src/gui/main.cpp` | L1-36 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L223-254 |
+| `qlith-pro/src/gui/mainwindow.cpp` | L161-257 |
+| `qlith-pro/src/litehtml-qt.js_plugin_import.cpp` | L1-13 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L254-305 |
+| `qlith-pro/src/gui/litehtmlwidget.cpp` | L147-223 |
+
+</details>
+
+---
+
+Let's examine the `import_css` implementation in the container_qt5 class:
+
+---
+
+Read file: qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+Now let's look at the header file of container_qt5 to understand the class structure:
+
+---
+
+Read file: qlith-pro/include/qlith/container_qt5.h
+
+---
+
+Now let's examine how CSS files are loaded and used in the mainwindow class:
+
+---
+
+Read file: qlith-pro/src/gui/mainwindow.cpp
+
+---
+
+Let's check the implementation of the container_qt5.cpp file, particularly the import_css method:
+
+---
+
+Read file: qlith-pro/src/gui/container_qt5.cpp
+
+---
+
+Let's check the litehtmlwidget implementation to understand how it uses the container and litehtml context:
+
+---
+
+Read file: qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+Let's read the rest of the litehtmlwidget implementation:
+
+---
+
+Read file: qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+Let's read the last part of the file:
+
+---
+
+Read file: qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+Let me read the rest of the file:
+
+---
+
+Read file: qlith-pro/src/gui/litehtmlwidget.cpp
+
+---
+
+
+
+Let me check the header file to better understand the class structure:
+
+---
+
+Could not find file 'qlith-pro/src/gui/litehtmlwidget.h'. Did you mean one of:
+- qlith-pro/src/gui/litehtmlwidget.h.bak
+
+---
 
 
 

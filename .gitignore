@@ -68,3 +68,5 @@ ui_*.h
 # Generated files
 *.qm
 qlith_export.h 
+# SpecStory explanation file
+.specstory/.what-is-this.md

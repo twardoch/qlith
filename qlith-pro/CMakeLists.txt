@@ -23,6 +23,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external")
 set(LITEHTML_DIR "${EXTERNAL_DIR}/litehtml")
 
+# macOS OpenGL workaround - setting variables to bypass OpenGL header check in Qt5Gui
+if(APPLE)
+  set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
+  set(OpenGL_GL_PREFERENCE LEGACY)
+  # Tell CMake to skip the FindOpenGL module's check for GL/gl.h
+  set(OPENGL_FOUND ON)
+  set(OPENGL_GLU_FOUND ON)
+  set(OPENGL_INCLUDE_DIR "")
+  # Core profile doesn't need these headers
+  set(QT_OPENGL_LIB_HEADERS_CHECKED TRUE)
+endif()
+
 # Find Qt5 packages
 find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network REQUIRED)
 

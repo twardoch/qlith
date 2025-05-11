@@ -1,10 +1,9 @@
 // -*- coding: utf-8 -*-
 
 # include "qlith/mainwindow.h"
-# include "ui_mainwindow.h"
-# include "qlith/container_qt5.h"
-# include "qlith/litehtmlwidget.h"
-# include "qlith/context.h"
+#include "ui_mainwindow.h"
+#include "qlith/litehtmlwidget.h"
+#include "qlith/container_qt5.h"
 
 #include <QDebug>
 #include <QFile>
@@ -16,100 +15,169 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QDir>
+#include <QCoreApplication>
+#include <QFileInfo>
+#include <QLabel>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QMessageBox>
 
-MainWindow::MainWindow(QWidget *parent) :
-QMainWindow(parent),
-ui(new Ui::MainWindow)
+MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
+                                                          ui(new Ui::MainWindow),
+                                                          m_litehtmlWidget(nullptr),
+                                                          m_debugMode(debugMode)
 {
   ui->setupUi(this);
+
+  if (m_debugMode)
+  {
+    // Minimal UI for debug mode - This part was already designed to be simple
+    // and to isolate litehtml initialization, so we keep its structure.
+    QWidget *centralWidget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+    QHBoxLayout *controlLayout = new QHBoxLayout();
+    QTextEdit *htmlEditor = new QTextEdit(centralWidget);
+    htmlEditor->setPlainText("<html><head><title>Test</title></head><body><h1>Test Page</h1><p>This is a simple test page.</p></body></html>");
+    QPushButton *renderButtonLiteHTML = new QPushButton("Render with LiteHTML", centralWidget);
+    QLabel *statusLabel = new QLabel("Status: Ready for LiteHTML test", centralWidget);
+
+    controlLayout->addWidget(renderButtonLiteHTML);
+    controlLayout->addWidget(statusLabel);
+    layout->addLayout(controlLayout);
+    layout->addWidget(htmlEditor, 1);
+
+    // Placeholder for where litehtmlWidget would go, or just use a simple label for now
+    QLabel *contentPlaceholder = new QLabel("LiteHTML content will appear here or in a new window.", centralWidget);
+    contentPlaceholder->setAlignment(Qt::AlignCenter);
+    contentPlaceholder->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    layout->addWidget(contentPlaceholder, 2);
+
+    centralWidget->setLayout(layout);
+    setCentralWidget(centralWidget);
+
+    connect(renderButtonLiteHTML, &QPushButton::clicked, [this, htmlEditor, statusLabel]()
+            {
+      try
+      {
+        statusLabel->setText("Status: Creating LiteHTML widget...");
+        if (this->m_litehtmlWidget)
+        {
+          delete this->m_litehtmlWidget;
+          this->m_litehtmlWidget = nullptr;
+        }
+        this->m_litehtmlWidget = new litehtmlWidget();
+
+        statusLabel->setText("Status: Loading HTML into LiteHTML widget...");
+        this->m_litehtmlWidget->loadHtml(htmlEditor->toPlainText());
+
+        statusLabel->setText("Status: Displaying LiteHTML widget...");
+        QScrollArea *scrollArea = new QScrollArea(this);
+        scrollArea->setWidget(this->m_litehtmlWidget);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->resize(600, 400);
+        scrollArea->setWindowTitle("LiteHTML Render Test");
+        scrollArea->show();
+
+        statusLabel->setText("Status: LiteHTML rendering attempted.");
+      }
+      catch (const std::exception &e)
+      {
+        statusLabel->setText(QString("LiteHTML Error: %1").arg(e.what()));
+        qCritical() << "LiteHTML rendering exception:" << e.what();
+      }
+      catch (...)
+      {
+        statusLabel->setText("LiteHTML Error: Unknown exception.");
+        qCritical() << "LiteHTML rendering unknown exception.";
+      } });
+
+    setWindowTitle("qlith-pro - Debug Mode");
+    return; // Important: Return to not execute normal mode UI setup
+  }
+
+  // == Normal Mode UI Setup (Not Debug) ==
+  qDebug() << "MainWindow: Setting up normal mode UI.";
 
   // Create address bar components
   QLineEdit* urlEdit = new QLineEdit(this);
   urlEdit->setPlaceholderText("Enter URL (file:// or https://)");
-  QPushButton* goButton = new QPushButton("Go", this);
-  
-  // Create address bar layout
+  QPushButton *goButton = new QPushButton("Go", this);
   QHBoxLayout* addressBarLayout = new QHBoxLayout();
   addressBarLayout->addWidget(urlEdit);
   addressBarLayout->addWidget(goButton);
-  
-  // Add address bar to the UI
   ui->verticalLayout_6->insertLayout(0, addressBarLayout);
-  
-  // Connect the go button and enter key in the URL field
+
   connect(goButton, &QPushButton::clicked, this, &MainWindow::navigateToUrl);
   connect(urlEdit, &QLineEdit::returnPressed, this, &MainWindow::navigateToUrl);
-  
-  // Make the existing button load the example page
   connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::loadExample);
   ui->pushButton->setText("Load Example");
 
+  // Create a new litehtmlWidget for normal mode
+  if (m_litehtmlWidget)
+  {
+    delete m_litehtmlWidget;
+  } // Should be null here, but good practice
   m_litehtmlWidget = new litehtmlWidget();
+  // m_litehtmlWidget->setContext(&m_context); // No longer setting context from here
 
-  // Set up scroll area
   QScrollArea* scrollArea = new QScrollArea();
   scrollArea->setWidget(m_litehtmlWidget);
   scrollArea->setWidgetResizable(true);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  
-  // Set scroll area as central widget
-  setCentralWidget(scrollArea);
-  
-  // Connect the linkClicked signal
-  connect(m_litehtmlWidget, &litehtmlWidget::linkClicked, this, &MainWindow::loadUrl);
+  setCentralWidget(scrollArea); // This replaces the central widget set by ui->setupUi(this)
 
-  // Create a litehtml context
-  litehtml_context context;
+  // Connect to the correct signal for link clicks
+  connect(m_litehtmlWidget, &litehtmlWidget::anchorClicked, this, &MainWindow::loadUrl);
+  // connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, this, &MainWindow::onDocumentLoaded); // Example new signal
 
-  // Load master CSS
-  QFile master_css_fh(":/css/master.css");
-  if (!master_css_fh.open(QIODevice::ReadOnly)) {
-    qWarning() << "Failed to open master CSS file:" << master_css_fh.errorString();
-    // Create an empty CSS if file cannot be opened
-    context.load_master_stylesheet("");
-  } else {
-    QByteArray master_css = master_css_fh.readAll();
-    context.load_master_stylesheet(master_css.constData());
-    master_css_fh.close();
+  setupScrollbar(); // This needs to be adapted if central widget is replaced or m_litehtmlWidget changes
+  // ui->scrollAreaVerticalLayout->addWidget(m_litehtmlWidget); // This line might be problematic if setCentralWidget is used.
+  // It implies adding to a specific layout in the .ui file.
+  // If centralWidget is the scrollArea, then this is not needed.
+
+  // Initial content loading (if not in debug mode)
+  QStringList args = QCoreApplication::arguments();
+  if (args.size() > 1 && !args.at(1).isEmpty())
+  {
+    QString filePath = args.at(1);
+    qDebug() << "MainWindow: Loading file from command line:" << filePath;
+    // Simplified URL/File loading logic
+    QUrl urlToLoad = QUrl::fromUserInput(filePath); // Handles local files and web URLs
+    if (urlToLoad.isValid())
+    {
+      loadUrl(urlToLoad.toString());
+      if (urlEdit)
+      {
+        urlEdit->setText(urlToLoad.toString());
+      }
+    }
+    else
+    {
+      qWarning() << "MainWindow: Invalid URL or file path from command line:" << filePath;
+      loadExample(); // Fallback to example
+    }
+  }
+  else
+  {
+    qDebug() << "MainWindow: No file from command line, loading example.";
+    loadExample();
   }
 
-  // Load the example page by default
-  loadExample();
+  setWindowTitle("qlith-pro");
+}
 
-  ui->scrollAreaVerticalLayout->addWidget(m_litehtmlWidget);
-
-  QScrollBar* scrollBar = new QScrollBar(Qt::Vertical);
-  scrollBar->setParent(this);
-  scrollBar->setFocusPolicy(Qt::StrongFocus);
-  scrollBar->setMinimum(0);
-  scrollBar->setMaximum(0);
-  scrollBar->setValue(0);
-  scrollBar->setSingleStep(1);
-  scrollBar->setInvertedControls(false);
-  connect(scrollBar, &QScrollBar::valueChanged, scrollBar, [this](int val){
-    m_litehtmlWidget->getContainer()->setScrollY(-val);
-    m_litehtmlWidget->repaint();
-  });
-
-  connect(m_litehtmlWidget->getContainer(), &container_qt5::docSizeChanged, m_litehtmlWidget->getContainer(), 
-    [this, scrollBar](int w, int h) {
-      if (!scrollBar) {
-        return;
-      }
-
-      const int singleVisiblePageHeight = m_litehtmlWidget->height();
-      
-      // Subtracts already visible area = widget size
-      const int availableScroll = h - singleVisiblePageHeight;
-      scrollBar->setMaximum(availableScroll);
-      // amount that the value changes on cursor keys
-      scrollBar->setSingleStep(singleVisiblePageHeight);
-      // amount that the value changes on Page Up and Page Down keys
-      scrollBar->setPageStep(singleVisiblePageHeight);
-  });
-
-  ui->verticalLayoutBar->addWidget(scrollBar);
+void MainWindow::setupScrollbar()
+{
+  // Disabled in this version
+  // This method would need significant rework if used outside debug mode
+  // given the changes to central widget management.
+  // For normal mode, the QScrollArea now handles scrollbars for m_litehtmlWidget.
 }
 
 MainWindow::~MainWindow()
@@ -117,154 +185,65 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::navigateToUrl()
+void MainWindow::resizeEvent(QResizeEvent *event)
 {
-  // Get the URL from the line edit
-  QLineEdit* urlEdit = findChild<QLineEdit*>();
-  if (urlEdit) {
-    QString url = urlEdit->text();
-    if (!url.isEmpty()) {
-      loadUrl(url);
-    }
+  QMainWindow::resizeEvent(event);
+
+  // Update litehtmlWidget size if needed
+  if (m_litehtmlWidget)
+  {
+    m_litehtmlWidget->setMinimumWidth(width() - 30);
   }
 }
 
-void MainWindow::loadUrl(const QString& url)
+void MainWindow::navigateToUrl()
 {
-  QUrl qurl(url);
-  
-  // Update the address bar with the current URL
   QLineEdit* urlEdit = findChild<QLineEdit*>();
-  if (urlEdit) {
-    urlEdit->setText(url);
+  if (urlEdit && !urlEdit->text().isEmpty())
+  {
+    loadUrl(urlEdit->text());
   }
-  
-  // Handle different URL schemes
-  if (qurl.scheme() == "file") {
-    // Load local file
-    QFile file(qurl.toLocalFile());
-    if (file.open(QIODevice::ReadOnly)) {
-      QString html = QString::fromUtf8(file.readAll());
-      m_litehtmlWidget->loadHtml(html, url);
-      file.close();
-    } else {
-      // Show error message if file can't be opened
-      m_litehtmlWidget->loadHtml("<html><body><h1>Error</h1><p>Could not open file: " + qurl.toLocalFile() + "</p></body></html>");
-    }
-  } else if (qurl.scheme() == "http" || qurl.scheme() == "https") {
-    // Load remote URL
-    m_litehtmlWidget->loadUrl(url);
-  } else {
-    // For other schemes and invalid URLs, just try to load it directly
-    m_litehtmlWidget->loadUrl(url);
+}
+
+void MainWindow::loadUrl(const QString &url)
+{
+  if (!m_litehtmlWidget)
+  {
+    qWarning() << "loadUrl: litehtmlWidget is null";
+    return;
   }
+
+  qDebug() << "loadUrl: Loading URL:" << url;
+  m_litehtmlWidget->loadUrl(url);
 }
 
 void MainWindow::loadExample()
 {
-  // Example HTML content
-  QString html = R"(
+  if (!m_litehtmlWidget)
+  {
+    qWarning() << "loadExample: litehtmlWidget is null";
+    return;
+  }
+
+  // Simple example HTML content
+  QString exampleHtml = R"(
+  <!DOCTYPE html>
   <html>
   <head>
-    <link rel="stylesheet" href=":/css/reset.css">
-    <link rel="stylesheet" href=":/css/bootstrap.css">
+    <title>Example Page</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        line-height: 1.5;
-      }
-      h1 {
-        color: #2c3e50;
-        text-align: center;
-        border-bottom: 2px solid #3498db;
-        padding-bottom: 10px;
-      }
-      p {
-        margin-bottom: 15px;
-      }
-      a {
-        color: #3498db;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-      .highlight {
-        background-color: #ffffcc;
-        padding: 5px;
-        border-left: 3px solid #f39c12;
-      }
-      button {
-        background-color: #3498db;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        margin: 5px;
-      }
-      button:hover {
-        background-color: #2980b9;
-      }
-      img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 20px auto;
-      }
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      h1 { color: #333; }
+      p { line-height: 1.5; }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Qlith HTML Rendering Demo</h1>
-      
-      <p>This is a demonstration of the <span class="highlight">qlith-pro</span> HTML rendering capabilities using the litehtml library.</p>
-      
-      <p>Features demonstrated:</p>
-      <ul>
-        <li>Text formatting and CSS styling</li>
-        <li>Links: <a href="https://github.com/litehtml/litehtml">litehtml on GitHub</a></li>
-        <li>Basic layout with containers and margins</li>
-        <li>Buttons and interactive elements</li>
-      </ul>
-      
-      <div style="text-align: center; margin: 20px 0;">
-        <button type="button">Primary Button</button>
-        <button type="button" style="background-color: #27ae60;">Success Button</button>
-        <button type="button" style="background-color: #e74c3c;">Danger Button</button>
-      </div>
-      
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
-      
-      <p style="text-align: center;"><a href="https://example.com">Visit Example Website</a></p>
-      
-      <p style="text-align: center;"><img src=":/img/test.png" alt="Test Image"></p>
-    </div>
+    <h1>Welcome to qlith-pro</h1>
+    <p>This is a simple HTML example page rendered with litehtml.</p>
+    <p>The rendering engine supports basic HTML, CSS, and images.</p>
   </body>
   </html>
   )";
-  
-  // Load the HTML into the widget
-  m_litehtmlWidget->loadHtml(html);
-}
 
-// Handle window resize
-void MainWindow::resizeEvent(QResizeEvent* event)
-{
-  QMainWindow::resizeEvent(event);
-  
-  // Update litehtmlWidget size if needed
-  if (m_litehtmlWidget) {
-    m_litehtmlWidget->setMinimumWidth(width() - 30);
-  }
+  m_litehtmlWidget->loadHtml(exampleHtml);
 }
