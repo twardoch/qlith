@@ -8,6 +8,7 @@
 #include <QCommandLineParser>
 #include <QUrl>
 #include <QFileInfo>
+#include <QTimer>
 #include "qlith/container_qt5.h"
 #include "qlith/context.h"
 #include "qlith/mainwindow.h"
@@ -45,11 +46,24 @@ int main(int argc, char **argv)
   QCommandLineOption pngOption(QStringList() << "png", "Render to PNG file and quit.", "path");
   parser.addOption(pngOption);
   
+  // Add width and height options
+  QCommandLineOption widthOption(QStringList() << "width", "Set rendering width in pixels.", "pixels", "2048");
+  parser.addOption(widthOption);
+  
+  QCommandLineOption heightOption(QStringList() << "height", "Set rendering height in pixels.", "pixels", "2048");
+  parser.addOption(heightOption);
+  
   parser.process(app);
   
   // Get export paths
   QString svgPath = parser.value(svgOption);
   QString pngPath = parser.value(pngOption);
+  
+  // Get width and height
+  int renderWidth = parser.value(widthOption).toInt();
+  int renderHeight = parser.value(heightOption).toInt();
+  
+  qDebug() << "Render size:" << renderWidth << "x" << renderHeight;
   
   // Get input file
   QString inputFile;
@@ -90,33 +104,60 @@ int main(int argc, char **argv)
   // Handle export mode
   bool exportMode = !svgPath.isEmpty() || !pngPath.isEmpty();
 
+  qDebug() << "Export mode:" << (exportMode ? "true" : "false");
+  if (exportMode) {
+    qDebug() << "PNG export path:" << pngPath;
+    qDebug() << "SVG export path:" << svgPath;
+  }
+
   // Create main window with debug flag
   MainWindow w(debugMode);
   
-  // If not in export mode, show the window
-  if (!exportMode) {
-    w.show();
-  }
+  // Set the render size for export
+  w.setRenderSize(QSize(renderWidth, renderHeight));
+  
+  // Always show the window, even in export mode for proper rendering
+  w.show();
   
   // Load file if specified
   if (!inputFile.isEmpty()) {
+    qDebug() << "Loading file:" << inputFile;
     w.loadFile(inputFile);
     
     // If in export mode, perform export after page load
     if (exportMode) {
-      QObject::connect(&w, &MainWindow::documentLoaded, [&](bool success) {
+      // Explicitly capture needed variables to avoid dangling references
+      QObject::connect(&w, &MainWindow::documentLoaded, [&app, &w, svgPath, pngPath](bool success) {
+        qDebug() << "Document loaded signal received, success:" << success;
         if (success) {
           if (!svgPath.isEmpty()) {
             w.exportToSvg(svgPath);
           }
           if (!pngPath.isEmpty()) {
-            w.exportToPng(pngPath);
+            qDebug() << "Exporting to PNG:" << pngPath;
+            bool result = w.exportToPng(pngPath);
+            qDebug() << "PNG export result:" << (result ? "Success" : "Failed");
           }
         } else {
           qWarning() << "Failed to load document for export";
         }
+        // Quit after export with a short delay to ensure proper cleanup
+        QTimer::singleShot(100, &app, &QApplication::quit);
+      });
+      
+      // Set a backup timer in case documentLoaded signal is never emitted
+      QTimer::singleShot(5000, [&app, &w, svgPath, pngPath]() {
+        qDebug() << "Backup timer triggered - forcing export";
+        if (!svgPath.isEmpty()) {
+          w.exportToSvg(svgPath);
+        }
+        if (!pngPath.isEmpty()) {
+          qDebug() << "Exporting to PNG (backup):" << pngPath;
+          bool result = w.exportToPng(pngPath);
+          qDebug() << "Backup PNG export result:" << (result ? "Success" : "Failed");
+        }
         // Quit after export
-        QApplication::quit();
+        QTimer::singleShot(100, &app, &QApplication::quit);
       });
     }
   }

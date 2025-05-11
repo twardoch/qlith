@@ -17,7 +17,7 @@ if [ "$#" -ge 1 ]; then
     html_file="$1"
 else
     # Default file if none provided
-    html_file="$dir/../test_files/basic_layout.html"
+    html_file="$dir/../examples/basic_layout.html"
 fi
 
 # Execute the qlith application with the specified HTML file

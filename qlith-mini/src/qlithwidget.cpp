@@ -154,6 +154,8 @@ void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
     QByteArray htmlData = html.toUtf8();
     
     try {
+        qDebug() << "QlithWidget: Creating litehtml document from string, length:" << htmlData.size();
+        
         // Create litehtml document
         document = litehtml::document::createFromString(
             htmlData.constData(), 
@@ -161,16 +163,26 @@ void QlithWidgetPrivate::loadHtml(const QString &html, const QUrl &url) {
         );
         
         if (document) {
+            qDebug() << "QlithWidget: Document created successfully, rendering with width:" << q->width();
             document->render(q->width());
             needsLayout = false;
             q->update();
+            
+            qDebug() << "QlithWidget: Document rendered, emitting loadFinished(true)";
+            loading = false;
             emit q->loadFinished(true);
         } else {
-            qWarning() << "Failed to create litehtml document";
+            qWarning() << "QlithWidget: Failed to create litehtml document";
+            loading = false;
             emit q->loadFinished(false);
         }
     } catch (const std::exception &e) {
-        qWarning() << "Exception creating document:" << e.what();
+        qWarning() << "QlithWidget: Exception creating document:" << e.what();
+        loading = false;
+        emit q->loadFinished(false);
+    } catch (...) {
+        qWarning() << "QlithWidget: Unknown exception creating document";
+        loading = false;
         emit q->loadFinished(false);
     }
 }

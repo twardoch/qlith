@@ -312,6 +312,8 @@ void litehtmlWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
+    qDebug() << "litehtmlWidget::paintEvent - Widget size:" << size() << ", Document size:" << documentSize();
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
@@ -389,38 +391,53 @@ void litehtmlWidget::paintEvent(QPaintEvent *event)
  */
 void litehtmlWidget::resizeEvent(QResizeEvent *event)
 {
-    Q_UNUSED(event);
-
-    if (m_htmlDocument)
+    QSize oldSize = event->oldSize();
+    QSize newSize = event->size();
+    
+    qDebug() << "litehtmlWidget::resizeEvent - Old size:" << oldSize << ", New size:" << newSize;
+    
+    // Only rerender if width has changed significantly (helps avoid expensive re-renders)
+    int widthDelta = qAbs(oldSize.width() - newSize.width());
+    if (m_htmlDocument && (oldSize.width() <= 1 || widthDelta > 5))
     {
-        // Re-render the document with the new width
-        m_htmlDocument->render(width());
-
-        // Update scrollbar positions
-        if (m_documentSizeSet)
-        {
-            m_vScrollBar->setRange(0, std::max(0, m_documentSize.height() - height()));
-            m_vScrollBar->setPageStep(height());
-
-            m_hScrollBar->setRange(0, std::max(0, m_documentSize.width() - width()));
-            m_hScrollBar->setPageStep(width());
-
-            // Show scrollbars if needed
-            m_vScrollBar->setVisible(m_documentSize.height() > height());
-            m_hScrollBar->setVisible(m_documentSize.width() > width());
-
-            // Position scrollbars
-            m_vScrollBar->setGeometry(width() - m_vScrollBar->sizeHint().width(),
-                                      0,
-                                      m_vScrollBar->sizeHint().width(),
-                                      height() - (m_hScrollBar->isVisible() ? m_hScrollBar->sizeHint().height() : 0));
-
-            m_hScrollBar->setGeometry(0,
-                                      height() - m_hScrollBar->sizeHint().height(),
-                                      width() - (m_vScrollBar->isVisible() ? m_vScrollBar->sizeHint().width() : 0),
-                                      m_hScrollBar->sizeHint().height());
+        qDebug() << "litehtmlWidget::resizeEvent - Re-rendering document with new width:" << newSize.width();
+        try {
+            m_htmlDocument->render(newSize.width());
+        }
+        catch (const std::exception &e) {
+            qCritical() << "resizeEvent: Exception during document re-render:" << e.what();
+        }
+        catch (...) {
+            qCritical() << "resizeEvent: Unknown exception during document re-render";
         }
     }
+
+    // Update scrollbar positions
+    if (m_documentSizeSet)
+    {
+        m_vScrollBar->setRange(0, std::max(0, m_documentSize.height() - height()));
+        m_vScrollBar->setPageStep(height());
+
+        m_hScrollBar->setRange(0, std::max(0, m_documentSize.width() - width()));
+        m_hScrollBar->setPageStep(width());
+
+        // Show scrollbars if needed
+        m_vScrollBar->setVisible(m_documentSize.height() > height());
+        m_hScrollBar->setVisible(m_documentSize.width() > width());
+
+        // Position scrollbars
+        m_vScrollBar->setGeometry(width() - m_vScrollBar->sizeHint().width(),
+                               0,
+                               m_vScrollBar->sizeHint().width(),
+                               height() - (m_hScrollBar->isVisible() ? m_hScrollBar->sizeHint().height() : 0));
+
+        m_hScrollBar->setGeometry(0,
+                               height() - m_hScrollBar->sizeHint().height(),
+                               width() - (m_vScrollBar->isVisible() ? m_vScrollBar->sizeHint().width() : 0),
+                               m_hScrollBar->sizeHint().height());
+    }
+    
+    QWidget::resizeEvent(event);
 }
 
 /**

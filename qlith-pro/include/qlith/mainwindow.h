@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QResizeEvent>
 #include <QString>
+#include <QTextEdit>
+#include <QSize>
 
 // Forward declarations only
 // class litehtml_context; // No longer needed
@@ -42,6 +44,12 @@ public:
    * @return True if export was successful, false otherwise
    */
   bool exportToPng(const QString& filePath);
+
+  /**
+   * @brief Set the rendering size for export operations.
+   * @param size The size to use for rendering.
+   */
+  void setRenderSize(const QSize& size);
 
 signals:
   /**
@@ -93,6 +101,8 @@ private:
 
   Ui::MainWindow *ui;
   litehtmlWidget *m_litehtmlWidget; // Keep this for managing the widget instance
+  QTextEdit *m_htmlEditor;          // HTML editor for debug mode
   // litehtml_context m_context; // No longer needed
   bool m_debugMode; // Debug mode flag
+  QSize m_renderSize; // Rendering size for export operations
 };

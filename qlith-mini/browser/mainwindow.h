@@ -55,6 +55,12 @@ public:
      * @return True if export was successful, false otherwise.
      */
     bool exportToPng(const QString& filePath);
+    
+    /**
+     * @brief Set the rendering size for export operations.
+     * @param size The size to use for rendering.
+     */
+    void setRenderSize(const QSize& size);
 
 signals:
     /**
@@ -125,6 +131,9 @@ private:
     
     // Zoom
     float m_zoomFactor;
+    
+    // Rendering size for export operations
+    QSize m_renderSize;
 };
 
 #endif // MAINWINDOW_H 
