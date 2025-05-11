@@ -17,9 +17,9 @@ root_dir="$(pwd)"
 # Define paths
 mini_app="$root_dir/qlith-mini/build/browser/qlith.app/Contents/MacOS/qlith"
 pro_app="$root_dir/qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro"
-test_files_dir="$root_dir/test_files"
-mini_output_dir="$test_files_dir/mini"
-pro_output_dir="$test_files_dir/pro"
+examples_dir="$root_dir/examples"
+mini_output_dir="$examples_dir/mini"
+pro_output_dir="$examples_dir/pro"
 
 # Create output directories if they don't exist
 mkdir -p "$mini_output_dir" "$pro_output_dir"
@@ -57,16 +57,16 @@ process_file() {
     echo
 }
 
-# Process all HTML files in the test_files directory
-echo "Starting to process all HTML files in $test_files_dir"
+# Process all HTML files in the examples directory
+echo "Starting to process all HTML files in $examples_dir"
 echo "=========================================================="
 
 # Count the HTML files
-html_files=($(find "$test_files_dir" -maxdepth 1 -name "*.html"))
+html_files=($(find "$examples_dir" -maxdepth 1 -name "*.html"))
 file_count=${#html_files[@]}
 
 if [ $file_count -eq 0 ]; then
-    echo "No HTML files found in $test_files_dir"
+    echo "No HTML files found in $examples_dir"
     exit 1
 fi
 
