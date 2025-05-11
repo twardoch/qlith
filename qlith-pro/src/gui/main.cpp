@@ -130,27 +130,52 @@ int main(int argc, char **argv)
       // Wait for document to load and then export
       QEventLoop waitLoop;
       
+      // Track loading success
+      bool loadingSuccess = false;
+      
       // Connect documentLoaded signal to exit the wait loop
-      QObject::connect(&w, &MainWindow::documentLoaded, [&waitLoop](bool success) {
+      QObject::connect(&w, &MainWindow::documentLoaded, [&waitLoop, &loadingSuccess](bool success) {
         qDebug() << "Document loaded signal received, success:" << success;
+        loadingSuccess = success;
         // Continue whether or not loading was successful
         waitLoop.quit();
       });
       
-      // Set a longer timeout for the waitLoop to ensure rendering completes
-      QTimer::singleShot(5000, &waitLoop, &QEventLoop::quit);
+      // Set a longer timeout for the waitLoop to ensure rendering completes (increased from 5000 to 10000)
+      QTimer::singleShot(10000, &waitLoop, &QEventLoop::quit);
       
       // Wait for document to load or timeout
       qDebug() << "Waiting for document to load...";
       waitLoop.exec();
       
-      // Add additional delay to ensure rendering happens
-      QThread::msleep(500);
+      if (!loadingSuccess) {
+        qWarning() << "Document loading may have failed, but proceeding with export attempt";
+      }
+      
+      // Add additional delay to ensure rendering happens (increased from 500 to 1000)
+      QThread::msleep(1000);
 
-      // Process events multiple times to ensure rendering happens
-      for (int i = 0; i < 3; i++) {
+      // Process events multiple times to ensure rendering happens (increased loops from 3 to 5)
+      for (int i = 0; i < 5; i++) {
         QApplication::processEvents();
-        QThread::msleep(100);
+        QThread::msleep(200); // Increased from 100 to 200
+      }
+      
+      // Force the window to repaint
+      w.repaint();
+      QApplication::processEvents();
+      
+      // Verify widget exists and has been properly initialized
+      litehtmlWidget* htmlWidget = w.findChild<litehtmlWidget*>();
+      if (htmlWidget) {
+        qDebug() << "HTML widget found, current size:" << htmlWidget->size();
+        qDebug() << "Document size:" << htmlWidget->documentSize();
+        
+        // Force a render update on the widget
+        htmlWidget->update();
+        QApplication::processEvents();
+      } else {
+        qWarning() << "Could not find litehtmlWidget in MainWindow";
       }
       
       // Perform export operations
