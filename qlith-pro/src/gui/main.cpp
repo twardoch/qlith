@@ -9,6 +9,7 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QTimer>
+#include <QThread>
 #include "qlith/container_qt5.h"
 #include "qlith/context.h"
 #include "qlith/mainwindow.h"
@@ -136,18 +137,27 @@ int main(int argc, char **argv)
         waitLoop.quit();
       });
       
-      // Set a shorter timeout for the waitLoop
-      QTimer::singleShot(2000, &waitLoop, &QEventLoop::quit);
+      // Set a longer timeout for the waitLoop to ensure rendering completes
+      QTimer::singleShot(5000, &waitLoop, &QEventLoop::quit);
       
       // Wait for document to load or timeout
+      qDebug() << "Waiting for document to load...";
       waitLoop.exec();
       
-      // Process events to ensure rendering happens
-      QApplication::processEvents();
+      // Add additional delay to ensure rendering happens
+      QThread::msleep(500);
+
+      // Process events multiple times to ensure rendering happens
+      for (int i = 0; i < 3; i++) {
+        QApplication::processEvents();
+        QThread::msleep(100);
+      }
       
       // Perform export operations
       if (!svgPath.isEmpty()) {
-        w.exportToSvg(svgPath);
+        qDebug() << "Exporting to SVG:" << svgPath;
+        bool svgResult = w.exportToSvg(svgPath);
+        qDebug() << "SVG export result:" << (svgResult ? "Success" : "Failed");
       }
       
       if (!pngPath.isEmpty()) {
@@ -157,7 +167,7 @@ int main(int argc, char **argv)
       }
       
       // Quit after export with a short delay to ensure proper cleanup
-      QTimer::singleShot(500, &app, &QApplication::quit);
+      QTimer::singleShot(1000, &app, &QApplication::quit);
     }
   }
 

@@ -85,6 +85,11 @@ private slots:
 
 private:
   /**
+   * @brief Initialize or reinitialize the litehtmlWidget
+   */
+  void initializeLitehtmlWidget();
+
+  /**
    * @brief Load example HTML content
    */
   void loadExample();

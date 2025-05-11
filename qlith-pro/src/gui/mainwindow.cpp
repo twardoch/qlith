@@ -176,6 +176,12 @@ void MainWindow::initializeLitehtmlWidget()
     return;
   }
 
+  // Set specific size for the widget to match our render size
+  if (m_renderSize.isValid()) {
+    m_litehtmlWidget->setMinimumSize(m_renderSize.width(), m_renderSize.height());
+    m_litehtmlWidget->resize(m_renderSize);
+  }
+
   // Create a scroll area and set the litehtmlWidget as its child
   QScrollArea* scrollArea = new QScrollArea();
   scrollArea->setWidget(m_litehtmlWidget);
@@ -314,6 +320,9 @@ void MainWindow::loadFile(const QString& filePath)
   
   // Convert to string
   QString htmlContent = QString::fromUtf8(htmlData);
+
+  // Log the content size
+  qDebug() << "HTML content size:" << htmlContent.size() << "bytes";
   
   // Check if we're in debug mode
   if (m_debugMode) {
@@ -328,8 +337,11 @@ void MainWindow::loadFile(const QString& filePath)
     // In normal mode, load the HTML into the widget
     if (m_litehtmlWidget) {
       // Reset the widget size to ensure proper rendering
-      m_litehtmlWidget->setMinimumSize(m_renderSize.width(), m_renderSize.height());
-      m_litehtmlWidget->resize(m_renderSize);
+      if (m_renderSize.isValid()) {
+        qDebug() << "Setting widget size to:" << m_renderSize;
+        m_litehtmlWidget->setMinimumSize(m_renderSize.width(), m_renderSize.height());
+        m_litehtmlWidget->resize(m_renderSize);
+      }
       
       // Make sure the widget is visible
       m_litehtmlWidget->setVisible(true);
@@ -340,6 +352,14 @@ void MainWindow::loadFile(const QString& filePath)
       // Load the HTML with the file's directory as the base URL for relative paths
       QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath() + "/").toString();
       qDebug() << "Loading HTML with base URL:" << baseUrl;
+      
+      // Add validation to ensure we have proper HTML structure
+      if (!htmlContent.contains("<!DOCTYPE", Qt::CaseInsensitive) && 
+          !htmlContent.contains("<html", Qt::CaseInsensitive)) {
+        qDebug() << "Adding HTML wrapper tags to content";
+        htmlContent = "<!DOCTYPE html><html><body>" + htmlContent + "</body></html>";
+      }
+      
       m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
       
       // The documentLoaded signal will be emitted by the onDocumentLoaded slot

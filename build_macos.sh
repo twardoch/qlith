@@ -5,10 +5,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-cd mini
-source ./build.sh
-cd ..
+echo "DIR $SCRIPT_DIR"
 
-cd pro
-source ./build.sh
-cd ..
+cd "./qlith-mini"
+source ./build_macos.sh
+cd "$SCRIPT_DIR"
+
+cd "./qlith-pro"
+source ./build_macos.sh
+cd "$SCRIPT_DIR"
