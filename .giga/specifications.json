@@ -1,0 +1,22 @@
+[
+  {
+    "fileName": "main-overview.mdc",
+    "description": "Complete system overview of the HTML/CSS rendering engine, including core components, architecture, and integration points"
+  },
+  {
+    "fileName": "layout-engine-algorithms.mdc",
+    "description": "Detailed documentation of the core layout algorithms including block formatting, flex layout, table layout, and inline context processing"
+  },
+  {
+    "fileName": "css-processing-model.mdc",
+    "description": "Documentation of CSS processing pipeline including selector matching, specificity calculation, property inheritance, and style application"
+  },
+  {
+    "fileName": "graphics-rendering.mdc",
+    "description": "Documentation of graphics rendering system including gradient generation, shadow effects, color processing, and image handling"
+  },
+  {
+    "fileName": "document-container.mdc",
+    "description": "Documentation of the document container architecture, resource management, and integration with Qt framework"
+  }
+]

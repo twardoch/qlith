@@ -14,4 +14,7 @@ echo "Current directory: \"$dir\""
 echo "Application directory: \"$dir/build/qlith-pro.app/Contents/MacOS\""
 
 # Run with debug environment variable
-QLITH_DEBUG=1 "$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$dir/../test_files/simple.html"
+# QLITH_DEBUG=1
+"$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$dir/../test_files/fl8.html"
+
+# "./qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro" "./test_files/simple.html"

@@ -1,0 +1,60 @@
+---
+description: Specifies graphics rendering implementations including gradients, shadows, color processing and image handling
+globs: **/*.{cpp,h},**/graphics/**,**/render/**,**/color*,**/image*,**/gradient*,**/shadow*
+alwaysApply: false
+---
+
+
+# graphics-rendering
+
+## Core Components
+
+### Gradient Generation System
+- Custom multi-color gradient interpolation with supporting linear, radial and conic gradients
+- Progressive alpha blending with defined thresholds (60% start, 80% end, 17 steps)
+- Special handling for inner/outer radius adjustments in radial gradients
+- Support for gradient color stop sorting with stable sort implementation
+File: `qlith-pro/src/gradient.cpp`
+
+### Shadow Effects Engine
+- Multi-layered shadow composition with configurable spread and blur
+- Custom shadow calculation algorithm for rectangular and float-based adjustments 
+- Shadow extent calculations with configurable outline sizes
+- Normal and custom shadow style support
+File: `qlith-pro/src/shadowdata.cpp`
+
+### Color Processing Pipeline
+- HSL to RGB conversion with specialized color space transformation
+- Color blending logic with progressive alpha thresholds
+- Custom multiplier calculations for light/dark color variants
+- CMYK to RGBA conversion with specific color space adjustments
+File: `qlith-pro/src/color.cpp`
+
+### Image Handling System
+- Custom frame timing control with catch-up logic for delayed frames
+- Specialized frame caching system for large animations (>5MB threshold)
+- Frame metadata tracking with deferred loading
+- Memory budget tracking with observer notification system
+File: `qlith-pro/src/bitmapimage.cpp`
+
+### Rendering Context 
+- Custom quad/rect mapping functions for graphics coordinate transformations
+- Special case handling for graphics-related transformations (scale, rotate, skew)
+- Graphics coordinate system conversions between different spaces (2D/3D)
+- Perspective component isolation and manipulation
+File: `qlith-pro/src/transformationmatrix.cpp`
+
+## Business Value
+- Domain-specific implementations for web content rendering
+- Custom graphics operations optimized for HTML/CSS display
+- Specialized color and gradient handling for web standards compliance
+- Memory-efficient animation and image processing
+
+Importance Scores:
+- Gradient Generation: 85 - Critical for modern web rendering
+- Shadow Effects: 80 - Key visual enhancement component
+- Color Processing: 75 - Essential for accurate color representation
+- Image Handling: 90 - Core functionality for web content
+- Rendering Context: 85 - Fundamental transformation system
+
+$END$

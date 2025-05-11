@@ -13,6 +13,7 @@
 #include <QPoint>
 #include <QMap>
 #include <QFontMetrics>
+#include <functional>
 
 // Forward declarations
 class litehtmlWidget;
@@ -33,6 +34,12 @@ signals:
 
 public:
     std::shared_ptr<litehtml::document> _doc;
+
+    // Set a custom color resolver function for testing
+    using ColorResolverFunc = std::function<std::string(const std::string&)>;
+    void setCustomColorResolver(ColorResolverFunc resolver) {
+        m_customColorResolver = resolver;
+    }
 
 private:
     QHash<QString, QByteArray> m_loaded_css;
@@ -62,6 +69,9 @@ private:
     
     QMap<int, font_metrics_t> m_fonts;
     int m_nextFontId = 1;
+
+    // Custom color resolver for testing
+    ColorResolverFunc m_customColorResolver;
 
   public:
     /**

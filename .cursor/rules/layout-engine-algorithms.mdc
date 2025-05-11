@@ -1,0 +1,54 @@
+---
+description: Specification for core HTML/CSS layout engine algorithms and rendering business logic
+globs: */src/render_*.cpp,*/src/layout_*.cpp,*/src/css_*.cpp,*/flex_*.cpp,*/table.cpp
+alwaysApply: false
+---
+
+
+# layout-engine-algorithms
+
+The layout engine implements several key business-specific algorithms:
+
+1. Block Formatting Context (external/litehtml/src/render_block.cpp)
+- Margin collapsing engine with hierarchical margin calculation
+- Float positioning system with collision detection 
+- Block size computation considering containing blocks
+- Anonymous block box generation for mixed inline/block content
+
+2. Flex Layout System (external/litehtml/src/render_flex.cpp)
+- Main/cross axis space distribution algorithm 
+- Flex factor normalization (multiplied by 1000) for precise distribution
+- Baseline alignment calculations for flex lines
+- Flex shrink/grow calculations with min/max constraints
+
+3. Table Layout Engine (external/litehtml/src/render_table.cpp)
+- Grid cell size distribution algorithm:
+  - Fixed width columns
+  - Percentage width columns  
+  - Auto width columns
+- Border collapse model with specific cell overlap rules
+- Row height distribution with vertical alignment
+
+4. Inline Context Processor (external/litehtml/src/render_inline_context.cpp)
+- Line box management with vertical rhythm
+- Whitespace collapsing per CSS white-space property
+- Text indentation and list marker positioning
+- Float interference calculation for line boxes
+
+5. Text Layout System
+- Text run segmentation with support for:
+  - CJK character boundaries
+  - Forced line breaks
+  - Soft hyphens
+  - Word boundaries
+- Justification space distribution
+
+6. Box Model Implementation
+- Margin auto calculation for centering
+- Border radius clipping for backgrounds
+- Box shadow rendering with spread and blur
+- Relative/absolute positioning offsets
+
+The layout engine focuses on implementing CSS visual formatting models while handling complex interactions between positioning schemes, floats, and formatting contexts.
+
+$END$

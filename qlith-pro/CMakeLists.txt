@@ -137,3 +137,32 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 message(STATUS "qlith-pro configuration complete")
+
+# Add color test program
+add_executable(color_test
+    test_app/color_test.cpp
+    src/gui/container_qt5.cpp
+)
+
+target_include_directories(color_test
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${LITEHTML_DIR}/include
+        ${LITEHTML_DIR}/include/litehtml
+        ${LITEHTML_DIR}/src/gumbo/include
+)
+
+target_link_libraries(color_test PRIVATE
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    litehtml
+    gumbo
+)
+
+# Set application properties for color_test
+set_target_properties(color_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)

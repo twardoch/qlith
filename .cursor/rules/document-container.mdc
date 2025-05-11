@@ -1,0 +1,59 @@
+---
+description: Technical specification for HTML document container implementation in Qt applications
+globs: **/container_*.{cpp,h},**/document*.{cpp,h},**/qlith*/src/*.{cpp,h}
+alwaysApply: false
+---
+
+
+# document-container
+
+The document container provides the core document management functionality:
+
+## Document Layout Engine (qlith-mini/src/container_qpainter.cpp)
+
+1. Font Management System:
+- Custom font metrics tracking with language/culture awareness 
+- Dynamic font ID allocation between litehtml and Qt systems
+- Font transformation rules for text styling
+
+2. Layout Engine:
+- Custom viewport calculation for document layout
+- Media features detection for responsive rendering
+- Device pixel ratio handling for high-DPI displays
+
+3. Drawing Pipeline:
+- Gradient rendering with linear, radial and conic support
+- Border rendering with multiple styles and radius handling
+- List marker rendering system
+
+## Resource Management (qlith-pro/src/container_qt5.cpp)
+
+1. Image Loading:
+- URL resolution for relative/absolute paths
+- Local file prioritization
+- Cache management for loaded resources
+- Base URL management for resource resolution
+
+2. Document State:
+- Title and anchor handling
+- Document reflow management
+- Content type validation
+- Error state propagation
+
+## HTML Parsing (external/litehtml/src/document.cpp)
+
+1. Document Structure:
+- HTML node hierarchy management
+- Style inheritance system
+- Media query evaluation
+- Document mode detection (quirks/standards)
+
+2. Layout Processing:
+- Box model calculations
+- Float positioning
+- Margin collapsing
+- Clear property handling
+
+The container provides the core bridge between the HTML rendering engine and the Qt framework while managing document state, resources and layout processing.
+
+$END$

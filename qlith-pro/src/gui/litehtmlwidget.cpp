@@ -134,15 +134,19 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
         }
 
         qDebug() << "loadHtml: Creating HTML document...";
-        m_htmlDocument = litehtml::document::createFromString(htmlData.constData(), m_container);
+        
+        // Ensure htmlData is explicitly null-terminated by converting to std::string first.
+        std::string htmlStdString = htmlData.toStdString();
+        m_htmlDocument = litehtml::document::createFromString(htmlStdString.c_str(), m_container);
 
         if (!m_htmlDocument)
         {
             qWarning() << "loadHtml: Failed to create litehtml document.";
-            // Optionally, create a simple error document to display
             try {
                 QString errorHtml = "<html><body><h1>Error</h1><p>Failed to create HTML document from content.</p></body></html>";
-                m_htmlDocument = litehtml::document::createFromString(errorHtml.toUtf8().constData(), m_container);
+                // Ensure error HTML also uses std::string for c_str()
+                std::string errorStdString = errorHtml.toUtf8().toStdString();
+                m_htmlDocument = litehtml::document::createFromString(errorStdString.c_str(), m_container);
             } catch (...) {
                 qCritical() << "loadHtml: Could not create fallback error document.";
             }
@@ -172,7 +176,9 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
         qCritical() << "loadHtml: Exception during HTML document processing:" << e.what();
         try {
             QString errorHtml = QString("<html><body><h1>Error</h1><p>Exception: %1</p></body></html>").arg(e.what());
-            m_htmlDocument = litehtml::document::createFromString(errorHtml.toUtf8().constData(), m_container);
+            // Ensure error HTML also uses std::string for c_str()
+            std::string errorStdString = errorHtml.toUtf8().toStdString();
+            m_htmlDocument = litehtml::document::createFromString(errorStdString.c_str(), m_container);
             update();
         } catch (...) {
             qCritical() << "loadHtml: Could not create error document after exception.";
@@ -184,7 +190,9 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
         qCritical() << "loadHtml: Unknown C++ exception during HTML document processing.";
         try {
             QString errorHtml = "<html><body><h1>Error</h1><p>Unknown C++ exception occurred.</p></body></html>";
-            m_htmlDocument = litehtml::document::createFromString(errorHtml.toUtf8().constData(), m_container);
+            // Ensure error HTML also uses std::string for c_str()
+            std::string errorStdString = errorHtml.toUtf8().toStdString();
+            m_htmlDocument = litehtml::document::createFromString(errorStdString.c_str(), m_container);
             update();
         } catch (...) {
             qCritical() << "loadHtml: Could not create error document after unknown exception.";

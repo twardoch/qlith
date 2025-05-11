@@ -1,0 +1,59 @@
+---
+description: Handles CSS processing pipeline including selector matching, specificity calculation, property inheritance, and style application
+globs: **/css_*.{cpp,h},**/render_*.{cpp,h},**/stylesheet.{cpp,h},**/html_tag.{cpp,h}
+alwaysApply: false
+---
+
+
+# css-processing-model
+
+The CSS processing model implements core layout and styling logic through several key components:
+
+## Selector Matching & Specificity
+- Custom implementation of CSS selector specificity calculation following W3C rules
+- Specialized handling of pseudo-classes and attribute selectors
+- Progressive cascade resolution for overlapping selectors
+- Inheritance chain management through element hierarchy
+
+Files:
+- external/litehtml/src/css_selector.cpp 
+- external/litehtml/src/html_tag.cpp
+
+## Property Processing
+- Property value computation with unit conversion and normalization
+- Custom inheritance rules for different property types
+- Value validation and fallback handling
+- Specialized processing for shorthand properties
+
+Files:
+- external/litehtml/src/css_properties.cpp
+- external/litehtml/src/css_length.cpp
+
+## Layout Engine
+- Box model implementation with margin collapsing
+- Float positioning and clearance
+- Flexbox layout algorithm
+- Table cell sizing and alignment
+
+Files:
+- external/litehtml/src/render_block.cpp
+- external/litehtml/src/render_flex.cpp
+- external/litehtml/src/render_table.cpp
+
+## Style Application
+- Progressive style resolution through cascading layers
+- Media query evaluation and conditional application
+- Dynamic pseudo-class state management
+- Background and border rendering rules
+
+Files:
+- external/litehtml/src/stylesheet.cpp
+- external/litehtml/src/background.cpp
+
+Importance Scores:
+- Selector Matching: 95 (Core CSS functionality)
+- Property Processing: 90 (Critical for style application)
+- Layout Engine: 85 (Key rendering component)
+- Style Application: 80 (Essential for final presentation)
+
+$END$

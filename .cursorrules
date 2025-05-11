@@ -1,0 +1,77 @@
+
+START SPECIFICATION:
+---
+description: Applied when documenting high-level architecture and business logic organization for HTML/CSS rendering engines and browser-like applications, focusing on layout algorithms, style processing, and document rendering pipelines
+globs: *.cpp,*.h,*.c
+alwaysApply: false
+---
+
+
+# main-overview
+
+## Development Guidelines
+
+- Only modify code directly relevant to the specific request. Avoid changing unrelated functionality.
+- Never replace code with placeholders like `# ... rest of the processing ...`. Always include complete code.
+- Break problems into smaller steps. Think through each step separately before implementing.
+- Always provide a complete PLAN with REASONING based on evidence from code and logs before making changes.
+- Explain your OBSERVATIONS clearly, then provide REASONING to identify the exact issue. Add console logs when needed to gather more information.
+
+
+The project implements a custom HTML/CSS rendering engine with several key business components:
+
+## Core Rendering Engine
+HTML layout engine focused on element positioning and visual formatting:
+- Complex positioning calculation system handling absolute, relative, fixed positioning
+- Stacking context and z-index ordering implementation
+- Box model calculations for margins, borders, padding
+- Specialized table layout algorithms with cell merging and border handling
+
+Key files: external/litehtml/src/render_item.cpp
+
+## CSS Processing Pipeline 
+Style processing and application system:
+- Selector matching with specificity calculation
+- Media query evaluation for responsive layouts
+- Custom color processing with HSL/RGB transformations
+- Property inheritance and cascade handling
+
+Key files: 
+- external/litehtml/src/css_selector.cpp
+- external/litehtml/src/css_properties.cpp
+
+## Document Layout System
+Layout calculation engine implementing:
+- Flexbox layout with grow/shrink distribution
+- Float positioning and clearing behavior
+- Line box generation and inline formatting
+- Block formatting context management
+
+Key files:
+- external/litehtml/src/render_block.cpp
+- external/litehtml/src/render_flex.cpp
+
+## Resource Management
+Image and font handling system:
+- Progressive image loading with frame animation
+- Font metrics caching and mapping
+- Resource loading state management
+- MIME type validation and mapping
+
+Key files:
+- qlith-pro/src/imagedecoder.cpp
+- qlith-pro/src/mimetyperegistry.cpp
+
+## Container Integration 
+Qt integration layer providing:
+- Custom viewport calculation
+- Device pixel ratio handling
+- Font transformation rules
+- Drawing pipeline with gradient support
+
+Key files: qlith-mini/src/container_qpainter.cpp
+
+The architecture separates core HTML/CSS processing from platform-specific rendering, allowing the engine to be used across different UI frameworks while maintaining consistent layout behavior.
+
+$END$
+END SPECIFICATION
