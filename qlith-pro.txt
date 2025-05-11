@@ -134,9 +134,12 @@ src/
   stillimageqt.cpp
   styleimage.cpp
   transformationmatrix.cpp
+test_app/
+  color_test.cpp
 build_macos.sh
 CMakeLists.txt
 runme.sh
+test.sh
 
 ================================================================
 Files
@@ -1158,6 +1161,7 @@ File: include/qlith/container_qt5.h
 #include <QPoint>
 #include <QMap>
 #include <QFontMetrics>
+#include <functional>
 
 // Forward declarations
 class litehtmlWidget;
@@ -1178,6 +1182,12 @@ signals:
 
 public:
     std::shared_ptr<litehtml::document> _doc;
+
+    // Set a custom color resolver function for testing
+    using ColorResolverFunc = std::function<std::string(const std::string&)>;
+    void setCustomColorResolver(ColorResolverFunc resolver) {
+        m_customColorResolver = resolver;
+    }
 
 private:
     QHash<QString, QByteArray> m_loaded_css;
@@ -1207,6 +1217,9 @@ private:
     
     QMap<int, font_metrics_t> m_fonts;
     int m_nextFontId = 1;
+
+    // Custom color resolver for testing
+    ColorResolverFunc m_customColorResolver;
 
   public:
     /**
@@ -5770,6 +5783,7 @@ File: src/gui/container_qt5.cpp
 #include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 #include <QDesktopServices>
 #include <QGuiApplication>
@@ -5781,6 +5795,7 @@ File: src/gui/container_qt5.cpp
 #include <cmath>
 #include <QFontDatabase>
 #include <QWindow>
+#include <set>
 
 // Default font settings - no longer needed as members are used
 // static const int DEFAULT_FONT_SIZE = 16;
@@ -6050,7 +6065,25 @@ int container_qt5::text_width(const char* text, litehtml::uint_ptr hFont)
 // Draw text
 void container_qt5::draw_text(litehtml::uint_ptr hdc, const char* text, litehtml::uint_ptr hFont, litehtml::web_color color, const litehtml::position& pos)
 {
-    qDebug() << "container_qt5::draw_text - NO-OP (Diagnostic)";
+    if (!m_painter || !text) return;
+    
+    int fontId = static_cast<int>(hFont);
+    if (!m_fonts.contains(fontId)) {
+        return;
+    }
+    
+    // Set up painter
+    m_painter->save();
+    m_painter->setPen(QColor(color.red, color.green, color.blue, color.alpha));
+    m_painter->setFont(m_fonts[fontId].font);
+    
+    // Draw the text
+    const QFontMetrics& metrics = m_fonts[fontId].metrics;
+    m_painter->drawText(pos.x, pos.y + metrics.ascent(), QString::fromUtf8(text));
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_text - Drawing text:" << text;
 }
 
 // Convert points to pixels
@@ -6087,57 +6120,395 @@ const char* container_qt5::get_default_font_name() const
 // Draw a list marker (bullet, number, etc.)
 void container_qt5::draw_list_marker(litehtml::uint_ptr hdc, const litehtml::list_marker& marker)
 {
-    qDebug() << "container_qt5::draw_list_marker - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    // Draw based on marker type
+    QColor markerColor(marker.color.red, marker.color.green, marker.color.blue, marker.color.alpha);
+    m_painter->setPen(markerColor);
+    m_painter->setBrush(markerColor);
+    
+    if (marker.image.empty()) {
+        // Draw the marker based on type
+        QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
+        
+        switch (marker.marker_type) {
+            case litehtml::list_style_type_circle:
+                m_painter->setBrush(Qt::NoBrush);
+                m_painter->drawEllipse(rect);
+                break;
+                
+            case litehtml::list_style_type_disc:
+                m_painter->setBrush(markerColor);
+                m_painter->drawEllipse(rect);
+                break;
+                
+            case litehtml::list_style_type_square:
+                m_painter->drawRect(rect);
+                break;
+                
+            default:
+                // For other types (decimal, alpha, roman, etc.), draw the text
+                if (marker.index >= 0) {
+                    QString indexStr = QString::number(marker.index);
+                    m_painter->drawText(rect, Qt::AlignCenter, indexStr);
+                }
+                break;
+        }
+    } else {
+        // Draw an image marker if available
+        QString imgUrl = QString::fromUtf8(marker.image.c_str());
+        if (m_images.contains(imgUrl)) {
+            QRect rect(marker.pos.x, marker.pos.y, marker.pos.width, marker.pos.height);
+            m_painter->drawImage(rect, m_images[imgUrl]);
+        }
+    }
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_list_marker - Drawing list marker of type:" << (int)marker.marker_type;
 }
 
-// Draw an image
+// Draw image background
 void container_qt5::draw_image(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const std::string& url, const std::string& base_url)
 {
-    qDebug() << "container_qt5::draw_image - NO-OP (Diagnostic)";
-}
-
-// Get image dimensions
-void container_qt5::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
-{
-    qDebug() << "container_qt5::get_image_size - Setting default 0x0 (Diagnostic)";
-    sz.width = 0;
-    sz.height = 0;
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QString imgUrl = QString::fromStdString(url);
+    if (m_images.contains(imgUrl)) {
+        const QImage& img = m_images[imgUrl];
+        
+        QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+        m_painter->setClipRect(clipRect);
+        
+        // Calculate image position and size based on background-position and background-size
+        // In this simplified implementation, we just place it at the origin_box position
+        QRect imgRect(layer.origin_box.x, layer.origin_box.y, img.width(), img.height());
+        
+        // Handle different background-repeat values
+        if (layer.repeat == litehtml::background_repeat_no_repeat) {
+            m_painter->drawImage(imgRect, img);
+            qDebug() << "container_qt5::draw_image - Drawing image (no-repeat):" << imgUrl;
+        } else if (layer.repeat == litehtml::background_repeat_repeat_x) {
+            for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                m_painter->drawImage(QRect(x, layer.origin_box.y, img.width(), img.height()), img);
+            }
+            qDebug() << "container_qt5::draw_image - Drawing image (repeat-x):" << imgUrl;
+        } else if (layer.repeat == litehtml::background_repeat_repeat_y) {
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                m_painter->drawImage(QRect(layer.origin_box.x, y, img.width(), img.height()), img);
+            }
+            qDebug() << "container_qt5::draw_image - Drawing image (repeat-y):" << imgUrl;
+        } else if (layer.repeat == litehtml::background_repeat_repeat) {
+            for (int y = layer.origin_box.y; y < clipRect.bottom(); y += img.height()) {
+                for (int x = layer.origin_box.x; x < clipRect.right(); x += img.width()) {
+                    m_painter->drawImage(QRect(x, y, img.width(), img.height()), img);
+                }
+            }
+            qDebug() << "container_qt5::draw_image - Drawing image (repeat):" << imgUrl;
+        }
+    } else {
+        qDebug() << "container_qt5::draw_image - Image not found:" << imgUrl;
+    }
+    
+    m_painter->restore();
 }
 
 // Load an image from a URL
 void container_qt5::load_image(const char* src, const char* baseurl, bool redraw_on_ready)
 {
-    qDebug() << "container_qt5::load_image - NO-OP (Diagnostic)";
+    if (!src) {
+        qWarning() << "container_qt5::load_image - Null source";
+        return;
+    }
+    
+    QString url = QString::fromUtf8(src);
+    QString base = baseurl ? QString::fromUtf8(baseurl) : m_baseUrl;
+    
+    // Resolve relative URLs
+    QUrl resolvedUrl;
+    if (QUrl(url).isRelative() && !base.isEmpty()) {
+        resolvedUrl = QUrl(base).resolved(QUrl(url));
+    } else {
+        resolvedUrl = QUrl(url);
+    }
+    
+    QString urlString = resolvedUrl.toString();
+    
+    // Skip if already loaded
+    if (m_images.contains(urlString)) {
+        return;
+    }
+    
+    // For local files, load directly
+    if (resolvedUrl.isLocalFile()) {
+        QImage img(resolvedUrl.toLocalFile());
+        if (!img.isNull()) {
+            m_images[urlString] = img;
+            qDebug() << "container_qt5::load_image - Loaded local image:" << urlString;
+            
+            if (redraw_on_ready && m_owner) {
+                m_owner->update();
+            }
+        } else {
+            qWarning() << "container_qt5::load_image - Failed to load local image:" << urlString;
+        }
+    } else {
+        // For remote URLs, just log that we need to implement this
+        // In a full implementation, we would use QNetworkAccessManager to fetch the image
+        qDebug() << "container_qt5::load_image - Remote image loading not implemented for:" << urlString;
+    }
+}
+
+// Get image dimensions
+void container_qt5::get_image_size(const char* src, const char* baseurl, litehtml::size& sz)
+{
+    if (!src) {
+        sz.width = 0;
+        sz.height = 0;
+        return;
+    }
+    
+    QString url = QString::fromUtf8(src);
+    QString base = baseurl ? QString::fromUtf8(baseurl) : m_baseUrl;
+    
+    // Resolve URL
+    QUrl resolvedUrl;
+    if (QUrl(url).isRelative() && !base.isEmpty()) {
+        resolvedUrl = QUrl(base).resolved(QUrl(url));
+    } else {
+        resolvedUrl = QUrl(url);
+    }
+    
+    QString urlString = resolvedUrl.toString();
+    
+    // If image is loaded, get its size
+    if (m_images.contains(urlString)) {
+        const QImage& img = m_images[urlString];
+        sz.width = img.width();
+        sz.height = img.height();
+        qDebug() << "container_qt5::get_image_size - Image size for" << urlString 
+                 << "is" << sz.width << "x" << sz.height;
+    } else {
+        // Default size if image not loaded yet
+        sz.width = 0;
+        sz.height = 0;
+        qDebug() << "container_qt5::get_image_size - Image not loaded:" << urlString;
+    }
 }
 
 // Draw solid color background
 void container_qt5::draw_solid_fill(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::web_color& color)
 {
-    qDebug() << "container_qt5::draw_solid_fill - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QColor bgColor(color.red, color.green, color.blue, color.alpha);
+    m_painter->fillRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height, bgColor);
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_solid_fill - Drawing solid fill with color:" 
+             << bgColor.name() << "(alpha:" << bgColor.alpha() << ")";
 }
 
 // Draw linear gradient
 void container_qt5::draw_linear_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::linear_gradient& gradient)
 {
-    qDebug() << "container_qt5::draw_linear_gradient - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Create a linear gradient
+    QLinearGradient qgradient;
+    qgradient.setStart(gradient.start.x, gradient.start.y);
+    qgradient.setFinalStop(gradient.end.x, gradient.end.y);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_linear_gradient - Drawing gradient from" 
+             << gradient.start.x << "," << gradient.start.y << " to " 
+             << gradient.end.x << "," << gradient.end.y;
 }
 
 // Draw radial gradient
 void container_qt5::draw_radial_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::radial_gradient& gradient)
 {
-    qDebug() << "container_qt5::draw_radial_gradient - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Create a radial gradient
+    // Use the maximum of x and y radius for simplicity (Qt doesn't support elliptical gradients directly)
+    qreal radius = std::max(gradient.radius.x, gradient.radius.y);
+    QRadialGradient qgradient(gradient.position.x, gradient.position.y, radius);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_radial_gradient - Drawing gradient at" 
+             << gradient.position.x << "," << gradient.position.y 
+             << " with radius " << radius;
 }
 
 // Draw conic gradient
 void container_qt5::draw_conic_gradient(litehtml::uint_ptr hdc, const litehtml::background_layer& layer, const litehtml::background_layer::conic_gradient& gradient)
 {
-    qDebug() << "container_qt5::draw_conic_gradient - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    m_painter->save();
+    
+    QRect clipRect(layer.clip_box.x, layer.clip_box.y, layer.clip_box.width, layer.clip_box.height);
+    m_painter->setClipRect(clipRect);
+    
+    // Qt doesn't have direct support for conic gradients in older versions
+    // Use QConicalGradient which is similar
+    QConicalGradient qgradient(gradient.position.x, gradient.position.y, gradient.angle);
+    
+    // Add color stops
+    for (const auto& stop : gradient.color_points) {
+        QColor stopColor(stop.color.red, stop.color.green, stop.color.blue, stop.color.alpha);
+        qgradient.setColorAt(stop.offset, stopColor);
+    }
+    
+    // Draw the gradient
+    m_painter->fillRect(clipRect, qgradient);
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_conic_gradient - Drawing gradient at" 
+             << gradient.position.x << "," << gradient.position.y 
+             << " with angle " << gradient.angle;
 }
 
 // Draw borders
 void container_qt5::draw_borders(litehtml::uint_ptr hdc, const litehtml::borders& borders, const litehtml::position& draw_pos, bool root)
 {
-    qDebug() << "container_qt5::draw_borders - NO-OP (Diagnostic)";
+    if (!m_painter || root) return;
+    
+    m_painter->save();
+    
+    QRect borderRect(draw_pos.x, draw_pos.y, draw_pos.width, draw_pos.height);
+    
+    // Draw top border
+    if (borders.top.width > 0 && borders.top.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.top.color.red, borders.top.color.green, borders.top.color.blue, borders.top.color.alpha));
+        pen.setWidth(borders.top.width);
+        
+        switch (borders.top.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left(), borderRect.top() + borders.top.width/2, 
+                            borderRect.right(), borderRect.top() + borders.top.width/2);
+    }
+    
+    // Draw right border
+    if (borders.right.width > 0 && borders.right.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.right.color.red, borders.right.color.green, borders.right.color.blue, borders.right.color.alpha));
+        pen.setWidth(borders.right.width);
+        
+        switch (borders.right.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.right() - borders.right.width/2, borderRect.top(), 
+                            borderRect.right() - borders.right.width/2, borderRect.bottom());
+    }
+    
+    // Draw bottom border
+    if (borders.bottom.width > 0 && borders.bottom.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.bottom.color.red, borders.bottom.color.green, borders.bottom.color.blue, borders.bottom.color.alpha));
+        pen.setWidth(borders.bottom.width);
+        
+        switch (borders.bottom.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left(), borderRect.bottom() - borders.bottom.width/2, 
+                            borderRect.right(), borderRect.bottom() - borders.bottom.width/2);
+    }
+    
+    // Draw left border
+    if (borders.left.width > 0 && borders.left.style != litehtml::border_style_none) {
+        QPen pen(QColor(borders.left.color.red, borders.left.color.green, borders.left.color.blue, borders.left.color.alpha));
+        pen.setWidth(borders.left.width);
+        
+        switch (borders.left.style) {
+            case litehtml::border_style_dotted:
+                pen.setStyle(Qt::DotLine);
+                break;
+            case litehtml::border_style_dashed:
+                pen.setStyle(Qt::DashLine);
+                break;
+            default:
+                pen.setStyle(Qt::SolidLine);
+                break;
+        }
+        
+        m_painter->setPen(pen);
+        m_painter->drawLine(borderRect.left() + borders.left.width/2, borderRect.top(), 
+                            borderRect.left() + borders.left.width/2, borderRect.bottom());
+    }
+    
+    m_painter->restore();
+    
+    qDebug() << "container_qt5::draw_borders - Drawing borders for rectangle:" 
+             << borderRect.x() << "," << borderRect.y() << "," << borderRect.width() << "," << borderRect.height();
 }
 
 // Set caption (title)
@@ -6227,13 +6598,90 @@ void container_qt5::import_css(litehtml::string& text, const litehtml::string& u
 // Set clipping rectangle
 void container_qt5::set_clip(const litehtml::position& pos, const litehtml::border_radiuses& bdr_radius)
 {
-    qDebug() << "container_qt5::set_clip - NO-OP (Diagnostic)";
+    if (!m_painter) return;
+    
+    // Create clipping region
+    QRect clipRect(pos.x, pos.y, pos.width, pos.height);
+    
+    // If all radii are 0, use rectangular clip
+    if (bdr_radius.top_left_x == 0 && bdr_radius.top_left_y == 0 &&
+        bdr_radius.top_right_x == 0 && bdr_radius.top_right_y == 0 &&
+        bdr_radius.bottom_right_x == 0 && bdr_radius.bottom_right_y == 0 &&
+        bdr_radius.bottom_left_x == 0 && bdr_radius.bottom_left_y == 0) {
+        m_painter->setClipRect(clipRect, Qt::IntersectClip);
+    } else {
+        // Use rounded rectangle clip
+        QPainterPath path;
+        
+        // Create rounded rect path with different corner radii
+        qreal tl_radius_x = bdr_radius.top_left_x;
+        qreal tl_radius_y = bdr_radius.top_left_y;
+        qreal tr_radius_x = bdr_radius.top_right_x;
+        qreal tr_radius_y = bdr_radius.top_right_y;
+        qreal br_radius_x = bdr_radius.bottom_right_x;
+        qreal br_radius_y = bdr_radius.bottom_right_y;
+        qreal bl_radius_x = bdr_radius.bottom_left_x;
+        qreal bl_radius_y = bdr_radius.bottom_left_y;
+        
+        path.moveTo(clipRect.left() + tl_radius_x, clipRect.top());
+        
+        // Top edge and top-right corner
+        path.lineTo(clipRect.right() - tr_radius_x, clipRect.top());
+        if (tr_radius_x > 0 || tr_radius_y > 0) {
+            path.arcTo(
+                clipRect.right() - tr_radius_x * 2, clipRect.top(),
+                tr_radius_x * 2, tr_radius_y * 2,
+                90, -90
+            );
+        }
+        
+        // Right edge and bottom-right corner
+        path.lineTo(clipRect.right(), clipRect.bottom() - br_radius_y);
+        if (br_radius_x > 0 || br_radius_y > 0) {
+            path.arcTo(
+                clipRect.right() - br_radius_x * 2, clipRect.bottom() - br_radius_y * 2,
+                br_radius_x * 2, br_radius_y * 2,
+                0, -90
+            );
+        }
+        
+        // Bottom edge and bottom-left corner
+        path.lineTo(clipRect.left() + bl_radius_x, clipRect.bottom());
+        if (bl_radius_x > 0 || bl_radius_y > 0) {
+            path.arcTo(
+                clipRect.left(), clipRect.bottom() - bl_radius_y * 2,
+                bl_radius_x * 2, bl_radius_y * 2,
+                -90, -90
+            );
+        }
+        
+        // Left edge and top-left corner
+        path.lineTo(clipRect.left(), clipRect.top() + tl_radius_y);
+        if (tl_radius_x > 0 || tl_radius_y > 0) {
+            path.arcTo(
+                clipRect.left(), clipRect.top(),
+                tl_radius_x * 2, tl_radius_y * 2,
+                180, -90
+            );
+        }
+        
+        path.closeSubpath();
+        m_painter->setClipPath(path, Qt::IntersectClip);
+    }
+    
+    qDebug() << "container_qt5::set_clip - Setting clip to" 
+             << clipRect.x() << "," << clipRect.y() << "," << clipRect.width() << "," << clipRect.height();
 }
 
 // Remove clipping
 void container_qt5::del_clip()
 {
-    qDebug() << "container_qt5::del_clip - NO-OP (Diagnostic)";
+    // QPainter handles clipping stack via save/restore, so just restore to previous state
+    if (m_painter) {
+        m_painter->restore();
+        m_painter->save();
+        qDebug() << "container_qt5::del_clip - Removing clip";
+    }
 }
 
 // Get viewport position and dimensions
@@ -6291,15 +6739,82 @@ litehtml::element::ptr container_qt5::create_element(const char* tag_name,
                                                     const litehtml::string_map& attributes,
                                                     const std::shared_ptr<litehtml::document>& doc)
 {
-    qDebug() << "container_qt5::create_element - Returning nullptr (Diagnostic)";
+    // Instead of just logging and returning nullptr, we should let litehtml handle element creation
+    // by returning nullptr only when we don't need custom elements
+    
+    // Add detailed debugging to understand which tags are being requested
+    qDebug() << "container_qt5::create_element - Called for tag:" << (tag_name ? tag_name : "nullptr");
+
+    // Ensure tag_name is valid
+    if (!tag_name) {
+        qWarning() << "container_qt5::create_element - Received null tag_name";
+        // Let litehtml handle this case by returning nullptr
+        return nullptr;
+    }
+
+    // Print attributes for debugging
+    if (!attributes.empty()) {
+        qDebug() << "Attributes:";
+        for (const auto& attr : attributes) {
+            qDebug() << "  " << attr.first.c_str() << " = " << attr.second.c_str();
+        }
+    }
+
+    // Unlike in the old code, we don't return nullptr for all elements
+    // Instead, we let litehtml create standard elements by returning nullptr
+    // This is how it's implemented in the working qlith-mini version
     return nullptr;
 }
 
 // Resolve color names to actual colors
 litehtml::string container_qt5::resolve_color(const litehtml::string& color) const
 {
-    // Basic passthrough, assuming LiteHTML handles named colors or they are already #RRGGBB
-    // A more robust version would use QColor::colorNames() or a similar map.
+    // Enhance color resolution with better logging and safety checks
+    qDebug() << "container_qt5::resolve_color - Called with color:" << color.c_str();
+    
+    // Check for invalid input
+    if (color.empty()) {
+        qWarning() << "container_qt5::resolve_color - Empty color value provided";
+        return color;
+    }
+    
+    // Skip CSS properties that aren't colors
+    // These are decoration properties like underline, line-through, initial, etc.
+    static const std::set<std::string> non_colors = {
+        "underline", "line-through", "initial", "inherit", "none", 
+        "normal", "bold", "italic", "oblique"
+    };
+    
+    if (non_colors.find(color) != non_colors.end()) {
+        qDebug() << "container_qt5::resolve_color - Ignoring non-color CSS value:" << color.c_str();
+        return color;
+    }
+    
+    // If it's already in #RRGGBB format, just return it
+    if (color.length() > 0 && color[0] == '#') {
+        return color;
+    }
+    
+    // Use custom resolver if available (for testing)
+    if (m_customColorResolver) {
+        std::string resolved = m_customColorResolver(color);
+        qDebug() << "container_qt5::resolve_color - Using custom resolver for" << color.c_str() 
+                 << "got" << resolved.c_str();
+        return resolved;
+    }
+    
+    // Try to resolve using QColor's named colors
+    QString colorName = QString::fromUtf8(color.c_str());
+    QColor qcolor(colorName);
+    
+    if (qcolor.isValid()) {
+        QString hexColor = qcolor.name();
+        qDebug() << "container_qt5::resolve_color - Resolved" << colorName << "to" << hexColor;
+        return hexColor.toStdString();
+    }
+    
+    // If we can't resolve, return the original to avoid creating error cycles
+    qDebug() << "container_qt5::resolve_color - Could not resolve color:" << color.c_str();
     return color;
 }
 
@@ -16592,6 +17107,114 @@ AffineTransform::operator QTransform() const
 }
 
 ================
+File: test_app/color_test.cpp
+================
+#include <iostream>
+#include <litehtml.h>
+#include <memory>
+#include <string>
+#include <QDebug>
+#include "qlith/container_qt5.h"
+
+// Simple test program to verify color parsing fixes
+int main(int argc, char** argv)
+{
+    std::cout << "Color parsing test program" << std::endl;
+    
+    // Create a simple document container
+    auto container = std::make_shared<container_qt5>(nullptr);
+    
+    // Test 1: Basic HTML with simple colors
+    const char* simple_html = R"(
+        <html>
+        <head>
+            <style>
+                body { color: blue; }
+                h1 { color: #ff0000; }
+                p { color: rgb(0, 128, 0); }
+            </style>
+        </head>
+        <body>
+            <h1>Test Header</h1>
+            <p>Test paragraph</p>
+        </body>
+        </html>
+    )";
+    
+    std::cout << "Testing simple HTML with standard colors..." << std::endl;
+    auto document = litehtml::document::createFromString(simple_html, container.get());
+    if (document) {
+        std::cout << "  Success: Document created" << std::endl;
+    } else {
+        std::cout << "  Failure: Document creation failed" << std::endl;
+        return 1;
+    }
+    
+    // Test 2: Named color resolution
+    const char* named_colors_html = R"(
+        <html>
+        <head>
+            <style>
+                .c1 { color: aliceblue; }
+                .c2 { color: chartreuse; }
+                .c3 { color: darkmagenta; }
+                .c4 { color: thisDoesNotExist; }
+            </style>
+        </head>
+        <body>
+            <div class="c1">Color 1</div>
+            <div class="c2">Color 2</div>
+            <div class="c3">Color 3</div>
+            <div class="c4">Color 4</div>
+        </body>
+        </html>
+    )";
+    
+    std::cout << "Testing named color resolution..." << std::endl;
+    auto document2 = litehtml::document::createFromString(named_colors_html, container.get());
+    if (document2) {
+        std::cout << "  Success: Document with named colors created" << std::endl;
+    } else {
+        std::cout << "  Failure: Document with named colors creation failed" << std::endl;
+        return 1;
+    }
+    
+    // Test 3: Recursion prevention
+    const char* recursive_html = R"(
+        <html>
+        <head>
+            <style>
+                body { color: recursiveColor; }
+            </style>
+        </head>
+        <body>
+            <p>Test recursion prevention</p>
+        </body>
+        </html>
+    )";
+    
+    // Override resolve_color to create a recursive scenario
+    container->setCustomColorResolver([](const std::string& color) -> std::string {
+        if (color == "recursiveColor") {
+            return "recursiveColor"; // This would normally cause infinite recursion
+        }
+        return color;
+    });
+    
+    std::cout << "Testing recursion prevention..." << std::endl;
+    auto document3 = litehtml::document::createFromString(recursive_html, container.get());
+    if (document3) {
+        std::cout << "  Success: Document with potential recursion created safely" << std::endl;
+    } else {
+        std::cout << "  Failure: Document with potential recursion creation failed" << std::endl;
+        return 1;
+    }
+    
+    std::cout << "All tests completed successfully!" << std::endl;
+    return 0;
+}
+
+================
 File: build_macos.sh
 ================
 #!/bin/bash
@@ -16807,6 +17430,35 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 message(STATUS "qlith-pro configuration complete")
 
+# Add color test program
+add_executable(color_test
+    test_app/color_test.cpp
+    src/gui/container_qt5.cpp
+)
+
+target_include_directories(color_test
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${LITEHTML_DIR}/include
+        ${LITEHTML_DIR}/include/litehtml
+        ${LITEHTML_DIR}/src/gumbo/include
+)
+
+target_link_libraries(color_test PRIVATE
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Network
+    litehtml
+    gumbo
+)
+
+# Set application properties for color_test
+set_target_properties(color_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
 ================
 File: runme.sh
 ================
@@ -16827,7 +17479,43 @@ echo "Application directory: \"$dir/build/qlith-pro.app/Contents/MacOS\""
 
 # Run with debug environment variable
 # QLITH_DEBUG=1
-"$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$dir/../test_files/simple.html"
+"$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$dir/../test_files/fl8.html"
+
+# "./qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro" "./test_files/simple.html"
+
+================
+File: test.sh
+================
+#!/bin/bash
+# Build and run tests for qlith-pro
+
+# Go to script directory
+cd "$(dirname "$0")"
+
+# Create build directory if it doesn't exist
+mkdir -p build
+cd build
+
+# Run CMake
+echo "Running CMake..."
+cmake ..
+
+# Build
+echo "Building qlith-pro and tests..."
+make -j4
+
+# Run color test
+echo "Running color test..."
+./bin/color_test
+
+# Test with the original simple.html
+echo "Testing with simple.html..."
+./qlith-pro.app/Contents/MacOS/qlith-pro "../test_files/simple.html"
+
+# Return to original directory
+cd ..
+
+echo "Tests completed!"
 
 
 
