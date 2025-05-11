@@ -9,12 +9,19 @@ while [ -h "$SOURCE" ]; do
 done
 dir="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
-echo "Running in debug mode"
+echo "Running qlith-pro"
 echo "Current directory: \"$dir\""
 echo "Application directory: \"$dir/build/qlith-pro.app/Contents/MacOS\""
 
-# Run with debug environment variable
-# QLITH_DEBUG=1
-"$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$dir/../test_files/fl8.html"
+# Check if an HTML file was provided as an argument
+if [ "$#" -ge 1 ]; then
+    html_file="$1"
+else
+    # Default file if none provided
+    html_file="$dir/../test_files/basic_layout.html"
+fi
+
+# Execute the qlith-pro application with the specified HTML file
+"$dir/build/qlith-pro.app/Contents/MacOS/qlith-pro" "$html_file"
 
 # "./qlith-pro/build/qlith-pro.app/Contents/MacOS/qlith-pro" "./test_files/simple.html"

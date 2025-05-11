@@ -20,6 +20,7 @@
 #include <QBuffer>
 #include <QTemporaryFile>
 #include <QLocale>
+#include <QFileInfo>
 
 // Helper function for debugging
 static void saveDebugContent(const QString &content, const QString &identifier, const QString &extension)
@@ -185,10 +186,14 @@ void QlithWidgetPrivate::loadUrl(const QUrl &url) {
     loading = true;
     needsLayout = true;
     
+    // Debug output
+    qDebug() << "QlithWidget::loadUrl - Loading URL:" << url.toString() << ", scheme:" << url.scheme();
+    
     emit q->loadStarted();
     
     // Handle different URL schemes
     if (url.scheme() == "file") {
+        qDebug() << "QlithWidget::loadUrl - Loading local file:" << url.toLocalFile();
         loadLocalFile(url.toLocalFile());
     } else if (url.scheme() == "http" || url.scheme() == "https") {
         loadRemoteUrl(url);
@@ -202,6 +207,12 @@ void QlithWidgetPrivate::loadUrl(const QUrl &url) {
 
 // Load local file
 void QlithWidgetPrivate::loadLocalFile(const QString &filePath) {
+    // Debug output
+    qDebug() << "QlithWidget::loadLocalFile - Attempting to load file:" << filePath;
+    QFileInfo fileInfo(filePath);
+    qDebug() << "  - Absolute file path:" << fileInfo.absoluteFilePath();
+    qDebug() << "  - File exists:" << fileInfo.exists();
+    
     QFile file(filePath);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QString html = QString::fromUtf8(file.readAll());

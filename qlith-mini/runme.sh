@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# this_file: qlith-mini/runme.sh
 
 # Get the absolute path to the directory containing this script
 SOURCE="${BASH_SOURCE[0]}"
@@ -11,4 +12,13 @@ dir="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
 cd "$dir"
 
-"$dir/build/browser/qlith.app/Contents/MacOS/qlith" "$dir/../test_files/fl8.html"
+# Check if an HTML file was provided as an argument
+if [ "$#" -ge 1 ]; then
+    html_file="$1"
+else
+    # Default file if none provided
+    html_file="$dir/../test_files/basic_layout.html"
+fi
+
+# Execute the qlith application with the specified HTML file
+"$dir/build/browser/qlith.app/Contents/MacOS/qlith" "$html_file"
