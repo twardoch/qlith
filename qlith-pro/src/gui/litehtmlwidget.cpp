@@ -113,8 +113,25 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
     if (!m_container)
     {
         qWarning() << "loadHtml: m_container is null. Cannot proceed.";
-        emit documentLoaded(false);
-        return;
+        try {
+            // Attempt to recreate the container as a last resort
+            m_container = new container_qt5(this);
+            if (!m_container) {
+                emit documentLoaded(false);
+                return;
+            }
+            qDebug() << "loadHtml: Successfully recreated container";
+            
+            // Reconnect signals
+            connect(m_container, &container_qt5::docSizeChanged, this, &litehtmlWidget::onDocSizeChanged);
+            connect(m_container, &container_qt5::documentSizeChanged, this, &litehtmlWidget::updateDocumentSize);
+            connect(m_container, &container_qt5::titleChanged, this, &litehtmlWidget::titleChanged);
+            connect(m_container, &container_qt5::anchorClicked, this, &litehtmlWidget::anchorClicked);
+        } catch (...) {
+            qCritical() << "loadHtml: Failed to recover from null container";
+            emit documentLoaded(false);
+            return;
+        }
     }
 
     try
@@ -168,8 +185,14 @@ void litehtmlWidget::loadHtml(const QString &html, const QString &baseUrl)
         m_htmlDocument->render(renderWidth);
         qDebug() << "loadHtml: Document rendered successfully.";
 
+        // Force an update before emitting documentLoaded
         update();
-        emit documentLoaded(true);
+        QApplication::processEvents();
+        
+        // Set a small delay to ensure rendering completes
+        QTimer::singleShot(100, this, [this]() {
+            emit documentLoaded(true);
+        });
     }
     catch (const std::exception &e)
     {

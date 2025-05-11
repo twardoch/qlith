@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QSvgGenerator>
 #include <QPlainTextEdit>
+#include <QApplication>
 
 MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
                                                           ui(new Ui::MainWindow),
@@ -326,6 +327,16 @@ void MainWindow::loadFile(const QString& filePath)
   } else {
     // In normal mode, load the HTML into the widget
     if (m_litehtmlWidget) {
+      // Reset the widget size to ensure proper rendering
+      m_litehtmlWidget->setMinimumSize(m_renderSize.width(), m_renderSize.height());
+      m_litehtmlWidget->resize(m_renderSize);
+      
+      // Make sure the widget is visible
+      m_litehtmlWidget->setVisible(true);
+      
+      // Process events to ensure widget is laid out
+      QApplication::processEvents();
+      
       // Load the HTML with the file's directory as the base URL for relative paths
       QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath() + "/").toString();
       qDebug() << "Loading HTML with base URL:" << baseUrl;
