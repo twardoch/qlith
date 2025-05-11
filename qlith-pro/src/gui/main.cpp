@@ -126,39 +126,38 @@ int main(int argc, char **argv)
     
     // If in export mode, perform export after page load
     if (exportMode) {
-      // Explicitly capture needed variables to avoid dangling references
-      QObject::connect(&w, &MainWindow::documentLoaded, [&app, &w, svgPath, pngPath](bool success) {
+      // Wait for document to load and then export
+      QEventLoop waitLoop;
+      
+      // Connect documentLoaded signal to exit the wait loop
+      QObject::connect(&w, &MainWindow::documentLoaded, [&waitLoop](bool success) {
         qDebug() << "Document loaded signal received, success:" << success;
-        if (success) {
-          if (!svgPath.isEmpty()) {
-            w.exportToSvg(svgPath);
-          }
-          if (!pngPath.isEmpty()) {
-            qDebug() << "Exporting to PNG:" << pngPath;
-            bool result = w.exportToPng(pngPath);
-            qDebug() << "PNG export result:" << (result ? "Success" : "Failed");
-          }
-        } else {
-          qWarning() << "Failed to load document for export";
-        }
-        // Quit after export with a short delay to ensure proper cleanup
-        QTimer::singleShot(100, &app, &QApplication::quit);
+        // Continue whether or not loading was successful
+        waitLoop.quit();
       });
       
-      // Set a backup timer in case documentLoaded signal is never emitted
-      QTimer::singleShot(5000, [&app, &w, svgPath, pngPath]() {
-        qDebug() << "Backup timer triggered - forcing export";
-        if (!svgPath.isEmpty()) {
-          w.exportToSvg(svgPath);
-        }
-        if (!pngPath.isEmpty()) {
-          qDebug() << "Exporting to PNG (backup):" << pngPath;
-          bool result = w.exportToPng(pngPath);
-          qDebug() << "Backup PNG export result:" << (result ? "Success" : "Failed");
-        }
-        // Quit after export
-        QTimer::singleShot(100, &app, &QApplication::quit);
-      });
+      // Set a shorter timeout for the waitLoop
+      QTimer::singleShot(2000, &waitLoop, &QEventLoop::quit);
+      
+      // Wait for document to load or timeout
+      waitLoop.exec();
+      
+      // Process events to ensure rendering happens
+      QApplication::processEvents();
+      
+      // Perform export operations
+      if (!svgPath.isEmpty()) {
+        w.exportToSvg(svgPath);
+      }
+      
+      if (!pngPath.isEmpty()) {
+        qDebug() << "Exporting to PNG:" << pngPath;
+        bool result = w.exportToPng(pngPath);
+        qDebug() << "PNG export result:" << (result ? "Success" : "Failed");
+      }
+      
+      // Quit after export with a short delay to ensure proper cleanup
+      QTimer::singleShot(500, &app, &QApplication::quit);
     }
   }
 

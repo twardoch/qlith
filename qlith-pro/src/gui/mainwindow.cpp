@@ -122,33 +122,12 @@ MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
   connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::loadExample);
   ui->pushButton->setText("Load Example");
 
-  // Create a new litehtmlWidget for normal mode
-  if (m_litehtmlWidget)
-  {
-    delete m_litehtmlWidget;
-  } // Should be null here, but good practice
-  m_litehtmlWidget = new litehtmlWidget();
-  // m_litehtmlWidget->setContext(&m_context); // No longer setting context from here
-
-  QScrollArea* scrollArea = new QScrollArea();
-  scrollArea->setWidget(m_litehtmlWidget);
-  scrollArea->setWidgetResizable(true);
-  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setCentralWidget(scrollArea); // This replaces the central widget set by ui->setupUi(this)
-
-  // Connect to the correct signal for link clicks
-  connect(m_litehtmlWidget, &litehtmlWidget::anchorClicked, this, &MainWindow::loadUrl);
-  // connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, this, &MainWindow::onDocumentLoaded); // Example new signal
-
-  setupScrollbar(); // This needs to be adapted if central widget is replaced or m_litehtmlWidget changes
-  // ui->scrollAreaVerticalLayout->addWidget(m_litehtmlWidget); // This line might be problematic if setCentralWidget is used.
-  // It implies adding to a specific layout in the .ui file.
-  // If centralWidget is the scrollArea, then this is not needed.
+  // Create a new litehtmlWidget for normal mode - ALWAYS initialize
+  initializeLitehtmlWidget();
 
   // Initial content loading (if not in debug mode)
   QStringList args = QCoreApplication::arguments();
-  if (args.size() > 1 && !args.at(1).isEmpty())
+  if (args.size() > 1 && !args.at(1).isEmpty() && !args.at(1).startsWith("--"))
   {
     QString filePath = args.at(1);
     qDebug() << "MainWindow: Loading file from command line:" << filePath;
@@ -176,13 +155,41 @@ MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
 
   setWindowTitle("qlith-pro");
 
-  // Connect the widget's documentLoaded signal to our onDocumentLoaded slot
-  if (m_litehtmlWidget) {
-    connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, this, &MainWindow::onDocumentLoaded);
-  }
-
   // Start with a maximized window
   showMaximized();
+}
+
+void MainWindow::initializeLitehtmlWidget()
+{
+  // Clean up existing widget if it exists
+  if (m_litehtmlWidget)
+  {
+    delete m_litehtmlWidget;
+    m_litehtmlWidget = nullptr;
+  }
+
+  // Create a new litehtmlWidget
+  m_litehtmlWidget = new litehtmlWidget();
+  if (!m_litehtmlWidget) {
+    qCritical() << "Failed to create litehtmlWidget instance!";
+    return;
+  }
+
+  // Create a scroll area and set the litehtmlWidget as its child
+  QScrollArea* scrollArea = new QScrollArea();
+  scrollArea->setWidget(m_litehtmlWidget);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  
+  // Set the scroll area as the central widget
+  setCentralWidget(scrollArea);
+
+  // Connect to the correct signal for link clicks and document loading
+  connect(m_litehtmlWidget, &litehtmlWidget::anchorClicked, this, &MainWindow::loadUrl);
+  connect(m_litehtmlWidget, &litehtmlWidget::documentLoaded, this, &MainWindow::onDocumentLoaded);
+  
+  qDebug() << "litehtmlWidget initialized successfully";
 }
 
 void MainWindow::setupScrollbar()
@@ -220,10 +227,14 @@ void MainWindow::navigateToUrl()
 
 void MainWindow::loadUrl(const QString &url)
 {
-  if (!m_litehtmlWidget)
-  {
-    qWarning() << "loadUrl: litehtmlWidget is null";
-    return;
+  // Ensure widget is initialized
+  if (!m_litehtmlWidget) {
+    qWarning() << "loadUrl: litehtmlWidget is null, initializing...";
+    initializeLitehtmlWidget();
+    if (!m_litehtmlWidget) {
+      qCritical() << "loadUrl: Failed to initialize litehtmlWidget";
+      return;
+    }
   }
 
   qDebug() << "loadUrl: Loading URL:" << url;
@@ -232,10 +243,14 @@ void MainWindow::loadUrl(const QString &url)
 
 void MainWindow::loadExample()
 {
-  if (!m_litehtmlWidget)
-  {
-    qWarning() << "loadExample: litehtmlWidget is null";
-    return;
+  // Ensure widget is initialized
+  if (!m_litehtmlWidget) {
+    qWarning() << "loadExample: litehtmlWidget is null, initializing...";
+    initializeLitehtmlWidget();
+    if (!m_litehtmlWidget) {
+      qCritical() << "loadExample: Failed to initialize litehtmlWidget";
+      return;
+    }
   }
 
   // Simple example HTML content
@@ -264,6 +279,17 @@ void MainWindow::loadExample()
 void MainWindow::loadFile(const QString& filePath)
 {
   qDebug() << "Loading file:" << filePath;
+  
+  // Ensure widget is initialized first
+  if (!m_litehtmlWidget) {
+    qWarning() << "loadFile: litehtmlWidget is null, initializing...";
+    initializeLitehtmlWidget();
+    if (!m_litehtmlWidget) {
+      qCritical() << "loadFile: Failed to initialize litehtmlWidget";
+      emit documentLoaded(false);
+      return;
+    }
+  }
   
   // Check if the file exists
   QFileInfo fileInfo(filePath);
@@ -302,6 +328,7 @@ void MainWindow::loadFile(const QString& filePath)
     if (m_litehtmlWidget) {
       // Load the HTML with the file's directory as the base URL for relative paths
       QString baseUrl = QUrl::fromLocalFile(fileInfo.absolutePath() + "/").toString();
+      qDebug() << "Loading HTML with base URL:" << baseUrl;
       m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
       
       // The documentLoaded signal will be emitted by the onDocumentLoaded slot
@@ -317,6 +344,12 @@ void MainWindow::setRenderSize(const QSize& size)
 {
   qDebug() << "Setting render size to:" << size;
   m_renderSize = size;
+  
+  // Update the widget size if it exists
+  if (m_litehtmlWidget) {
+    m_litehtmlWidget->setMinimumSize(size.width() / 2, size.height() / 2);
+    m_litehtmlWidget->resize(size);
+  }
 }
 
 bool MainWindow::exportToSvg(const QString& filePath)

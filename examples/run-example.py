@@ -160,25 +160,73 @@ class QlithRunner:
         # Add engine prefix to the output filename
         name_with_engine = f"{basename}-{engine}"
 
+        # Make sure we have absolute paths
+        html_file = html_file.absolute()
+        output_dir = output_dir.absolute()
+
+        # Ensure output directory exists before starting
+        output_dir.mkdir(parents=True, exist_ok=True)
+        console.print(f"Ensuring output directory exists: {output_dir}")
+
+        # For qlith-pro engine, set debug environment variables
+        if engine == "pro":
+            os.environ["QLITH_EXPORT_DEBUG"] = "1"
+            os.environ["QLITH_VERBOSE"] = "1"
+
         for fmt in formats:
             output_file = output_dir / f"{name_with_engine}.{fmt}"
 
+            # Print the absolute path of the output file that will be created
             console.print(f"  Processing with [bold]qlith-{engine}[/bold]...")
-            console.print(f"    Generating [bold]{fmt.upper()}[/bold]...")
+            console.print(f"    Generating [bold]{fmt.upper()}[/bold] to:")
+            console.print(f"    [blue]{output_file}[/blue]")
 
-            cmd = [
-                str(engine_path),
-                f"--{fmt}",
-                str(output_file),
-                "--width",
-                str(width),
-                "--height",
-                str(height),
-                str(html_file),
-            ]
+            # Initialize tmp_output_file to avoid unbounded variable issues
+            tmp_output_file = None
+
+            # Initialize rel_output_file to avoid unbounded variable issues
+            rel_output_file = None
+
+            # For pro engine, try using the current directory for output
+            if engine == "pro":
+                # Try relative path to current directory
+                rel_output_file = Path(f"./output-{name_with_engine}.{fmt}")
+                console.print(
+                    f"    Using current directory output for pro engine: {rel_output_file.absolute()}"
+                )
+                cmd = [
+                    str(engine_path),
+                    f"--{fmt}",
+                    str(rel_output_file),
+                    "--width",
+                    str(width),
+                    "--height",
+                    str(height),
+                    str(html_file),
+                ]
+            else:
+                cmd = [
+                    str(engine_path),
+                    f"--{fmt}",
+                    str(output_file),
+                    "--width",
+                    str(width),
+                    "--height",
+                    str(height),
+                    str(html_file),
+                ]
+
+            # Print the full command being executed for debugging
+            console.print(f"    Executing command: {' '.join(cmd)}")
+
             start_time = time.time()
             returncode, stdout, stderr = run_command_with_timeout(cmd, timeout)
             duration = time.time() - start_time
+
+            # Print additional debug information for pro engine
+            if engine == "pro":
+                console.print(f"    Command output (stdout):\n{stdout}")
+                console.print(f"    Command error output (stderr):\n{stderr}")
 
             if returncode == 124:
                 console.print(
@@ -188,26 +236,100 @@ class QlithRunner:
                     "success": False,
                     "reason": "timeout",
                     "duration": duration,
+                    "output_file": output_file,
                 }
             elif returncode != 0:
                 console.print(
                     f"    [red]ERROR:[/red] qlith-{engine} {fmt.upper()} generation failed with code {returncode}"
                 )
+                console.print(f"    stderr: {stderr}")
                 results[fmt] = {
                     "success": False,
                     "reason": "error",
                     "duration": duration,
                     "stderr": stderr,
+                    "output_file": output_file,
                 }
             else:
                 console.print(
                     f"    [green]qlith-{engine} {fmt.upper()} generation completed successfully[/green] in {duration:.2f}s"
                 )
+
+                # If we used a relative path for pro engine, move it to the correct location
+                if engine == "pro" and rel_output_file and rel_output_file.exists():
+                    console.print(
+                        f"    Relative output file exists: {rel_output_file.absolute()} ({rel_output_file.stat().st_size} bytes)"
+                    )
+                    try:
+                        # Copy the file to the intended destination
+                        import shutil
+
+                        shutil.copy2(rel_output_file, output_file)
+                        console.print(
+                            f"    [green]Copied file to:[/green] {output_file}"
+                        )
+                    except Exception as e:
+                        console.print(f"    [red]Error copying file:[/red] {e}")
+
                 results[fmt] = {
                     "success": True,
                     "duration": duration,
                     "output_file": output_file,
                 }
+
+            # Check if the output file actually exists
+            if output_file.exists():
+                console.print(
+                    f"    [green]Verified:[/green] Output file exists ({output_file.stat().st_size} bytes)"
+                )
+            else:
+                console.print(
+                    f"    [red]WARNING:[/red] Output file does not exist: {output_file}"
+                )
+
+                # Look for files that might have been created elsewhere
+                if engine == "pro":
+                    # Search for recently created files with similar names
+                    console.print("    Searching for similar output files...")
+                    search_dirs = [
+                        Path("."),
+                        Path.home(),
+                        self.script_dir,
+                        self.root_dir,
+                        self.root_dir / "qlith-pro",
+                    ]
+
+                    for search_dir in search_dirs:
+                        if search_dir.exists():
+                            potential_files = list(
+                                search_dir.glob(f"*{basename}*.{fmt}")
+                            )
+                            if potential_files:
+                                console.print(
+                                    f"    [yellow]Found potential output files in {search_dir}:[/yellow]"
+                                )
+                                for f in potential_files:
+                                    if f.is_file() and f.stat().st_mtime > start_time:
+                                        console.print(
+                                            f"      - {f} ({f.stat().st_size} bytes) [RECENT]"
+                                        )
+                                        try:
+                                            # Copy the file to the intended destination
+                                            import shutil
+
+                                            shutil.copy2(f, output_file)
+                                            console.print(
+                                                f"    [green]Copied file to:[/green] {output_file}"
+                                            )
+                                            break
+                                        except Exception as e:
+                                            console.print(
+                                                f"    [red]Error copying file:[/red] {e}"
+                                            )
+                                    else:
+                                        console.print(
+                                            f"      - {f} ({f.stat().st_size} bytes)"
+                                        )
 
         return results
 
@@ -341,6 +463,8 @@ class QlithRunner:
             # Process the test file with each engine
             for eng in engines:
                 output_dir = Path(output) if output else (self.script_dir / eng)
+                output_dir = output_dir.absolute()  # Ensure absolute path
+                console.print(f"Output directory (absolute): [bold]{output_dir}[/bold]")
                 self.create_output_directory(output_dir)
 
                 results = self.generate_output(
@@ -369,6 +493,7 @@ class QlithRunner:
         # Process each HTML file with each engine
         for eng in engines:
             output_dir = Path(output) if output else (self.script_dir / eng)
+            output_dir = output_dir.absolute()  # Ensure absolute path
             self.create_output_directory(output_dir)
 
             console.print(f"\nUsing engine: [bold]{eng}[/bold]")
@@ -395,17 +520,45 @@ class QlithRunner:
 
                 console.print(f"Done with [bold]{html_file.name}[/bold]")
 
+                # Check if all output files exist
+                success = all(
+                    r.get("success", False) and Path(r.get("output_file", "")).exists()
+                    for r in results.values()
+                )
+                if not success:
+                    console.print(
+                        f"[red]WARNING:[/red] Some output files for {html_file.name} were not created correctly"
+                    )
+
         console.print(
             Panel.fit(
                 "[bold green]Processing complete![/bold green]", border_style="green"
             )
         )
 
+        # Final verification of output directories and files
         for eng in engines:
             output_dir = Path(output) if output else (self.script_dir / eng)
+            output_dir = output_dir.absolute()
             console.print(
                 f"Output files for qlith-{eng} are in [bold]{output_dir}[/bold]"
             )
+
+            # List files in output directory
+            if output_dir.exists():
+                files = list(output_dir.glob("*"))
+                if files:
+                    console.print(
+                        f"[green]Found {len(files)} files in output directory:[/green]"
+                    )
+                    for f in files:
+                        console.print(f"  - {f.name} ({f.stat().st_size} bytes)")
+                else:
+                    console.print(
+                        f"[yellow]Warning: No files found in output directory.[/yellow]"
+                    )
+            else:
+                console.print(f"[red]ERROR: Output directory does not exist![/red]")
 
         return 0
 
