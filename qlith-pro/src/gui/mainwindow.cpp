@@ -33,13 +33,15 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <QThread>
+#include <QToolBar> // Added for history actions
 
 MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
                                                           ui(new Ui::MainWindow),
                                                           m_litehtmlWidget(nullptr),
                                                           m_htmlEditor(nullptr),
                                                           m_debugMode(debugMode),
-                                                          m_renderSize(800, 600) // Default render size
+                                                          m_renderSize(800, 600), // Default render size
+                                                          m_historyIndex(-1)     // Initialize history index
 {
   ui->setupUi(this);
 
@@ -119,15 +121,39 @@ MainWindow::MainWindow(bool debugMode, QWidget *parent) : QMainWindow(parent),
   QHBoxLayout* addressBarLayout = new QHBoxLayout();
   addressBarLayout->addWidget(urlEdit);
   addressBarLayout->addWidget(goButton);
-  ui->verticalLayout_6->insertLayout(0, addressBarLayout);
+
+  // Setup actions for navigation
+  setupNavigationActions(); // New method to create actions
+
+  QToolBar* navigationToolBar = addToolBar(tr("Navigation"));
+  navigationToolBar->addAction(m_backAction);
+  navigationToolBar->addAction(m_forwardAction);
+  navigationToolBar->addAction(m_reloadAction);
+  navigationToolBar->addAction(m_stopAction);
+  // Add the address bar layout to the toolbar
+  QWidget* addressBarWidget = new QWidget();
+  addressBarWidget->setLayout(addressBarLayout);
+  navigationToolBar->addWidget(addressBarWidget);
+
+
+  // Instead of adding to verticalLayout_6, we make the toolbar part of the MainWindow
+  // ui->verticalLayout_6->insertLayout(0, addressBarLayout); // Remove this line
 
   connect(goButton, &QPushButton::clicked, this, &MainWindow::navigateToUrl);
   connect(urlEdit, &QLineEdit::returnPressed, this, &MainWindow::navigateToUrl);
-  connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::loadExample);
+  connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::loadExample); // Assuming ui->pushButton is "Load Example"
   ui->pushButton->setText("Load Example");
+
 
   // Create a new litehtmlWidget for normal mode - ALWAYS initialize
   initializeLitehtmlWidget();
+
+  // Connect new actions
+  if (m_backAction) connect(m_backAction, &QAction::triggered, this, &MainWindow::goBack);
+  if (m_forwardAction) connect(m_forwardAction, &QAction::triggered, this, &MainWindow::goForward);
+  if (m_reloadAction) connect(m_reloadAction, &QAction::triggered, this, &MainWindow::reload);
+  if (m_stopAction) connect(m_stopAction, &QAction::triggered, this, &MainWindow::stop);
+
 
   // Initial content loading (if not in debug mode)
   QStringList args = QCoreApplication::arguments();
@@ -278,7 +304,112 @@ void MainWindow::loadUrl(const QString &url)
   
   // Otherwise use the standard URL loading
   m_litehtmlWidget->loadUrl(qUrl.toString());
+  updateHistory(qUrl);
 }
+
+void MainWindow::updateHistory(const QUrl& url)
+{
+    if (url.isEmpty() || url.toString() == "about:blank") // Don't add blank pages or current page if already at top
+    {
+        if (m_history.isEmpty() || m_history.last() != url) {
+            // allow one about:blank at the start
+        } else {
+            return;
+        }
+    }
+
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size() - 1) {
+        m_history.erase(m_history.begin() + m_historyIndex + 1, m_history.end());
+    }
+
+    // Avoid adding consecutive duplicates
+    if (m_history.isEmpty() || m_history.last() != url) {
+        m_history.append(url);
+    }
+
+    while (m_history.size() > 100) { // Limit history size
+        m_history.removeFirst();
+    }
+    m_historyIndex = m_history.size() - 1;
+
+    if (m_backAction) m_backAction->setEnabled(m_historyIndex > 0);
+    if (m_forwardAction) m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+}
+
+
+void MainWindow::goBack()
+{
+    if (m_historyIndex > 0) {
+        m_historyIndex--;
+        QUrl url = m_history.at(m_historyIndex);
+        QLineEdit* urlEdit = findChild<QLineEdit*>();
+        if (urlEdit) {
+            urlEdit->setText(url.toString());
+        }
+        m_litehtmlWidget->loadUrl(url.toString()); // Do not call updateHistory here, loadUrl will do it via signal or direct call if needed
+        if (m_backAction) m_backAction->setEnabled(m_historyIndex > 0);
+        if (m_forwardAction) m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+    }
+}
+
+void MainWindow::goForward()
+{
+    if (m_historyIndex < m_history.size() - 1) {
+        m_historyIndex++;
+        QUrl url = m_history.at(m_historyIndex);
+        QLineEdit* urlEdit = findChild<QLineEdit*>();
+        if (urlEdit) {
+            urlEdit->setText(url.toString());
+        }
+        m_litehtmlWidget->loadUrl(url.toString()); // Do not call updateHistory here
+        if (m_backAction) m_backAction->setEnabled(m_historyIndex > 0);
+        if (m_forwardAction) m_forwardAction->setEnabled(m_historyIndex < m_history.size() - 1);
+    }
+}
+
+void MainWindow::reload()
+{
+    if (m_historyIndex >= 0 && m_historyIndex < m_history.size()) {
+        QUrl currentUrl = m_history.at(m_historyIndex);
+        // To ensure it's treated as a fresh load, create a new QUrl instance
+        m_litehtmlWidget->loadUrl(QUrl(currentUrl.toString()).toString());
+    } else if (m_litehtmlWidget) {
+        // If history is empty, try reloading whatever is current in the widget
+        // This might require getting current URL from widget or container if available
+        // For now, let's assume loadExample or an initial page might be reloaded by re-calling loadExample
+        loadExample(); // Or some other default reload action
+    }
+}
+
+void MainWindow::stop()
+{
+    // m_litehtmlWidget should have a stop() method if it supports stopping network requests.
+    // For now, this is a placeholder.
+    qDebug() << "MainWindow::stop() called - (Placeholder: m_litehtmlWidget->stop() if implemented)";
+    // if (m_litehtmlWidget) { m_litehtmlWidget->stop(); }
+}
+
+void MainWindow::setupNavigationActions()
+{
+    m_backAction = new QAction(tr("Back"), this);
+    m_backAction->setIcon(QIcon::fromTheme("go-previous"));
+    m_backAction->setShortcut(QKeySequence::Back);
+    m_backAction->setEnabled(false);
+
+    m_forwardAction = new QAction(tr("Forward"), this);
+    m_forwardAction->setIcon(QIcon::fromTheme("go-next"));
+    m_forwardAction->setShortcut(QKeySequence::Forward);
+    m_forwardAction->setEnabled(false);
+
+    m_reloadAction = new QAction(tr("Reload"), this);
+    m_reloadAction->setIcon(QIcon::fromTheme("view-refresh"));
+    m_reloadAction->setShortcut(QKeySequence::Refresh);
+
+    m_stopAction = new QAction(tr("Stop"), this);
+    m_stopAction->setIcon(QIcon::fromTheme("process-stop"));
+    m_stopAction->setShortcut(Qt::Key_Escape);
+}
+
 
 void MainWindow::loadExample()
 {
@@ -404,6 +535,7 @@ void MainWindow::loadFile(const QString& filePath)
   
   // Load the HTML content with base URL for proper relative path resolution
   m_litehtmlWidget->loadHtml(htmlContent, baseUrl);
+  updateHistory(QUrl::fromLocalFile(absoluteFilePath)); // Add to history
 }
 
 void MainWindow::setRenderSize(const QSize& size)
@@ -537,43 +669,71 @@ bool MainWindow::exportToPng(const QString& filePath)
   
   qDebug() << "Using export size:" << exportSize;
   
-  // Create a pixmap with the export size
+  // Store original widget size and state if possible
+  QSize originalWidgetSize = m_litehtmlWidget->size();
+  bool widgetWasVisible = m_litehtmlWidget->isVisible();
+  // m_litehtmlWidget->setVisible(true); // Ensure widget is visible for rendering if it wasn't
+
+  // Determine the target rendering size for the widget
+  QSize targetRenderWidgetSize = exportSize; // Use the calculated exportSize for resizing
+
+  qDebug() << "PNG Export - Temporarily resizing widget to:" << targetRenderWidgetSize;
+  m_litehtmlWidget->resize(targetRenderWidgetSize);
+
+  // Force a relayout and process events to ensure it takes effect
+  // This might involve reloading content or just re-rendering with new dimensions
+  // For litehtmlWidget, calling loadHtml again or ensuring its internal document
+  // re-renders at the new width is key. Since loadHtml is complex,
+  // we will try to make the widget re-evaluate its layout.
+  if (m_litehtmlWidget->getContainer() && m_litehtmlWidget->getContainer()->getDocument()) {
+      m_litehtmlWidget->getContainer()->getDocument()->render(targetRenderWidgetSize.width());
+      // Update documentSize within the widget as render might change it
+      m_litehtmlWidget->updateDocumentSize(m_litehtmlWidget->getContainer()->getDocument()->width(), m_litehtmlWidget->getContainer()->getDocument()->height());
+  }
+  QApplication::processEvents(); // Process events to allow GUI updates
+
+  // Get the document size again after resize, as it may have changed
+  documentSize = m_litehtmlWidget->documentSize(); // Update documentSize
+  qDebug() << "PNG Export - Document size after resize:" << documentSize;
+
+  // Ensure exportSize is still appropriate (e.g., if document grew larger than m_renderSize)
+  exportSize = QSize(
+      qMax(exportSize.width(), documentSize.width()),
+      qMax(exportSize.height(), documentSize.height())
+  );
+  qDebug() << "PNG Export - Final export pixmap size:" << exportSize;
+
+  // Create a pixmap with the final export size
   QPixmap pixmap(exportSize);
-  pixmap.fill(Qt::white);
+  pixmap.fill(Qt::white); // Fill with white background
   
   // Create a painter for the pixmap
   QPainter painter(&pixmap);
   
-  // Apply appropriate scaling
-  if (documentSize.isValid() && documentSize.width() > 0 && documentSize.height() > 0) {
-    // Scale based on document size while maintaining aspect ratio
-    double scaleX = (double)exportSize.width() / documentSize.width();
-    double scaleY = (double)exportSize.height() / documentSize.height();
-    
-    // Option 1: Use the minimum scale factor to fit while preserving aspect ratio
-    double scale = qMin(scaleX, scaleY);
-    painter.scale(scale, scale);
-    
-    // Center the content
-    if (scaleX > scaleY) {
-      double offsetX = (exportSize.width() - documentSize.width() * scale) / (2 * scale);
-      painter.translate(offsetX, 0);
-    } else {
-      double offsetY = (exportSize.height() - documentSize.height() * scale) / (2 * scale);
-      painter.translate(0, offsetY);
-    }
-    
-    qDebug() << "Applied scale:" << scale << "with centering";
-  }
-  
+  // No scaling needed here if widget is already at exportSize and document rendered to fit
+  // Scaling logic from SVG can be removed or adapted if necessary, but direct render is preferred.
+  // If exportSize is different from targetRenderWidgetSize (e.g. document was larger),
+  // we might need to adjust. For now, assume render at targetRenderWidgetSize is what we capture.
+
   // Let the widget render into the painter
-  qDebug() << "Rendering widget to pixmap";
-  m_litehtmlWidget->render(&painter);
+  qDebug() << "Rendering widget (now resized) to pixmap";
+  m_litehtmlWidget->render(&painter); // Render the (potentially resized) widget content
   painter.end();
   
   // Save to PNG
   qDebug() << "Saving pixmap to PNG file:" << filePath;
   bool result = pixmap.save(filePath, "PNG");
+
+  // Restore original widget size and visibility
+  qDebug() << "PNG Export - Restoring widget to original size:" << originalWidgetSize;
+  m_litehtmlWidget->resize(originalWidgetSize);
+  // m_litehtmlWidget->setVisible(widgetWasVisible);
+  // Reload or re-render content at original size if necessary
+  if (m_litehtmlWidget->getContainer() && m_litehtmlWidget->getContainer()->getDocument()) {
+      m_litehtmlWidget->getContainer()->getDocument()->render(originalWidgetSize.width());
+      m_litehtmlWidget->updateDocumentSize(m_litehtmlWidget->getContainer()->getDocument()->width(), m_litehtmlWidget->getContainer()->getDocument()->height());
+  }
+  QApplication::processEvents();
   if (result) {
     qInfo() << "Successfully exported PNG to:" << filePath;
   } else {

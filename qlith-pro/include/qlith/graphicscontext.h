@@ -156,7 +156,7 @@ private:
 
         FloatSize shadowOffset;
         float shadowBlur;
-        Color shadowColor;
+        QColor shadowColor; // Changed from Color to QColor
 
         bool shadowsIgnoreTransforms;
 
@@ -314,12 +314,12 @@ public:
         /*void beginTransparencyLayer(float opacity);
         void endTransparencyLayer();*/
 
-        void setShadow(const FloatSize&, float blur, const Color&, ColorSpace);
-        bool getShadow(FloatSize&, float&, Color&) const;
+        void setShadow(const FloatSize&, float blur, const QColor&, ColorSpace); // Changed Color to QColor
+        bool getShadow(FloatSize&, float&, QColor&) const; // Changed Color to QColor
         void clearShadow();
 
-        void drawFocusRing(const QVector<IntRect>&, int width, int offset, const Color&);
-        void drawFocusRing(const QVector<Path>&, int width, int offset, const Color&);
+        void drawFocusRing(const QVector<IntRect>&, int width, int offset, const QColor&); // Changed Color to QColor
+        void drawFocusRing(const QVector<Path>&, int width, int offset, const Color&); // Kept qlith::Color for this overload for now
 
         void setLineCap(LineCap);
         void setLineDash(const DashArray&, float dashOffset);
@@ -381,13 +381,13 @@ public:
         void setPlatformStrokeGradient(Gradient*);
         /*void setPlatformStrokePattern(Pattern*);*/
 
-        void setPlatformFillColor(const Color&, ColorSpace);
+        void setPlatformFillColor(const Color&, ColorSpace); // This should remain qlith::Color for now
         void setPlatformFillGradient(Gradient*);
         /*void setPlatformFillPattern(Pattern*);*/
 
         void setPlatformShouldAntialias(bool b);
 
-        void setPlatformShadow(const FloatSize&, float blur, const Color&, ColorSpace);
+        void setPlatformShadow(const FloatSize&, float blur, const QColor&, ColorSpace); // Changed Color to QColor
 
         void clearPlatformShadow();
 

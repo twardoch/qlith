@@ -79,29 +79,31 @@ void GraphicsContext::setStrokeColor(const Color& color, ColorSpace colorSpace)
     setPlatformStrokeColor(color, colorSpace);
 }
 
-void GraphicsContext::setShadow(const FloatSize& offset, float blur, const Color& color, ColorSpace colorSpace)
+// Signature changed to QColor
+void GraphicsContext::setShadow(const FloatSize& offset, float blur, const QColor& color, ColorSpace colorSpace)
 {
     m_common->state.shadowOffset = offset;
     m_common->state.shadowBlur = blur;
-    m_common->state.shadowColor = color;
-    setPlatformShadow(offset, blur, color, colorSpace);
+    m_common->state.shadowColor = color; // Assign QColor
+    setPlatformShadow(offset, blur, color, colorSpace); // Pass QColor
 }
 
 void GraphicsContext::clearShadow()
 {
     m_common->state.shadowOffset = FloatSize();
     m_common->state.shadowBlur = 0;
-    m_common->state.shadowColor = Color();
+    m_common->state.shadowColor = QColor(); // Assign default QColor (invalid)
     clearPlatformShadow();
 }
 
-bool GraphicsContext::getShadow(FloatSize& offset, float& blur, Color& color) const
+// Signature changed to QColor
+bool GraphicsContext::getShadow(FloatSize& offset, float& blur, QColor& color) const
 {
     offset = m_common->state.shadowOffset;
     blur = m_common->state.shadowBlur;
-    color = m_common->state.shadowColor;
+    color = m_common->state.shadowColor; // Assign QColor
 
-    return color.isValid() && color.alpha() && (blur || offset.width() || offset.height());
+    return color.isValid() && color.alpha() != 0 && (blur || offset.width() || offset.height()); // Use QColor methods
 }
 
 float GraphicsContext::strokeThickness() const

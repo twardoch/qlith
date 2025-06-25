@@ -110,4 +110,12 @@ private:
   // litehtml_context m_context; // No longer needed
   bool m_debugMode; // Debug mode flag
   QSize m_renderSize; // Rendering size for export operations
+
+  // History management
+  QList<QUrl> m_history;
+  int m_historyIndex;
+  QAction* m_backAction = nullptr;     // Ensure initialized
+  QAction* m_forwardAction = nullptr;  // Ensure initialized
+  QAction* m_reloadAction = nullptr;
+  QAction* m_stopAction = nullptr;
 };

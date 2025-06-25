@@ -1,23 +1,27 @@
-#include "contextshadow.h"
+#include "qlith/contextshadow.h" // Already includes QColor via common.h or its own include
+#include "qlith/color.h"       // Keep for now if other parts of file use qlith::Color, but aim to remove
 
 /*#include "config.h"
-#include "ContextShadow.h"
+// #include "ContextShadow.h" // Original comment
 
 #include <wtf/MathExtras.h>
 #include <wtf/Noncopyable.h>
 
 using WTF::min;
 using WTF::max;*/
+#include <algorithm> // For std::min, std::max if not covered by WTF
 
 ContextShadow::ContextShadow()
     : m_type(NoShadow)
+    , m_color() // QColor default constructor creates an invalid color
     , m_blurDistance(0)
 {
 }
 
-ContextShadow::ContextShadow(const Color& color, float radius, const FloatSize& offset)
+// Updated constructor to take QColor
+ContextShadow::ContextShadow(const QColor& color, float radius, const FloatSize& offset)
     : m_color(color)
-    , m_blurDistance(round(radius))
+    , m_blurDistance(static_cast<int>(roundf(radius))) // Use roundf for float
     , m_offset(offset)
 {
     // See comments in http://webkit.org/b/40793, it seems sensible
@@ -25,7 +29,7 @@ ContextShadow::ContextShadow(const Color& color, float radius, const FloatSize& 
     m_blurDistance = std::min(m_blurDistance, 128);
 
     // The type of shadow is decided by the blur radius, shadow offset, and shadow color.
-    if (!m_color.isValid() || !color.alpha()) {
+    if (!m_color.isValid() || m_color.alpha() == 0) { // QColor uses alpha() == 0 for fully transparent
         // Can't paint the shadow with invalid or invisible color.
         m_type = NoShadow;
     } else if (radius > 0) {
@@ -42,7 +46,7 @@ ContextShadow::ContextShadow(const Color& color, float radius, const FloatSize& 
 void ContextShadow::clear()
 {
     m_type = NoShadow;
-    m_color = Color();
+    m_color = QColor(); // Use QColor's default constructor (invalid color)
     m_blurDistance = 0;
     m_offset = FloatSize();
 }
@@ -268,10 +272,10 @@ void ContextShadow::endShadowLayer(PlatformContext p)
                        m_layerImage.bytesPerLine());
 
         // "Colorize" with the right shadow color.
-        QPainter p(&m_layerImage);
-        p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-        p.fillRect(m_layerImage.rect(), m_color.rgb());
-        p.end();
+        QPainter blurPainter(&m_layerImage); // Changed painter variable name for clarity
+        blurPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        blurPainter.fillRect(m_layerImage.rect(), m_color); // m_color is now QColor
+        blurPainter.end();
     }
 
     p->drawImage(m_layerRect.topLeft(), m_layerImage);

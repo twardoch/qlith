@@ -67,11 +67,23 @@ int main(int argc, char **argv)
   
   qDebug() << "Render size:" << renderWidth << "x" << renderHeight;
   
-  // Get input file
-  QString inputFile;
+  // Get input file / URL
+  QString userInput;
   const QStringList args = parser.positionalArguments();
   if (!args.isEmpty()) {
-    inputFile = args.first();
+    userInput = args.first();
+  }
+
+  QUrl urlToLoad;
+  if (!userInput.isEmpty()) {
+      QFileInfo fileInfo(userInput);
+      if (fileInfo.exists() && fileInfo.isRelative()) {
+          // If it's a relative path and the file exists, convert to absolute path
+          urlToLoad = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+      } else {
+          // Otherwise, let QUrl try to figure it out (handles absolute paths, http, https, etc.)
+          urlToLoad = QUrl::fromUserInput(userInput);
+      }
   }
 
   // Check for debug mode
@@ -122,9 +134,13 @@ int main(int argc, char **argv)
   w.show();
   
   // Load file if specified
-  if (!inputFile.isEmpty()) {
-    qDebug() << "Loading file:" << inputFile;
-    w.loadFile(inputFile);
+  if (urlToLoad.isValid()) {
+    qDebug() << "Loading URL/file:" << urlToLoad.toString();
+    // MainWindow::loadFile expects a QString path for local files,
+    // or MainWindow::loadUrl can take a QUrl.
+    // Since urlToLoad is a QUrl, we can pass it to loadUrl,
+    // and MainWindow::loadUrl can then decide if it's a local file.
+    w.loadUrl(urlToLoad.toString()); // Pass the string representation of the QUrl
     
     // If in export mode, perform export after page load
     if (exportMode) {
