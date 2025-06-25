@@ -1,15 +1,17 @@
 // this_file: qlith-pro/include/qlith/contextshadow.h
 #pragma once
 
-#include "qlith/common.h"
+#include "qlith/common.h" // common.h includes QColor
 
-#include "qlith/color.h"
+// #include "qlith/color.h" // Replaced by QColor via common.h or direct include
+#include <QColor> // Explicit include for clarity
 #include "qlith/floatrect.h"
 //#include "graphicscontext.h"
 #include "qlith/intrect.h"
 //#include "RefCounted.h"
 
-/*#include "Color.h"
+/*
+// #include "Color.h" // Original comment
 #include "FloatRect.h"
 #include "GraphicsContext.h"
 #include "IntRect.h"
@@ -36,12 +38,12 @@ public:
         BlurShadow
     } m_type;
 
-    Color m_color;
+    QColor m_color; // Changed from qlith::Color to QColor
     int m_blurDistance;
     FloatSize m_offset;
 
     ContextShadow();
-    ContextShadow(const Color&, float radius, const FloatSize& offset);
+    ContextShadow(const QColor&, float radius, const FloatSize& offset); // Changed param
 
     void clear();
 

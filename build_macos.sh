@@ -7,9 +7,10 @@ cd "$SCRIPT_DIR"
 
 echo "DIR $SCRIPT_DIR"
 
-cd "./qlith-mini"
-source ./build_macos.sh
-cd "$SCRIPT_DIR"
+# qlith-mini is being deprecated, build qlith-pro only.
+# cd "./qlith-mini"
+# source ./build_macos.sh
+# cd "$SCRIPT_DIR"
 
 cd "./qlith-pro"
 source ./build_macos.sh
