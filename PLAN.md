@@ -1,55 +1,181 @@
-1.  **Project Setup & Cleanup:**
-    *   Create `PLAN.md`, `TODO.md`, and `CHANGELOG.md`.
-    *   Remove `qlith-pro/src/gui/litehtmlwidget.h.bak`.
-    *   Record initial actions in `CHANGELOG.md`.
+# Qlith Development Plan
 
-2.  **Consolidate `qlith-mini` into `qlith-pro` (or deprecate `qlith-mini`):**
-    *   **Analyze `container_qpainter` (mini) vs. `container_qt5` (pro):**
-        *   Identify unique, valuable features in `container_qpainter`.
-        *   Merge these features into `container_qt5` if applicable.
-        *   Prioritize `container_qt5` as the primary `litehtml::document_container` implementation.
-    *   **Analyze `QlithWidget` (mini) vs. `litehtmlWidget` (pro):**
-        *   Identify unique, valuable features in `QlithWidget`.
-        *   Merge these into `litehtmlWidget`.
-        *   Prioritize `litehtmlWidget` as the primary rendering widget.
-    *   **Analyze `qlith-mini/browser` vs. `qlith-pro/src/gui/` (MainWindow, main.cpp):**
-        *   The `qlith-pro`'s `MainWindow` and `main.cpp` seem more complete with CLI parsing for export.
-        *   Ensure all necessary functionality from `qlith-mini/browser` (if any unique) is present in the `qlith-pro` equivalent.
-    *   **Decision & Action:**
-        *   If `qlith-mini`'s functionality is fully subsumed and improved by `qlith-pro` after potential merges, mark `qlith-mini` directory for removal.
-        *   Update CMakeLists.txt files to reflect this consolidation (remove `qlith-mini` targets, ensure `qlith-pro` builds stand-alone).
+## Executive Summary
 
-3.  **Streamline `qlith-pro` Graphics Primitives:**
-    *   **Investigate custom graphics classes** in `qlith-pro/include/qlith/` and `qlith-pro/src/` (e.g., `Color`, `FloatPoint`, `FloatRect`, `IntPoint`, `IntRect`, `FloatSize`, `IntSize`, `AffineTransform`, `TransformationMatrix`, `Image`, `BitmapImage`, `Gradient`, `Path`).
-    *   For each custom class, compare its functionality with the Qt equivalent (e.g., `QColor`, `QPointF`, `QRectF`, `QTransform`, `QImage`, `QGradient`, `QPainterPath`).
-    *   **Decision criteria for replacement:**
-        *   Does the Qt class provide all necessary features used by `litehtml` or the surrounding `qlith-pro` code?
-        *   Are there specific performance characteristics or memory layouts of the custom classes that are critical and not met by Qt versions?
-        *   Does `litehtml`'s API (e.g., `litehtml::document_container` methods taking `litehtml::web_color`, `litehtml::position`) impose constraints that make direct Qt class usage difficult? (Note: `container_qt5` already bridges this gap).
-    *   **Action Plan (Iterative):**
-        *   Start with simpler classes like `Color`, `IntPoint`, `IntRect`, `IntSize`, `FloatPoint`, `FloatRect`, `FloatSize`.
-        *   Attempt to replace their usage within `qlith-pro` with Qt equivalents.
-        *   Refactor `container_qt5` and other parts of `qlith-pro` to use Qt types directly where possible. This involves changing method signatures and internal logic.
-        *   Test thoroughly after each replacement.
-        *   Address more complex classes like `AffineTransform`, `TransformationMatrix`, `Image`, `Gradient`, `Path` subsequently. These are more likely to have specific reasons for custom implementation. `QImage` and `QPixmap` are already used in places, so `Image` and `BitmapImage` might be wrappers or extensions.
-    *   **Goal:** Reduce custom graphics code significantly if Qt equivalents are suitable, simplifying maintenance and leveraging Qt's optimizations.
+Qlith is a Qt5-based HTML rendering library built on litehtml. The project currently has two implementations: qlith-mini (lightweight) and qlith-pro (feature-rich). This plan outlines the path to create a unified, stable, and maintainable HTML rendering solution.
 
-4.  **Refactor and Remove Redundancies in `qlith-pro`:**
-    *   **Consolidate `FontCache`:** Evaluate if `qlith-pro/src/gui/fontcache.cpp` can be replaced by direct usage of `QFontDatabase` or simplified.
-    *   **Review `import_css` in `container_qt5.cpp`:** Confirm that the current NO-OP behavior is sufficient for MVP or if basic local CSS file loading (from a known resources path) is needed. For MVP, a NO-OP (relying on litehtml's master CSS) is likely fine.
-    *   **Handle `litehtml-qt.js_plugin_import.cpp`:** Determine if WebAssembly/JS plugin support is MVP. If not, remove this file and related CMake entries.
-    *   **Review `test_app/`:** Decide if this app needs to be part of the MVP build or if it's purely for dev testing. If the latter, exclude from default release builds.
-    *   **Address `qDebug()` and `QLITH_DEBUG_DIR`:** Make extensive debug logging conditional (e.g., via macros controlled by CMake build type) or remove for release builds to improve performance and reduce log noise.
+## Current State Analysis
 
-5.  **Build System & Testing:**
-    *   Update all relevant `CMakeLists.txt` files to reflect the changes from consolidation and streamlining.
-    *   Ensure the project (likely `qlith-pro` as the main target) builds cleanly.
-    *   Run existing examples (e.g., `examples/run-examples.sh` if it can be adapted) or create minimal test cases to verify rendering and export functionality after major changes.
+### Architecture Overview
+- **qlith-mini**: Simple QPainter-based implementation (~1,500 LOC)
+- **qlith-pro**: Complex custom graphics layer (~10,000+ LOC)
+- **Core dependencies**: litehtml (HTML/CSS engine), gumbo-parser (HTML5 parser), Qt5
 
-6.  **Documentation & Finalization:**
-    *   Update `README.md` to reflect the streamlined structure and usage.
-    *   Ensure `PLAN.md` and `TODO.md` are fully updated to reflect completed work.
-    *   Final review of `CHANGELOG.md`.
+### Key Findings
+1. Significant code duplication between mini and pro versions
+2. qlith-pro's custom graphics layer largely reimplements Qt functionality
+3. Recent consolidation efforts have begun but are incomplete
+4. Build system needs modernization for easier deployment
 
-7.  **Submit Changes:**
-    *   Commit all changes with a comprehensive commit message.
+## Phase 1: Complete Consolidation (1-2 weeks)
+
+### 1.1 Merge Remaining qlith-mini Features
+- [ ] Extract any unique features from ContainerQPainter that aren't in container_qt5
+- [ ] Port QlithWidget's cleaner API design to litehtmlWidget
+- [ ] Migrate example/test cases to use unified implementation
+- [ ] Archive qlith-mini directory (keep for reference, remove from builds)
+
+### 1.2 Simplify Graphics Abstraction Layer
+- [ ] **Immediate replacements** (low risk):
+  - `Color` → `QColor`
+  - `IntPoint/FloatPoint` → `QPoint/QPointF`
+  - `IntRect/FloatRect` → `QRect/QRectF`
+  - `IntSize/FloatSize` → `QSize/QSizeF`
+- [ ] **Evaluate and replace** (medium risk):
+  - `AffineTransform/TransformationMatrix` → `QTransform`
+  - `Gradient` → `QGradient` family
+  - `Path` → `QPainterPath`
+- [ ] **Refactor GraphicsContext** to be a thin wrapper around QPainter
+- [ ] Keep custom implementations only where Qt lacks functionality
+
+### 1.3 Clean Up Build System
+- [ ] Create unified CMakeLists.txt at project root
+- [ ] Support both bundled and system litehtml/gumbo
+- [ ] Add CMake options for debug/release builds
+- [ ] Create proper installation targets
+- [ ] Add pkg-config support
+
+## Phase 2: Enhance Stability & Performance (2-3 weeks)
+
+### 2.1 Memory Management
+- [ ] Audit and fix memory leaks (especially in image/font caching)
+- [ ] Implement proper RAII patterns throughout
+- [ ] Add smart pointer usage where appropriate
+- [ ] Profile memory usage with complex HTML documents
+
+### 2.2 Error Handling
+- [ ] Replace silent failures with proper error reporting
+- [ ] Add comprehensive nullptr checks
+- [ ] Implement graceful degradation for unsupported features
+- [ ] Add logging system with configurable levels
+
+### 2.3 Performance Optimization
+- [ ] Profile rendering pipeline with large documents
+- [ ] Optimize font metrics caching
+- [ ] Implement lazy image loading
+- [ ] Add viewport-based rendering optimization
+- [ ] Consider multi-threaded layout calculation
+
+### 2.4 Testing Infrastructure
+- [ ] Create unit tests for core components
+- [ ] Add rendering regression tests
+- [ ] Implement automated visual diff testing
+- [ ] Set up CI/CD pipeline
+
+## Phase 3: Improve Deployability (1-2 weeks)
+
+### 3.1 Platform Support
+- [ ] **macOS**: Create proper .app bundle with embedded frameworks
+- [ ] **Windows**: Add MSVC support, create installer
+- [ ] **Linux**: Create packages for major distributions (deb, rpm)
+- [ ] Add static linking option for self-contained builds
+
+### 3.2 Distribution
+- [ ] Create release scripts for all platforms
+- [ ] Set up GitHub Actions for automated releases
+- [ ] Publish to package managers (Homebrew, vcpkg, Conan)
+- [ ] Create pre-built binaries for common configurations
+
+### 3.3 Documentation
+- [ ] Write comprehensive API documentation
+- [ ] Create usage examples and tutorials
+- [ ] Document build instructions for all platforms
+- [ ] Add architecture documentation for contributors
+
+## Phase 4: Feature Enhancements (3-4 weeks)
+
+### 4.1 Core Rendering
+- [ ] Improve CSS3 support (flexbox, grid)
+- [ ] Add WebFont loading support
+- [ ] Implement print rendering
+- [ ] Add PDF export capability
+
+### 4.2 Widget Features
+- [ ] Add text selection and copying
+- [ ] Implement find-in-page functionality
+- [ ] Add zoom controls
+- [ ] Improve keyboard navigation
+
+### 4.3 Developer Experience
+- [ ] Create Qt Designer plugin
+- [ ] Add QML component wrapper
+- [ ] Provide CSS debugging tools
+- [ ] Create visual HTML inspector
+
+### 4.4 Network Support
+- [ ] Improve HTTP/HTTPS resource loading
+- [ ] Add caching system for network resources
+- [ ] Implement proper redirect handling
+- [ ] Add proxy support
+
+## Phase 5: Long-term Improvements (Ongoing)
+
+### 5.1 Modernization
+- [ ] Consider Qt6 support (dual Qt5/Qt6 compatibility)
+- [ ] Evaluate C++17/20 features for code improvement
+- [ ] Investigate WebAssembly compilation
+- [ ] Consider mobile platform support (iOS, Android)
+
+### 5.2 Performance & Features
+- [ ] GPU-accelerated rendering path
+- [ ] Incremental layout/rendering
+- [ ] Better JavaScript stub support
+- [ ] SVG rendering improvements
+
+### 5.3 Community Building
+- [ ] Set up proper issue templates
+- [ ] Create contribution guidelines
+- [ ] Establish code review process
+- [ ] Build example gallery
+
+## Success Metrics
+
+### Technical
+- Clean build on all major platforms
+- No memory leaks in typical usage
+- Rendering performance comparable to QtWebEngine for static content
+- 90%+ test coverage for core components
+
+### Usability
+- Single header include for basic usage
+- 5-minute quick start guide
+- Comprehensive examples covering common use cases
+- Active community support
+
+### Adoption
+- Available in major package managers
+- Used in at least 10 open-source projects
+- Regular release cycle (quarterly)
+- Responsive to bug reports and feature requests
+
+## Risk Mitigation
+
+### Technical Risks
+- **litehtml limitations**: Maintain capability to switch rendering engines
+- **Qt version compatibility**: Abstract Qt-specific code where possible
+- **Performance regression**: Continuous benchmarking in CI
+
+### Project Risks
+- **Maintainer availability**: Document everything, automate releases
+- **Scope creep**: Maintain focus on core HTML/CSS rendering
+- **Breaking changes**: Semantic versioning, deprecation policy
+
+## Next Steps
+
+1. Review and refine this plan with stakeholders
+2. Create detailed task breakdowns for Phase 1
+3. Set up project management tools (issues, milestones)
+4. Begin implementation starting with highest-impact items
+5. Establish regular progress reviews
+
+This plan provides a roadmap from the current state to a production-ready, maintainable HTML rendering library that serves the Qt ecosystem well.
